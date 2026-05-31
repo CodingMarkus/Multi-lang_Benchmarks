@@ -40,3 +40,6 @@ Objective-C and C++ are only benchmarked when a meaningful difference
 from the C implementation is expected. If both would mainly exercise the
 same underlying C-style implementation, benchmarking them separately
 does not add much value.
+
+Kotlin and TypeScript are not benchmarked separately because the same
+results as Java and JavaScript are expected in these cases.
