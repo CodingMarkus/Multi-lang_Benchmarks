@@ -36,10 +36,6 @@ Compare performance of multiple popular languages across different tasks.
 - **Perl:** Standard Perl interpreter execution.
 - **Lua:** Standard Lua interpreter execution.
 
-Objective-C and C++ are only benchmarked when a meaningful difference
-from the C implementation is expected. If both would mainly exercise the
-same underlying C-style implementation, benchmarking them separately
-does not add much value.
+Objective-C and C++ are only benchmarked when they can use their standard libraries at a meaningfully higher level than plain C. Both can of course also fall back to the same C implementation style when that is better for performance, so these benchmarks are not mainly about absolute performance. They are included to show how much higher-level objects and abstractions can slow things down compared to a C-style baseline.
 
-Kotlin and TypeScript are not benchmarked separately because the same
-results as Java and JavaScript are expected in these cases.
+Kotlin and TypeScript are not benchmarked separately because the same results as Java and JavaScript are expected in these cases.
