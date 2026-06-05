@@ -59,4 +59,4 @@ if ($#ARGV == -1) {
     mandelbrot($ARGV[0]);
 }
 my $end = gettimeofday() - $begin;
-printf STDERR "Perl Elapsed %0.2f\n", $end;
+printf STDERR "Perl Elapsed %0.3f\n", $end;

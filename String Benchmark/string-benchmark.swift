@@ -193,7 +193,7 @@ private func main ( )
 	let startTime = CFAbsoluteTimeGetCurrent()
 	runBenchmark(sourceText, sourceHash, runs)
 	let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-	let timeString = String(format: "%.2f", timeElapsed)
+	let timeString = String(format: "%.3f", timeElapsed)
 	print("Swift Elapsed \(timeString)", to: &errStream)
 }
 

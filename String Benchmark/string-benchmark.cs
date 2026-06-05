@@ -192,6 +192,6 @@ public class StringBenchmark
 		RunBenchmark(data, runs);
 		stopwatch.Stop();
 		double queryTime = stopwatch.Elapsed.TotalSeconds;
-		Console.Error.WriteLine($"C# Elapsed {queryTime:F2} seconds");
+		Console.Error.WriteLine($"C# Elapsed {queryTime:F3} seconds");
 	}
 }

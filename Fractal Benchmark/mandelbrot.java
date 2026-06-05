@@ -59,7 +59,7 @@ class Mandelbrot
 		}
 		diff = System.currentTimeMillis() - start;
 		DecimalFormat df = new DecimalFormat(
-			"0.00", new DecimalFormatSymbols(Locale.US));
+			"0.000", new DecimalFormatSymbols(Locale.US));
 
 		System.err.println("Java Elapsed " + df.format(diff/1000.0f));
 	}

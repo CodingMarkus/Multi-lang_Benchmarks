@@ -46,5 +46,5 @@ if ($argc > 1) {
 }
 mandelbrot($runs);
 $diff = microtime(1) - $d1;
-fprintf(STDERR, "PHP Elapsed %0.2f\n", $diff);
+fprintf(STDERR, "PHP Elapsed %0.3f\n", $diff);
 ?>

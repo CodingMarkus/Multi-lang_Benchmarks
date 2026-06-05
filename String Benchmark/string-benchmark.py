@@ -137,4 +137,4 @@ if source_hash != REFERENCE_HASH:
 
 t = time.time()
 run_benchmark(source_text, source_hash, runs)
-print('Python Elapsed %.02f' % (time.time() - t), file = sys.stderr)
+print('Python Elapsed %.03f' % (time.time() - t), file = sys.stderr)

@@ -60,5 +60,5 @@ fn main ( )
     let end = SystemTime::now();
     let elapsed = end.duration_since(UNIX_EPOCH).unwrap().as_secs_f64()
 		- start.duration_since(UNIX_EPOCH).unwrap().as_secs_f64();
-    eprintln!("Rust Elapsed {:.2}", elapsed);
+    eprintln!("Rust Elapsed {:.3}", elapsed);
 }

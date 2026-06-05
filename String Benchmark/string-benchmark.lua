@@ -184,4 +184,4 @@ end
 local t = os.clock()
 run_benchmark(source_text, source_hash_hi, source_hash_lo, runs)
 local diff = os.clock() - t
-io.stderr:write(string.format("Lua Elapsed %.2f\n", diff))
+io.stderr:write(string.format("Lua Elapsed %.3f\n", diff))

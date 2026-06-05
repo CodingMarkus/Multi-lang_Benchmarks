@@ -222,5 +222,5 @@ fn main ( )
 	let end = SystemTime::now();
 	let elapsed = end.duration_since(UNIX_EPOCH).unwrap().as_secs_f64()
 		- start.duration_since(UNIX_EPOCH).unwrap().as_secs_f64();
-	eprintln!("Rust Unicode Elapsed {:.2}", elapsed);
+	eprintln!("Rust Unicode Elapsed {:.3}", elapsed);
 }

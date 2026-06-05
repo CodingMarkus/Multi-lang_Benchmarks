@@ -41,4 +41,4 @@ runs = 1
 if len(sys.argv) > 1:
 	runs = int(sys.argv[1])
 mandelbrot(runs)
-print('Python Elapsed %.02f' % (time.time() - t), file=sys.stderr)
+print('Python Elapsed %.03f' % (time.time() - t), file=sys.stderr)

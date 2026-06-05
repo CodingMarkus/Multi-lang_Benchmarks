@@ -48,4 +48,4 @@ else
 	mandelbrot(1)
 end
 local diff = os.clock() - t
-io.stderr:write(string.format("Lua Elapsed %.2f\n", diff))
+io.stderr:write(string.format("Lua Elapsed %.3f\n", diff))

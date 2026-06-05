@@ -389,6 +389,6 @@ int main( int argc, const char * argv[] )
 	query_time = (double) aTv.tv_sec * 1000000.0 + aTv.tv_usec;
 	query_time -= start;
 	query_time /= 1000000.0;
-	fprintf(stderr, "C Elapsed %0.2f\n", query_time);
+	fprintf(stderr, "C Elapsed %0.3f\n", query_time);
 	return 0;
 }

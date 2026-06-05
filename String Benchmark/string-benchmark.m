@@ -207,7 +207,7 @@ int main ( int argc, const char * argv[] )
 		startTime = CFAbsoluteTimeGetCurrent();
 		runBenchmark(data, runs);
 		timeElapsed = CFAbsoluteTimeGetCurrent() - startTime;
-		fprintf(stderr, "Objective-C Elapsed %.2f\n", timeElapsed);
+		fprintf(stderr, "Objective-C Elapsed %.3f\n", timeElapsed);
 	}
 
 	return 0;

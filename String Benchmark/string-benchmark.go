@@ -167,5 +167,5 @@ func main ( ) {
 	start := time.Now()
 	runBenchmark(sourceText, sourceHash, runs)
 	diff := time.Since(start)
-	fmt.Fprintf(os.Stderr, "Go Elapsed %.2f\n", diff.Seconds())
+	fmt.Fprintf(os.Stderr, "Go Elapsed %.3f\n", diff.Seconds())
 }

@@ -212,6 +212,6 @@ runBenchmark(data.text, data.hashHi, data.hashLo, runs);
 var elapsed = (Date.now() - start) / 1000;
 std.err.puts(
 	"JavaScript (QuickJS) Elapsed "
-	+ elapsed.toFixed(6)
+	+ elapsed.toFixed(3)
 	+ " seconds\n"
 );

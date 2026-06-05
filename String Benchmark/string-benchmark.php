@@ -176,5 +176,5 @@ if (
 $d1 = microtime(true);
 run_benchmark($sourceText, $sourceHashHi, $sourceHashLo, $runs);
 $diff = microtime(true) - $d1;
-fprintf(STDERR, "PHP Elapsed %0.2f\n", $diff);
+fprintf(STDERR, "PHP Elapsed %0.3f\n", $diff);
 ?>

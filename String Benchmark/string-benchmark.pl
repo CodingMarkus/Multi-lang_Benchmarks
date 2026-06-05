@@ -194,4 +194,4 @@ if (
 my $begin = gettimeofday();
 run_benchmark($source_text, $source_hash_hi, $source_hash_lo, $runs);
 my $end = gettimeofday() - $begin;
-printf STDERR "Perl Elapsed %0.2f\n", $end;
+printf STDERR "Perl Elapsed %0.3f\n", $end;

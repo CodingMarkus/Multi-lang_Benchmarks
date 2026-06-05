@@ -145,4 +145,4 @@ end
 time = Time.now
 run_benchmark(source_text, source_hash, runs)
 diff = Time.now - time
-$stderr.printf "Ruby Elapsed %.2f\n" % diff
+$stderr.printf "Ruby Elapsed %.3f\n" % diff
