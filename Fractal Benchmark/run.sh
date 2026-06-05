@@ -109,10 +109,33 @@ fi
 # Test JavaScript (Node.js)
 if have_command node
 then
+	printf "Node.js " >&2
 	node mandelbrot.node.js "$count" >/dev/null
 	sleep 1
 else
 	printf "Skipping Node.js benchmark because node was not found.\n" >&2
+fi
+
+# Test JavaScript (Bun)
+if have_command bun
+then
+	printf "Bun " >&2
+	bun mandelbrot.node.js "$count" >/dev/null
+	sleep 1
+else
+	printf "Skipping Bun benchmark because bun was not found.\n" >&2
+fi
+
+# Test JavaScript (Bun, Compiled)
+if have_command bun
+then
+	bun build --compile --outfile=mandelbrot-bun mandelbrot.node.js >/dev/null 2>&1
+	sleep 1
+	printf "Bun (compiled) " >&2
+	./mandelbrot-bun "$count" >/dev/null
+	sleep 1
+else
+	printf "Skipping Bun compiled benchmark because bun was not found.\n" >&2
 fi
 
 # Test Java (Interpreted)

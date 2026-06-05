@@ -240,11 +240,32 @@ fi
 # Test JavaScript (Node.js)
 if have_command node
 then
-	measure_run "JavaScript (Node.js)" '
+	measure_run "Node.js" '
 		node mandelbrot.node.js "$count" >/dev/null
 	'
 else
 	printf "Skipping Node.js benchmark because node was not found.\n" >&2
+fi
+
+# Test JavaScript (Bun)
+if have_command bun
+then
+	measure_run "Bun" '
+		bun mandelbrot.node.js "$count" >/dev/null
+	'
+else
+	printf "Skipping Bun benchmark because bun was not found.\n" >&2
+fi
+
+# Test JavaScript (Bun, Compiled)
+if have_command bun
+then
+	bun build --compile --outfile=mandelbrot-bun mandelbrot.node.js >/dev/null 2>&1
+	measure_run "Bun (Compiled)" '
+		./mandelbrot-bun "$count" >/dev/null
+	'
+else
+	printf "Skipping Bun compiled benchmark because bun was not found.\n" >&2
 fi
 
 # Test Java (Interpreted)
@@ -262,7 +283,7 @@ fi
 # Test JavaScript (Node.js, Interpreted)
 if have_command node
 then
-	measure_run "Interpreted JavaScript (Node.js)" '
+	measure_run "Interpreted Node.js" '
 		node --jitless mandelbrot.node.js "$count" >/dev/null
 	'
 else

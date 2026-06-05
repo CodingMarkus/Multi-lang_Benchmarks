@@ -219,5 +219,5 @@ runBenchmark(data.text, data.hashHi, data.hashLo, runs);
 var diff = process.hrtime(start);
 var elapsed = diff[0] + diff[1] / 1e9;
 process.stderr.write(
-	"JavaScript (Node.js) Elapsed " + elapsed.toFixed(6) + " seconds\n"
+	"JavaScript Elapsed " + elapsed.toFixed(6) + " seconds\n"
 );
