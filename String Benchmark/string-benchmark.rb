@@ -5,7 +5,7 @@ WORD_COUNT = 16
 LINE_LIMIT = 80
 FNV_OFFSET = 14695981039346656037
 FNV_PRIME = 1099511628211
-REFERENCE_HASH = 0x35ce3126ab961070
+REFERENCE_HASH = 0xc6be9b9267a2fb8e
 MASK = (1 << 64) - 1
 
 def random_next(state)
@@ -36,7 +36,7 @@ def build_source_text(words)
 			length += 1
 		end
 		parts << word
-		length += word.length
+		length += word.bytesize
 		word_count += 1
 		break if (length > TARGET_SIZE)
 	end
@@ -51,7 +51,7 @@ def wrap_words(words)
 
 	for i in 0...words.length do
 		word = words[i]
-		word_length = word.length
+		word_length = word.bytesize
 
 		if i == 0
 			parts << word
@@ -113,9 +113,9 @@ words = [
 	"we",
 	"cat",
 	"tree",
-	"apple",
-	"bridge",
-	"lantern",
+	"café",
+	"naïve",
+	"jalapeño",
 	"mountain",
 	"blueberry",
 	"basketball",

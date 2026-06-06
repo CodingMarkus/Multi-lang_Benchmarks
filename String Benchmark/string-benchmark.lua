@@ -4,8 +4,8 @@ local LINE_LIMIT = 80
 local FNV_OFFSET_HI = 0xcbf29ce4
 local FNV_OFFSET_LO = 0x84222325
 local FNV_PRIME_SMALL = 0x1b3
-local REFERENCE_HASH_HI = 0x35ce3126
-local REFERENCE_HASH_LO = 0xab961070
+local REFERENCE_HASH_HI = 0xc6be9b92
+local REFERENCE_HASH_LO = 0x67a2fb8e
 
 function random_next(state)
 	state.value = (state.value * 1664525 + 1013904223) % 4294967296
@@ -147,9 +147,9 @@ local words = {
 	"we",
 	"cat",
 	"tree",
-	"apple",
-	"bridge",
-	"lantern",
+	"café",
+	"naïve",
+	"jalapeño",
 	"mountain",
 	"blueberry",
 	"basketball",

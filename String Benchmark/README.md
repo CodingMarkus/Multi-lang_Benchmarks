@@ -3,9 +3,7 @@ String Benchmark
 
 ## What this benchmark does
 
-This benchmark generates a deterministic source text of a bit more than
-1 MiB by concatenating pseudo-randomly selected ASCII words from a fixed
-word list. It then measures how fast each implementation can:
+This benchmark generates a deterministic source text of a bit more than 1 MiB by concatenating pseudo-randomly selected UTF-8 or UTF-16 words from a fixed word list. It then measures how fast each implementation can:
 
 - split the source text into words,
 - re-wrap those words into lines below 80 characters, and
@@ -17,11 +15,8 @@ line-wrapping logic, and result verification on a large in-memory text.
 
 ## String-specific variants
 
-- **C (`wchar_t`):** Alternative C implementation using wide characters
-  instead of narrow ASCII-oriented strings.
-- **Rust (Unicode scalar values):** Alternative Rust implementation
-  working on Unicode scalar values rather than byte-oriented string
-  handling.
+- **C (UTF-16):** Alternative C implementation using fixed-width UTF-16 code units instead of UTF-8 bytes.
+- **Rust (UTF-16):** Alternative Rust implementation working on UTF-16 code units rather than byte-oriented string handling.
 
 ## Benchmark system
 
@@ -35,9 +30,9 @@ Use `./run.sh` for benchmark-only timings reported by each implementation. Use `
 | Language | Time (s) | Total Time (s) | Start Time (s) | Max RSS (MiB) |
 | --- | ---: | ---: | ---: | ---: |
 | C | 0.250 | 0.25 | 0.000 | 5.094 |
-| C wchar | 0.290 | 0.29 | 0.000 | 14.109 |
+| C UTF-16 | 0.290 | 0.29 | 0.000 | 14.109 |
 | Rust | 0.300 | 0.30 | 0.000 | 10.234 |
-| Rust Unicode | 0.280 | 0.28 | 0.000 | 15.156 |
+| Rust UTF-16 | 0.280 | 0.28 | 0.000 | 15.156 |
 | Swift | 1.900 | 1.90 | 0.000 | 46.578 |
 | Objective-C | 2.160 | 2.16 | 0.000 | 29.469 |
 | Go | 0.340 | 0.34 | 0.000 | 14.328 |

@@ -5,7 +5,7 @@ static const NSUInteger wordCount = 16;
 static const NSUInteger lineLimit = 80;
 static const uint64_t fnvOffset = UINT64_C(14695981039346656037);
 static const uint64_t fnvPrime = UINT64_C(1099511628211);
-static const uint64_t referenceHash = UINT64_C(0x35ce3126ab961070);
+static const uint64_t referenceHash = UINT64_C(0xc96d7fcba133ffd5);
 
 
 static uint32_t randomNext ( uint32_t * state )
@@ -15,23 +15,16 @@ static uint32_t randomNext ( uint32_t * state )
 }
 
 
-static uint64_t hashBytes ( const char * text, size_t length )
+static uint64_t hashUTF16 ( NSString * text )
 {
 	uint64_t hash = fnvOffset;
-	size_t i;
+	NSUInteger i;
 
-	for (i = 0; i < length; i++) {
-		hash ^= (unsigned char) text[i];
+	for (i = 0; i < [text length]; i++) {
+		hash ^= [text characterAtIndex:i];
 		hash *= fnvPrime;
 	}
 	return hash;
-}
-
-
-static uint64_t hashString ( NSString * text )
-{
-	NSData * data = [text dataUsingEncoding:NSASCIIStringEncoding];
-	return hashBytes([data bytes], [data length]);
 }
 
 
@@ -42,9 +35,9 @@ static NSDictionary * buildBenchmarkData ( void )
 		@"we",
 		@"cat",
 		@"tree",
-		@"apple",
-		@"bridge",
-		@"lantern",
+		@"café",
+		@"naïve",
+		@"jalapeño",
 		@"mountain",
 		@"blueberry",
 		@"basketball",
@@ -64,8 +57,7 @@ static NSDictionary * buildBenchmarkData ( void )
 
 	while (1) {
 		NSString * word = words[randomNext(&state) % wordCount];
-		NSUInteger wordLength = [word lengthOfBytesUsingEncoding:
-			NSASCIIStringEncoding];
+		NSUInteger wordLength = [word length];
 
 		if (generatedWordCount > 0) {
 			[text appendString:@" "];
@@ -81,7 +73,7 @@ static NSDictionary * buildBenchmarkData ( void )
 		}
 	}
 
-	sourceHash = hashString(text);
+	sourceHash = hashUTF16(text);
 	if (sourceHash != referenceHash) {
 		fprintf(
 			stderr,
@@ -108,8 +100,7 @@ static NSString * wrapWords ( NSArray * words )
 
 	for (i = 0; i < [words count]; i++) {
 		NSString * word = words[i];
-		NSUInteger wordLength = [word lengthOfBytesUsingEncoding:
-			NSASCIIStringEncoding];
+		NSUInteger wordLength = [word length];
 
 		if (i == 0) {
 			[text appendString:word];
@@ -139,20 +130,16 @@ static uint64_t hashWrappedText ( NSString * text )
 
 	[text enumerateLinesUsingBlock:
 		^(NSString * line, BOOL * stop __attribute__((unused))) {
-			NSData * data;
-			const unsigned char * bytes;
 			NSUInteger i;
 
 			if (!first) {
-				hash ^= (unsigned char) ' ';
+				hash ^= ' ';
 				hash *= fnvPrime;
 			}
 			first = NO;
 
-			data = [line dataUsingEncoding:NSASCIIStringEncoding];
-			bytes = [data bytes];
-			for (i = 0; i < [data length]; i++) {
-				hash ^= bytes[i];
+			for (i = 0; i < [line length]; i++) {
+				hash ^= [line characterAtIndex:i];
 				hash *= fnvPrime;
 			}
 		}

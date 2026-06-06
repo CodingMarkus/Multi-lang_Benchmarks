@@ -6,12 +6,12 @@ const WORD_COUNT: usize = 16;
 const LINE_LIMIT: usize = 80;
 const FNV_OFFSET: u64 = 14695981039346656037;
 const FNV_PRIME: u64 = 1099511628211;
-const REFERENCE_HASH: u64 = 0x35ce3126ab961070;
+const REFERENCE_HASH: u64 = 0xc96d7fcba133ffd5;
 
 
 struct BenchmarkData
 {
-	source_text: Vec<char>,
+	source_text: Vec<u16>,
 	source_length: usize,
 	source_word_count: usize,
 	source_hash: u64
@@ -25,12 +25,12 @@ fn random_next ( state: &mut u32 ) -> u32
 }
 
 
-fn hash_chars ( text: &[char] ) -> u64
+fn hash_utf16 ( text: &[u16] ) -> u64
 {
 	let mut hash = FNV_OFFSET;
 
-	for ch in text {
-		hash ^= *ch as u32 as u64;
+	for code_unit in text {
+		hash ^= *code_unit as u64;
 		hash = hash.wrapping_mul(FNV_PRIME);
 	}
 	return hash;
@@ -44,9 +44,9 @@ fn build_benchmark_data ( ) -> BenchmarkData
 		"we",
 		"cat",
 		"tree",
-		"apple",
-		"bridge",
-		"lantern",
+		"café",
+		"naïve",
+		"jalapeño",
 		"mountain",
 		"blueberry",
 		"basketball",
@@ -66,11 +66,11 @@ fn build_benchmark_data ( ) -> BenchmarkData
 		let word = words[index];
 
 		if generated_word_count > 0 {
-			text.push(' ');
+			text.push(b' ' as u16);
 		}
 
-		for ch in word.chars() {
-			text.push(ch);
+		for code_unit in word.encode_utf16() {
+			text.push(code_unit);
 		}
 
 		generated_word_count += 1;
@@ -80,7 +80,7 @@ fn build_benchmark_data ( ) -> BenchmarkData
 	}
 
 	let data = BenchmarkData {
-		source_hash: hash_chars(&text),
+		source_hash: hash_utf16(&text),
 		source_length: text.len(),
 		source_text: text,
 		source_word_count: generated_word_count
@@ -99,7 +99,7 @@ fn build_benchmark_data ( ) -> BenchmarkData
 }
 
 
-fn split_words ( text: &mut [char], words: &mut Vec<(usize, usize)> )
+fn split_words ( text: &mut [u16], words: &mut Vec<(usize, usize)> )
 {
 	let mut index = 0;
 
@@ -108,7 +108,7 @@ fn split_words ( text: &mut [char], words: &mut Vec<(usize, usize)> )
 	while index < text.len() {
 		let start = index;
 
-		while index < text.len() && text[index] != ' ' {
+		while index < text.len() && text[index] != b' ' as u16 {
 			index += 1;
 		}
 
@@ -118,13 +118,13 @@ fn split_words ( text: &mut [char], words: &mut Vec<(usize, usize)> )
 			break;
 		}
 
-		text[index] = '\0';
+		text[index] = 0;
 		index += 1;
 	}
 }
 
 
-fn wrap_words ( text: &[char], words: &[(usize, usize)] ) -> Vec<char>
+fn wrap_words ( text: &[u16], words: &[(usize, usize)] ) -> Vec<u16>
 {
 	let mut wrapped = Vec::with_capacity(TARGET_SIZE + 64);
 	let mut line_length = 0;
@@ -141,13 +141,13 @@ fn wrap_words ( text: &[char], words: &[(usize, usize)] ) -> Vec<char>
 		}
 
 		if line_length + 1 + word_length >= LINE_LIMIT {
-			wrapped.push('\n');
+			wrapped.push(b'\n' as u16);
 			wrapped.extend_from_slice(
 				&text[start .. start + word_length]
 			);
 			line_length = word_length;
 		} else {
-			wrapped.push(' ');
+			wrapped.push(b' ' as u16);
 			wrapped.extend_from_slice(
 				&text[start .. start + word_length]
 			);
@@ -159,15 +159,15 @@ fn wrap_words ( text: &[char], words: &[(usize, usize)] ) -> Vec<char>
 }
 
 
-fn hash_wrapped_text ( text: &[char] ) -> u64
+fn hash_wrapped_text ( text: &[u16] ) -> u64
 {
 	let mut hash = FNV_OFFSET;
 
-	for ch in text {
-		if *ch == '\n' {
-			hash ^= ' ' as u32 as u64;
+	for code_unit in text {
+		if *code_unit == b'\n' as u16 {
+			hash ^= b' ' as u64;
 		} else {
-			hash ^= *ch as u32 as u64;
+			hash ^= *code_unit as u64;
 		}
 		hash = hash.wrapping_mul(FNV_PRIME);
 	}
@@ -222,5 +222,5 @@ fn main ( )
 	let end = SystemTime::now();
 	let elapsed = end.duration_since(UNIX_EPOCH).unwrap().as_secs_f64()
 		- start.duration_since(UNIX_EPOCH).unwrap().as_secs_f64();
-	eprintln!("Rust Unicode Elapsed {:.3}", elapsed);
+	eprintln!("Rust UTF-16 Elapsed {:.3}", elapsed);
 }

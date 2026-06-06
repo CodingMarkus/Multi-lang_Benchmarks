@@ -2,6 +2,8 @@
 
 use strict;
 use warnings;
+use utf8;
+use bytes;
 use Time::HiRes qw( gettimeofday );
 
 my $TARGET_SIZE = 1024 * 1024;
@@ -10,8 +12,8 @@ my $LINE_LIMIT = 80;
 my $FNV_OFFSET_HI = 0xcbf29ce4;
 my $FNV_OFFSET_LO = 0x84222325;
 my $FNV_PRIME_SMALL = 0x1b3;
-my $REFERENCE_HASH_HI = 0x35ce3126;
-my $REFERENCE_HASH_LO = 0xab961070;
+my $REFERENCE_HASH_HI = 0xc6be9b92;
+my $REFERENCE_HASH_LO = 0x67a2fb8e;
 
 sub random_next {
 	my ($state_ref) = @_;
@@ -161,9 +163,9 @@ my @words = (
 	"we",
 	"cat",
 	"tree",
-	"apple",
-	"bridge",
-	"lantern",
+	"café",
+	"naïve",
+	"jalapeño",
 	"mountain",
 	"blueberry",
 	"basketball",

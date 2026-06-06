@@ -5,7 +5,7 @@ let wordCount = 16
 let lineLimit = 80
 let fnvOffset: UInt64 = 14695981039346656037
 let fnvPrime: UInt64 = 1099511628211
-let referenceHash: UInt64 = 0x35ce3126ab961070
+let referenceHash: UInt64 = 0xc6be9b9267a2fb8e
 
 private
 func randomNext(_ state: inout UInt32) -> UInt32
@@ -156,9 +156,9 @@ private func main ( )
 		"we",
 		"cat",
 		"tree",
-		"apple",
-		"bridge",
-		"lantern",
+		"café",
+		"naïve",
+		"jalapeño",
 		"mountain",
 		"blueberry",
 		"basketball",

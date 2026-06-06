@@ -4,8 +4,8 @@ const LINE_LIMIT = 80;
 const FNV_OFFSET_HI = 0xcbf29ce4 >>> 0;
 const FNV_OFFSET_LO = 0x84222325 >>> 0;
 const FNV_PRIME_SMALL = 0x1b3;
-const REFERENCE_HASH_HI = 0x35ce3126 >>> 0;
-const REFERENCE_HASH_LO = 0xab961070 >>> 0;
+const REFERENCE_HASH_HI = 0xc96d7fcb >>> 0;
+const REFERENCE_HASH_LO = 0xa133ffd5 >>> 0;
 
 function randomNext(state)
 {
@@ -176,9 +176,9 @@ const words = [
 	"we",
 	"cat",
 	"tree",
-	"apple",
-	"bridge",
-	"lantern",
+	"café",
+	"naïve",
+	"jalapeño",
 	"mountain",
 	"blueberry",
 	"basketball",

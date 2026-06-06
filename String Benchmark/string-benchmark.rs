@@ -7,7 +7,7 @@ const WORD_COUNT: usize = 16;
 const LINE_LIMIT: usize = 80;
 const FNV_OFFSET: u64 = 14695981039346656037;
 const FNV_PRIME: u64 = 1099511628211;
-const REFERENCE_HASH: u64 = 0x35ce3126ab961070;
+const REFERENCE_HASH: u64 = 0xc6be9b9267a2fb8e;
 
 
 fn random_next ( state: &mut u32 ) -> u32
@@ -136,9 +136,9 @@ fn main ( )
 		"we",
 		"cat",
 		"tree",
-		"apple",
-		"bridge",
-		"lantern",
+		"café",
+		"naïve",
+		"jalapeño",
 		"mountain",
 		"blueberry",
 		"basketball",

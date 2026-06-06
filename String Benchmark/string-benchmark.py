@@ -8,7 +8,7 @@ WORD_COUNT = 16
 LINE_LIMIT = 80
 FNV_OFFSET = 14695981039346656037
 FNV_PRIME = 1099511628211
-REFERENCE_HASH = 0x35ce3126ab961070
+REFERENCE_HASH = 0xc6be9b9267a2fb8e
 
 
 def random_next(state):
@@ -19,10 +19,15 @@ def random_next(state):
 def hash_bytes(text):
 	hash_value = FNV_OFFSET
 
-	for byte in text.encode("ascii"):
+	for byte in text.encode("utf-8"):
 		hash_value ^= byte
 		hash_value = (hash_value * FNV_PRIME) & MASK
+
 	return hash_value
+
+
+def byte_length(text):
+	return len(text.encode("utf-8"))
 
 
 def build_source_text(words):
@@ -39,7 +44,7 @@ def build_source_text(words):
 			length += 1
 
 		parts.append(word)
-		length += len(word)
+		length += byte_length(word)
 		word_count += 1
 
 		if length > TARGET_SIZE:
@@ -55,7 +60,7 @@ def wrap_words(words):
 
 	for i in range(len(words)):
 		word = words[i]
-		word_length = len(word)
+		word_length = byte_length(word)
 
 		if i == 0:
 			parts.append(word)
@@ -82,7 +87,7 @@ def hash_wrapped_text(text):
 			hash_value ^= 32
 			hash_value = (hash_value * FNV_PRIME) & MASK
 
-		for byte in line.encode("ascii"):
+		for byte in line.encode("utf-8"):
 			hash_value ^= byte
 			hash_value = (hash_value * FNV_PRIME) & MASK
 
@@ -109,9 +114,9 @@ words = [
 	"we",
 	"cat",
 	"tree",
-	"apple",
-	"bridge",
-	"lantern",
+	"café",
+	"naïve",
+	"jalapeño",
 	"mountain",
 	"blueberry",
 	"basketball",

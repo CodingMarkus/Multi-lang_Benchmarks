@@ -20,7 +20,7 @@ static const uint64_t fnvOffset = UINT64_C(14695981039346656037);
 static const uint64_t fnvPrime = UINT64_C(1099511628211);
 
 // Expected hash for the generated 1 MiB source text.
-static const uint64_t referenceHash = UINT64_C(0x35ce3126ab961070);
+static const uint64_t referenceHash = UINT64_C(0xc6be9b9267a2fb8e);
 
 
 /**
@@ -233,9 +233,9 @@ static struct BenchmarkData build_benchmark_data( void )
 		"we",
 		"cat",
 		"tree",
-		"apple",
-		"bridge",
-		"lantern",
+		"café",
+		"naïve",
+		"jalapeño",
 		"mountain",
 		"blueberry",
 		"basketball",

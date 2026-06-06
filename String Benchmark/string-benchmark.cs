@@ -10,7 +10,7 @@ public class StringBenchmark
 	private const int LINE_LIMIT = 80;
 	private const ulong FNV_OFFSET = 14695981039346656037UL;
 	private const ulong FNV_PRIME = 1099511628211UL;
-	private const ulong REFERENCE_HASH = 0x35ce3126ab961070UL;
+	private const ulong REFERENCE_HASH = 0xc96d7fcba133ffd5UL;
 
 	private sealed class BenchmarkData
 	{
@@ -47,9 +47,9 @@ public class StringBenchmark
 			"we",
 			"cat",
 			"tree",
-			"apple",
-			"bridge",
-			"lantern",
+			"café",
+			"naïve",
+			"jalapeño",
 			"mountain",
 			"blueberry",
 			"basketball",

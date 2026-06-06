@@ -6,8 +6,8 @@ $LINE_LIMIT = 80;
 $FNV_OFFSET_HI = 0xcbf29ce4;
 $FNV_OFFSET_LO = 0x84222325;
 $FNV_PRIME_SMALL = 0x1b3;
-$REFERENCE_HASH_HI = 0x35ce3126;
-$REFERENCE_HASH_LO = 0xab961070;
+$REFERENCE_HASH_HI = 0xc6be9b92;
+$REFERENCE_HASH_LO = 0x67a2fb8e;
 
 function random_next(&$state) {
 	$state = (($state * 1664525) + 1013904223) & 0xffffffff;
@@ -139,9 +139,9 @@ $words = array(
 	"we",
 	"cat",
 	"tree",
-	"apple",
-	"bridge",
-	"lantern",
+	"café",
+	"naïve",
+	"jalapeño",
 	"mountain",
 	"blueberry",
 	"basketball",

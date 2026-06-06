@@ -1,20 +1,22 @@
 #!/bin/bash
 
+export LC_ALL=C
+
 TARGET_SIZE=$((1024 * 1024))
 WORD_COUNT=16
 LINE_LIMIT=80
 FNV_OFFSET=-3750763034362895579
 FNV_PRIME=1099511628211
-REFERENCE_HASH=3877090371369832560
+REFERENCE_HASH=-4124450537793817666
 
 words=(
 	"I"
 	"we"
 	"cat"
 	"tree"
-	"apple"
-	"bridge"
-	"lantern"
+	"café"
+	"naïve"
+	"jalapeño"
 	"mountain"
 	"blueberry"
 	"basketball"

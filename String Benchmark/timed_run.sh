@@ -180,15 +180,15 @@ else
 	printf "Skipping C benchmark because %s was not found.\n" "$CC" >&2
 fi
 
-# Test C (wchar_t)
+# Test C (UTF-16)
 if have_command "$CC"
 then
 	"$CC" -O3 -o string-benchmark-c-wchar string-benchmark-wchar.c
-	measure_run "C wchar" '
+	measure_run "C UTF-16" '
 		./string-benchmark-c-wchar "$count" >/dev/null
 	'
 else
-	printf "Skipping C wchar benchmark because %s was not found.\n" \
+	printf "Skipping C UTF-16 benchmark because %s was not found.\n" \
 		"$CC" >&2
 fi
 
@@ -203,16 +203,16 @@ else
 	printf "Skipping Rust benchmark because rustc was not found.\n" >&2
 fi
 
-# Test Rust (Unicode scalar values)
+# Test Rust (UTF-16)
 if have_command rustc
 then
 	rustc -C opt-level=3 -o string-benchmark-rust-unicode \
 		string-benchmark-unicode.rs
-	measure_run "Rust Unicode" '
+	measure_run "Rust UTF-16" '
 		./string-benchmark-rust-unicode "$count" >/dev/null
 	'
 else
-	printf "Skipping Rust Unicode benchmark because rustc was not found.\n" \
+	printf "Skipping Rust UTF-16 benchmark because rustc was not found.\n" \
 		>&2
 fi
 

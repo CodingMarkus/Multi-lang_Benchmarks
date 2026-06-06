@@ -11,7 +11,7 @@ class StringBenchmark
 	static int LINE_LIMIT = 80;
 	static long FNV_OFFSET = 0xcbf29ce484222325L;
 	static long FNV_PRIME = 1099511628211L;
-	static long REFERENCE_HASH = 0x35ce3126ab961070L;
+	static long REFERENCE_HASH = 0xc96d7fcba133ffd5L;
 
 	static class BenchmarkData
 	{
@@ -46,9 +46,9 @@ class StringBenchmark
 			"we",
 			"cat",
 			"tree",
-			"apple",
-			"bridge",
-			"lantern",
+			"café",
+			"naïve",
+			"jalapeño",
 			"mountain",
 			"blueberry",
 			"basketball",

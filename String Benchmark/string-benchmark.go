@@ -14,7 +14,7 @@ var wordCount = 16
 var lineLimit = 80
 var fnvOffset uint64 = 14695981039346656037
 var fnvPrime uint64 = 1099511628211
-var referenceHash uint64 = 0x35ce3126ab961070
+var referenceHash uint64 = 0xc6be9b9267a2fb8e
 
 func randomNext ( state *uint32 ) uint32 {
 	*state = *state*1664525 + 1013904223
@@ -135,9 +135,9 @@ func main ( ) {
 		"we",
 		"cat",
 		"tree",
-		"apple",
-		"bridge",
-		"lantern",
+		"café",
+		"naïve",
+		"jalapeño",
 		"mountain",
 		"blueberry",
 		"basketball",
