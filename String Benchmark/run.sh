@@ -190,7 +190,7 @@ fi
 # Test JavaScript (Node.js, Interpreted)
 if have_command node
 then
-	printf "Interpreted " >&2
+	printf "Node.js (Interpreted) " >&2
 	node --jitless string-benchmark.node.js "$count" >/dev/null
 	sleep 1
 else

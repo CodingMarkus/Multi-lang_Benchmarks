@@ -23,11 +23,11 @@ Compare performance of multiple popular languages across different tasks.
   with `java -Xint`, disabling JIT compilation.
 - **C#:** C# implementation compiled with `mcs` and run on Mono with
   optimizations enabled.
-- **JavaScript (Node.js):** Standard Node.js execution with the normal
+- **Node.js JavaScript:** Standard Node.js execution with the normal
   V8 JIT pipeline enabled.
-- **JavaScript (Node.js, interpreted):** Node.js run with `--jitless`,
+- **Node.js (Interpreted) JavaScript:** Node.js run with `--jitless`,
   disabling the V8 JIT so execution stays in non-JIT mode.
-- **JavaScript (QuickJS):** JavaScript executed with QuickJS instead of
+- **QuickJS JavaScript:** JavaScript executed with QuickJS instead of
   Node.js and V8.
 - **Python:** CPython execution using `python` or `python3`, depending
   on what is available.

@@ -24,21 +24,23 @@ Use `./run.sh` for benchmark-only timings reported by each implementation. Use `
 
 | Language | Time (s) | Total Time (s) | Start Time (s) | Max RSS (MiB) |
 | --- | ---: | ---: | ---: | ---: |
-| C | 0.540 | 0.54 | 0.000 | 2.125 |
-| Rust | 0.330 | 0.33 | 0.000 | 2.125 |
-| Swift | 0.350 | 0.35 | 0.000 | 3.203 |
-| Go | 0.460 | 0.46 | 0.000 | 3.953 |
-| Java | 0.340 | 0.34 | 0.000 | 63.578 |
-| C# | 0.530 | 0.53 | 0.000 | 17.859 |
-| JavaScript (Node.js) | 0.300 | 0.30 | 0.000 | 52.250 |
-| Interpreted Java | 2.500 | 2.50 | 0.000 | 38.859 |
-| Interpreted JavaScript (Node.js) | 2.840 | 2.84 | 0.000 | 46.562 |
-| JavaScript (QuickJS) | 3.850 | 3.85 | 0.000 | 2.469 |
-| Python | 8.110 | 8.11 | 0.000 | 8.938 |
-| Ruby | 5.790 | 5.79 | 0.000 | 25.281 |
-| PHP | 2.500 | 2.50 | 0.000 | 8.438 |
-| Perl | 9.100 | 9.10 | 0.000 | 4.469 |
-| Lua | 1.790 | 1.79 | 0.000 | 1.969 |
+| C | 0.184 | 0.30 | 0.000 | 1.953 |
+| Rust | 0.173 | 0.33 | 0.000 | 1.953 |
+| Swift | 0.189 | 0.34 | 0.000 | 3.000 |
+| Go | 0.278 | 0.43 | 0.000 | 3.953 |
+| Java | 0.270 | 0.33 | 0.000 | 60.469 |
+| C# | 0.521 | 0.52 | 0.000 | 17.016 |
+| Node.js JavaScript | 0.268 | 0.29 | 0.000 | 52.359 |
+| Bun JavaScript | 0.227 | 0.23 | 0.000 | 32.125 |
+| Bun (compiled) JavaScript | 0.235 | 0.80 | 0.000 | 29.828 |
+| Interpreted Java | 2.455 | 2.49 | 0.000 | 40.641 |
+| Node.js (Interpreted) JavaScript | 2.823 | 2.86 | 0.000 | 46.734 |
+| QuickJS JavaScript | 3.870 | 3.85 | 0.000 | 2.469 |
+| Python | 8.062 | 8.09 | 0.000 | 8.531 |
+| Ruby | 5.710 | 5.77 | 0.000 | 25.125 |
+| PHP | 2.482 | 2.50 | 0.000 | 8.625 |
+| Perl | 9.090 | 9.01 | 0.000 | 4.516 |
+| Lua | 1.806 | 1.80 | 0.000 | 2.109 |
 
 ![Benchmark results time](assets/results-time.png)
 

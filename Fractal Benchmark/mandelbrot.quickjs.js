@@ -46,7 +46,7 @@ var start = Date.now();
 mandelbrot(runs);
 var elapsed = (Date.now() - start) / 1000;
 var elapsedLine =
-	"JavaScript (QuickJS) Elapsed " + elapsed.toFixed(3) + " seconds";
+	"QuickJS JavaScript Elapsed " + elapsed.toFixed(3) + " seconds";
 
 if (typeof std !== "undefined" && std.err && std.err.puts) {
 	std.err.puts(elapsedLine + "\n");

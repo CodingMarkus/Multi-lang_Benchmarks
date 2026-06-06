@@ -240,7 +240,7 @@ fi
 # Test JavaScript (Node.js)
 if have_command node
 then
-	measure_run "Node.js" '
+	measure_run "Node.js JavaScript" '
 		node mandelbrot.node.js "$count" >/dev/null
 	'
 else
@@ -250,7 +250,7 @@ fi
 # Test JavaScript (Bun)
 if have_command bun
 then
-	measure_run "Bun" '
+	measure_run "Bun JavaScript" '
 		bun mandelbrot.node.js "$count" >/dev/null
 	'
 else
@@ -261,7 +261,7 @@ fi
 if have_command bun
 then
 	bun build --compile --outfile=mandelbrot-bun mandelbrot.node.js >/dev/null 2>&1
-	measure_run "Bun (Compiled)" '
+	measure_run "Bun (compiled) JavaScript" '
 		./mandelbrot-bun "$count" >/dev/null
 	'
 else
@@ -283,7 +283,7 @@ fi
 # Test JavaScript (Node.js, Interpreted)
 if have_command node
 then
-	measure_run "Interpreted Node.js" '
+	measure_run "Node.js (Interpreted) JavaScript" '
 		node --jitless mandelbrot.node.js "$count" >/dev/null
 	'
 else
@@ -294,7 +294,7 @@ fi
 # Test JavaScript (QuickJS)
 if have_command qjs
 then
-	measure_run "JavaScript (QuickJS)" '
+	measure_run "QuickJS JavaScript" '
 		qjs --std mandelbrot.quickjs.js "$count" >/dev/null
 	'
 else
