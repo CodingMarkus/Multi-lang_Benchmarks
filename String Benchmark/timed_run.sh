@@ -3,12 +3,178 @@
 set -euh
 
 count=40
-if [ $# -gt 0 ]
+selectedTests=
+
+print_usage( )
+{
+	cat <<EOF
+Usage: ./timed_run.sh [options] [iterations]
+
+Run the timed String Benchmark.
+
+Options:
+	-h, -help, --help
+		Show this help and exit.
+	-it, -iterations, --iterations COUNT
+		Run each selected test COUNT times.
+	-t, -tests, --tests LIST
+		Run only the comma-separated tests from LIST.
+
+Examples:
+	./timed_run.sh
+	./timed_run.sh -it 20
+	./timed_run.sh -tests c,rust,nodei
+	./timed_run.sh 20
+
+Available tests:
+	c        C
+	c16      C UTF-16
+	rust     Rust
+	rust16   Rust UTF-16
+	swift    Swift
+	objc     Objective-C
+	go       Go
+	java     Java
+	cs       C#
+	node     Node.js
+	bun      Bun
+	bunc     Bun compiled
+	javai    Java interpreted
+	nodei    Node.js interpreted
+	qjs      QuickJS
+	py       Python
+	ruby     Ruby
+	php      PHP
+	perl     Perl
+	lua      Lua
+EOF
+}
+
+die_usage( )
+{
+	printf "%s\n\n" "$1" >&2
+	print_usage >&2
+	exit 1
+}
+
+validate_count( )
+{
+	case "$1" in
+	"" | *[!0-9]*)
+		die_usage "Iterations must be a positive integer."
+		;;
+	0)
+		die_usage "Iterations must be greater than zero."
+		;;
+	esac
+}
+
+is_known_test( )
+{
+	case "$1" in
+	c | c16 | rust | rust16 | swift | objc | go | java | cs | node | \
+		bun | bunc | javai | nodei | qjs | py | ruby | php | perl | \
+		lua)
+		return 0
+		;;
+	esac
+
+	return 1
+}
+
+validate_tests( )
+{
+	oldIfs=$IFS
+	IFS=,
+	for testName in $selectedTests
+	do
+		if ! is_known_test "$testName"
+		then
+			IFS=$oldIfs
+			die_usage "Unknown test: $testName"
+		fi
+	done
+	IFS=$oldIfs
+}
+
+want_test( )
+{
+	if [ -z "$selectedTests" ]
+	then
+		return 0
+	fi
+
+	case ",$selectedTests," in
+	*,"$1",*)
+		return 0
+		;;
+	esac
+
+	return 1
+}
+
+parse_args( )
+{
+	havePositionalCount=false
+
+	while [ $# -gt 0 ]
+	do
+		case "$1" in
+		-h | -help | --help)
+			print_usage
+			exit 0
+			;;
+		-it | -iterations | --iterations)
+			[ $# -ge 2 ] || die_usage "Missing value for $1."
+			validate_count "$2"
+			count="$2"
+			shift 2
+			;;
+		-t | -tests | --tests)
+			[ $# -ge 2 ] || die_usage "Missing value for $1."
+			[ -n "$2" ] || die_usage "Test list must not be empty."
+			selectedTests="$2"
+			shift 2
+			;;
+		--)
+			shift
+			break
+			;;
+		-*)
+			die_usage "Unknown option: $1"
+			;;
+		*)
+			if [ "$havePositionalCount" = true ]
+			then
+				die_usage "Only one positional iterations value is allowed."
+			fi
+			validate_count "$1"
+			count="$1"
+			havePositionalCount=true
+			shift
+			;;
+		esac
+	done
+
+	if [ $# -gt 0 ]
+	then
+		die_usage "Unexpected argument: $1"
+	fi
+
+	if [ -n "$selectedTests" ]
+	then
+		validate_tests
+	fi
+}
+
+parse_args "$@"
+
+if [ -n "$selectedTests" ]
 then
-	count="$1"
-	echo "Performing $count iterations." >&2
+	printf "Performing %s iterations for tests: %s.\n" \
+		"$count" "$selectedTests" >&2
 else
-	echo "No number of iterations given, using default of $count." >&2
+	printf "Performing %s iterations for all tests.\n" "$count" >&2
 fi
 
 
@@ -170,220 +336,294 @@ then
 	pythonCmd=python3
 fi
 
-if have_command "$CC"
+if want_test c
 then
-	"$CC" -O3 -o string-benchmark-c string-benchmark.c
-	measure_run "C" '
-		./string-benchmark-c "$count" >/dev/null
-	'
-else
-	printf "Skipping C benchmark because %s was not found.\n" "$CC" >&2
+	if have_command "$CC"
+	then
+		"$CC" -O3 -o string-benchmark-c string-benchmark.c
+		measure_run "C" '
+			./string-benchmark-c "$count" >/dev/null
+		'
+	else
+		printf "Skipping C benchmark because %s was not found.\n" \
+			"$CC" >&2
+	fi
 fi
 
 # Test C (UTF-16)
-if have_command "$CC"
+if want_test c16
 then
-	"$CC" -O3 -o string-benchmark-c-wchar string-benchmark-wchar.c
-	measure_run "C UTF-16" '
-		./string-benchmark-c-wchar "$count" >/dev/null
-	'
-else
-	printf "Skipping C UTF-16 benchmark because %s was not found.\n" \
-		"$CC" >&2
+	if have_command "$CC"
+	then
+		"$CC" -O3 -o string-benchmark-c-wchar string-benchmark-wchar.c
+		measure_run "C UTF-16" '
+			./string-benchmark-c-wchar "$count" >/dev/null
+		'
+	else
+		printf "Skipping C UTF-16 benchmark because %s was not found.\n" \
+			"$CC" >&2
+	fi
 fi
 
 # Test Rust
-if have_command rustc
+if want_test rust
 then
-	rustc -C opt-level=3 -o string-benchmark-rust string-benchmark.rs
-	measure_run "Rust" '
-		./string-benchmark-rust "$count" >/dev/null
-	'
-else
-	printf "Skipping Rust benchmark because rustc was not found.\n" >&2
+	if have_command rustc
+	then
+		rustc -C opt-level=3 -o string-benchmark-rust \
+			string-benchmark.rs
+		measure_run "Rust" '
+			./string-benchmark-rust "$count" >/dev/null
+		'
+	else
+		printf "Skipping Rust benchmark because rustc was not found.\n" \
+			>&2
+	fi
 fi
 
 # Test Rust (UTF-16)
-if have_command rustc
+if want_test rust16
 then
-	rustc -C opt-level=3 -o string-benchmark-rust-unicode \
-		string-benchmark-unicode.rs
-	measure_run "Rust UTF-16" '
-		./string-benchmark-rust-unicode "$count" >/dev/null
-	'
-else
-	printf "Skipping Rust UTF-16 benchmark because rustc was not found.\n" \
-		>&2
+	if have_command rustc
+	then
+		rustc -C opt-level=3 -o string-benchmark-rust-unicode \
+			string-benchmark-unicode.rs
+		measure_run "Rust UTF-16" '
+			./string-benchmark-rust-unicode "$count" >/dev/null
+		'
+	else
+		printf "Skipping Rust UTF-16 benchmark because rustc was not " \
+			"found.\n" >&2
+	fi
 fi
 
 # Test Swift
-if have_command swiftc
+if want_test swift
 then
-	swiftc -O -o string-benchmark-swift string-benchmark.swift
-	measure_run "Swift" '
-		./string-benchmark-swift "$count" >/dev/null
-	'
-else
-	printf "Skipping Swift benchmark because swiftc was not found.\n" >&2
+	if have_command swiftc
+	then
+		swiftc -O -o string-benchmark-swift string-benchmark.swift
+		measure_run "Swift" '
+			./string-benchmark-swift "$count" >/dev/null
+		'
+	else
+		printf "Skipping Swift benchmark because swiftc was not found.\n" \
+			>&2
+	fi
 fi
 
 # Test Objective-C
-if have_command "$CC"
+if want_test objc
 then
-	"$CC" -O3 -fobjc-arc -framework Foundation \
-		-o string-benchmark-objc string-benchmark.m
-	measure_run "Objective-C" '
-		./string-benchmark-objc "$count" >/dev/null
-	'
-else
-	printf "Skipping Objective-C benchmark because %s was not found.\n" \
-		"$CC" >&2
+	if have_command "$CC"
+	then
+		"$CC" -O3 -fobjc-arc -framework Foundation \
+			-o string-benchmark-objc string-benchmark.m
+		measure_run "Objective-C" '
+			./string-benchmark-objc "$count" >/dev/null
+		'
+	else
+		printf "Skipping Objective-C benchmark because %s was not " \
+			"found.\n" "$CC" >&2
+	fi
 fi
 
 # Test Go
-if have_command go
+if want_test go
 then
-	go build -o string-benchmark-go string-benchmark.go
-	measure_run "Go" '
-		./string-benchmark-go "$count" >/dev/null
-	'
-else
-	printf "Skipping Go benchmark because go was not found.\n" >&2
+	if have_command go
+	then
+		go build -o string-benchmark-go string-benchmark.go
+		measure_run "Go" '
+			./string-benchmark-go "$count" >/dev/null
+		'
+	else
+		printf "Skipping Go benchmark because go was not found.\n" >&2
+	fi
 fi
 
 # Test Java
-if have_command javac && have_command java
+if want_test java
 then
-	javac -d . string-benchmark.java
-	measure_run "Java" '
-		java -cp . StringBenchmark "$count" >/dev/null
-	'
-else
-	printf "Skipping Java benchmark because javac or java was not found.\n" \
-		>&2
+	if have_command javac && have_command java
+	then
+		javac -d . string-benchmark.java
+		measure_run "Java" '
+			java -cp . StringBenchmark "$count" >/dev/null
+		'
+	else
+		printf "Skipping Java benchmark because javac or java was not " \
+			"found.\n" >&2
+	fi
 fi
 
 # Test C#
-if have_command mcs && have_command mono
+if want_test cs
 then
-	mcs -optimize+ -out:string-benchmark-mono string-benchmark.cs
-	measure_run "C#" '
-		mono --optimize=all string-benchmark-mono "$count" >/dev/null
-	'
-else
-	printf "Skipping C# benchmark because mcs or mono was not found.\n" >&2
+	if have_command mcs && have_command mono
+	then
+		mcs -optimize+ -out:string-benchmark-mono string-benchmark.cs
+		measure_run "C#" '
+			mono --optimize=all string-benchmark-mono "$count" \
+				>/dev/null
+		'
+	else
+		printf "Skipping C# benchmark because mcs or mono was not " \
+			"found.\n" >&2
+	fi
 fi
 
 # Test JavaScript (Node.js)
-if have_command node
+if want_test node
 then
-	measure_run "Node.js JavaScript" '
-		node string-benchmark.node.js "$count" >/dev/null
-	'
-else
-	printf "Skipping Node.js benchmark because node was not found.\n" >&2
+	if have_command node
+	then
+		measure_run "Node.js JavaScript" '
+			node string-benchmark.node.js "$count" >/dev/null
+		'
+	else
+		printf "Skipping Node.js benchmark because node was not found.\n" \
+			>&2
+	fi
 fi
 
 # Test JavaScript (Bun)
-if have_command bun
+if want_test bun
 then
-	measure_run "Bun JavaScript" '
-		bun string-benchmark.node.js "$count" >/dev/null
-	'
-else
-	printf "Skipping Bun benchmark because bun was not found.\n" >&2
+	if have_command bun
+	then
+		measure_run "Bun JavaScript" '
+			bun string-benchmark.node.js "$count" >/dev/null
+		'
+	else
+		printf "Skipping Bun benchmark because bun was not found.\n" >&2
+	fi
 fi
 
 # Test JavaScript (Bun, Compiled)
-if have_command bun
+if want_test bunc
 then
-	bun build --compile --outfile=string-benchmark-bun string-benchmark.node.js >/dev/null 2>&1
-	measure_run "Bun (compiled) JavaScript" '
-		./string-benchmark-bun "$count" >/dev/null
-	'
-else
-	printf "Skipping Bun compiled benchmark because bun was not found.\n" >&2
+	if have_command bun
+	then
+		bun build --compile --outfile=string-benchmark-bun \
+			string-benchmark.node.js >/dev/null 2>&1
+		measure_run "Bun (compiled) JavaScript" '
+			./string-benchmark-bun "$count" >/dev/null
+		'
+	else
+		printf "Skipping Bun compiled benchmark because bun was not " \
+			"found.\n" >&2
+	fi
 fi
 
 # Test Java (Interpreted)
-if have_command javac && have_command java
+if want_test javai
 then
-	javac -d . string-benchmark.java
-	measure_run "Interpreted Java" '
-		java -Xint -cp . StringBenchmark "$count" >/dev/null
-	'
-else
-	printf "Skipping interpreted Java benchmark because " \
-		"javac or java was not found.\n" >&2
+	if have_command javac && have_command java
+	then
+		javac -d . string-benchmark.java
+		measure_run "Interpreted Java" '
+			java -Xint -cp . StringBenchmark "$count" >/dev/null
+		'
+	else
+		printf "Skipping interpreted Java benchmark because javac or " \
+			"java was not found.\n" >&2
+	fi
 fi
 
 # Test JavaScript (Node.js, Interpreted)
-if have_command node
+if want_test nodei
 then
-	measure_run "Node.js (Interpreted) JavaScript" '
-		node --jitless string-benchmark.node.js "$count" >/dev/null
-	'
-else
-	printf "Skipping interpreted Node.js benchmark because " \
-		"node was not found.\n" >&2
+	if have_command node
+	then
+		measure_run "Node.js (Interpreted) JavaScript" '
+			node --jitless string-benchmark.node.js "$count" \
+				>/dev/null
+		'
+	else
+		printf "Skipping interpreted Node.js benchmark because node " \
+			"was not found.\n" >&2
+	fi
 fi
 
 # Test JavaScript (QuickJS)
-if have_command qjs
+if want_test qjs
 then
-	measure_run "QuickJS JavaScript" '
-		qjs --std string-benchmark.quickjs.js "$count" >/dev/null
-	'
-else
-	printf "Skipping QuickJS benchmark because qjs was not found.\n" >&2
+	if have_command qjs
+	then
+		measure_run "QuickJS JavaScript" '
+			qjs --std string-benchmark.quickjs.js "$count" >/dev/null
+		'
+	else
+		printf "Skipping QuickJS benchmark because qjs was not " \
+			"found.\n" >&2
+	fi
 fi
 
 # Test Python
-if [ -n "$pythonCmd" ]
+if want_test py
 then
-	measure_run "Python" '
-		"$pythonCmd" string-benchmark.py "$count" >/dev/null
-	'
-else
-	printf "Skipping Python benchmark because python was not found.\n" >&2
+	if [ -n "$pythonCmd" ]
+	then
+		measure_run "Python" '
+			"$pythonCmd" string-benchmark.py "$count" >/dev/null
+		'
+	else
+		printf "Skipping Python benchmark because python was not " \
+			"found.\n" >&2
+	fi
 fi
 
 # Test Ruby
-if have_command ruby
+if want_test ruby
 then
-	measure_run "Ruby" '
-		ruby string-benchmark.rb "$count" >/dev/null
-	'
-else
-	printf "Skipping Ruby benchmark because ruby was not found.\n" >&2
+	if have_command ruby
+	then
+		measure_run "Ruby" '
+			ruby string-benchmark.rb "$count" >/dev/null
+		'
+	else
+		printf "Skipping Ruby benchmark because ruby was not found.\n" \
+			>&2
+	fi
 fi
 
 # Test PHP
-if have_command php
+if want_test php
 then
-	measure_run "PHP" '
-		php string-benchmark.php "$count" >/dev/null
-	'
-else
-	printf "Skipping PHP benchmark because php was not found.\n" >&2
+	if have_command php
+	then
+		measure_run "PHP" '
+			php string-benchmark.php "$count" >/dev/null
+		'
+	else
+		printf "Skipping PHP benchmark because php was not found.\n" >&2
+	fi
 fi
 
 # Test Perl
-if have_command perl
+if want_test perl
 then
-	measure_run "Perl" '
-		perl string-benchmark.pl "$count" >/dev/null
-	'
-else
-	printf "Skipping Perl benchmark because perl was not found.\n" >&2
+	if have_command perl
+	then
+		measure_run "Perl" '
+			perl string-benchmark.pl "$count" >/dev/null
+		'
+	else
+		printf "Skipping Perl benchmark because perl was not found.\n" \
+			>&2
+	fi
 fi
 
 # Lua
-if have_command lua
+if want_test lua
 then
-	measure_run "Lua" '
-		lua string-benchmark.lua "$count" >/dev/null
-	'
-else
-	printf "Skipping Lua benchmark because lua was not found.\n" >&2
+	if have_command lua
+	then
+		measure_run "Lua" '
+			lua string-benchmark.lua "$count" >/dev/null
+		'
+	else
+		printf "Skipping Lua benchmark because lua was not found.\n" >&2
+	fi
 fi

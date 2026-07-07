@@ -3,12 +3,174 @@
 set -euh
 
 count=20
-if [ $# -gt 0 ]
+selectedTests=
+
+print_usage( )
+{
+	cat <<EOF
+Usage: ./run.sh [options] [iterations]
+
+Run the Fractal Benchmark.
+
+Options:
+	-h, -help, --help
+		Show this help and exit.
+	-it, -iterations, --iterations COUNT
+		Run each selected test COUNT times.
+	-t, -tests, --tests LIST
+		Run only the comma-separated tests from LIST.
+
+Examples:
+	./run.sh
+	./run.sh -it 20
+	./run.sh -tests c,rust,nodei
+	./run.sh 20
+
+Available tests:
+	c        C
+	rust     Rust
+	swift    Swift
+	go       Go
+	java     Java
+	cs       C#
+	node     Node.js
+	bun      Bun
+	bunc     Bun compiled
+	javai    Java interpreted
+	nodei    Node.js interpreted
+	qjs      QuickJS
+	py       Python
+	ruby     Ruby
+	php      PHP
+	perl     Perl
+	lua      Lua
+EOF
+}
+
+die_usage( )
+{
+	printf "%s\n\n" "$1" >&2
+	print_usage >&2
+	exit 1
+}
+
+validate_count( )
+{
+	case "$1" in
+	"" | *[!0-9]*)
+		die_usage "Iterations must be a positive integer."
+		;;
+	0)
+		die_usage "Iterations must be greater than zero."
+		;;
+	esac
+}
+
+is_known_test( )
+{
+	case "$1" in
+	c | rust | swift | go | java | cs | node | bun | bunc | javai | \
+		nodei | qjs | py | ruby | php | perl | lua)
+		return 0
+		;;
+	esac
+
+	return 1
+}
+
+validate_tests( )
+{
+	oldIfs=$IFS
+	IFS=,
+	for testName in $selectedTests
+	do
+		if ! is_known_test "$testName"
+		then
+			IFS=$oldIfs
+			die_usage "Unknown test: $testName"
+		fi
+	done
+	IFS=$oldIfs
+}
+
+want_test( )
+{
+	if [ -z "$selectedTests" ]
+	then
+		return 0
+	fi
+
+	case ",$selectedTests," in
+	*,"$1",*)
+		return 0
+		;;
+	esac
+
+	return 1
+}
+
+parse_args( )
+{
+	havePositionalCount=false
+
+	while [ $# -gt 0 ]
+	do
+		case "$1" in
+		-h | -help | --help)
+			print_usage
+			exit 0
+			;;
+		-it | -iterations | --iterations)
+			[ $# -ge 2 ] || die_usage "Missing value for $1."
+			validate_count "$2"
+			count="$2"
+			shift 2
+			;;
+		-t | -tests | --tests)
+			[ $# -ge 2 ] || die_usage "Missing value for $1."
+			[ -n "$2" ] || die_usage "Test list must not be empty."
+			selectedTests="$2"
+			shift 2
+			;;
+		--)
+			shift
+			break
+			;;
+		-*)
+			die_usage "Unknown option: $1"
+			;;
+		*)
+			if [ "$havePositionalCount" = true ]
+			then
+				die_usage "Only one positional iterations value is allowed."
+			fi
+			validate_count "$1"
+			count="$1"
+			havePositionalCount=true
+			shift
+			;;
+		esac
+	done
+
+	if [ $# -gt 0 ]
+	then
+		die_usage "Unexpected argument: $1"
+	fi
+
+	if [ -n "$selectedTests" ]
+	then
+		validate_tests
+	fi
+}
+
+parse_args "$@"
+
+if [ -n "$selectedTests" ]
 then
-	count="$1"
-	echo "Performing $count iterations." >&2
+	printf "Performing %s iterations for tests: %s.\n" \
+		"$count" "$selectedTests" >&2
 else
-	echo "No number of iterations given, using default of $count." >&2
+	printf "Performing %s iterations for all tests.\n" "$count" >&2
 fi
 
 
@@ -43,128 +205,175 @@ cd "$tmp"
 
 # Test C
 CC=${CC:-clang}
-if have_command "$CC"
+if want_test c
 then
-	"$CC" -O3 -o mandelbrot-c mandelbrot.c
-	sleep 1
-	./mandelbrot-c "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping C benchmark because %s was not found.\n" "$CC" >&2
+	if have_command "$CC"
+	then
+		"$CC" -O3 -o mandelbrot-c mandelbrot.c
+		sleep 1
+		./mandelbrot-c "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping C benchmark because %s was not found.\n" \
+			"$CC" >&2
+	fi
 fi
 
 # Test Rust
-if have_command rustc
+if want_test rust
 then
-	rustc -C opt-level=3 -o mandelbrot-rust mandelbrot.rs
-	sleep 1
-	./mandelbrot-rust "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping Rust benchmark because rustc was not found.\n" >&2
+	if have_command rustc
+	then
+		rustc -C opt-level=3 -o mandelbrot-rust mandelbrot.rs
+		sleep 1
+		./mandelbrot-rust "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping Rust benchmark because rustc was not found.\n" \
+			>&2
+	fi
 fi
 
 # Test Swift
-if have_command swift
+if want_test swift
 then
-	swift -O mandelbrot.swift "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping Swift benchmark because swift was not found.\n" >&2
+	if have_command swift
+	then
+		swift -O mandelbrot.swift "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping Swift benchmark because swift was not found.\n" \
+			>&2
+	fi
 fi
 
 # Test Go
-if have_command go
+if want_test go
 then
-	go build -o mandelbrot-go mandelbrot.go
-	sleep 1
-	./mandelbrot-go "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping Go benchmark because go was not found.\n" >&2
+	if have_command go
+	then
+		go build -o mandelbrot-go mandelbrot.go
+		sleep 1
+		./mandelbrot-go "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping Go benchmark because go was not found.\n" >&2
+	fi
 fi
 
-
 # Test Java
-if have_command javac && have_command java
+if want_test java
 then
-	javac -d . mandelbrot.java
-	java -cp . Mandelbrot "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping Java benchmark because javac or java was not found.\n" >&2
+	if have_command javac && have_command java
+	then
+		javac -d . mandelbrot.java
+		java -cp . Mandelbrot "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping Java benchmark because javac or java was not " \
+			"found.\n" >&2
+	fi
 fi
 
 # Test C#
-if have_command mcs && have_command mono
+if want_test cs
 then
-	mcs -optimize+ -out:mandelbrot-mono mandelbrot.cs
-	sleep 1
-	mono --optimize=all mandelbrot-mono "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping C# benchmark because mcs or mono was not found.\n" >&2
+	if have_command mcs && have_command mono
+	then
+		mcs -optimize+ -out:mandelbrot-mono mandelbrot.cs
+		sleep 1
+		mono --optimize=all mandelbrot-mono "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping C# benchmark because mcs or mono was not " \
+			"found.\n" >&2
+	fi
 fi
 
 # Test JavaScript (Node.js)
-if have_command node
+if want_test node
 then
-	printf "Node.js " >&2
-	node mandelbrot.node.js "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping Node.js benchmark because node was not found.\n" >&2
+	if have_command node
+	then
+		printf "Node.js " >&2
+		node mandelbrot.node.js "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping Node.js benchmark because node was not found.\n" \
+			>&2
+	fi
 fi
 
 # Test JavaScript (Bun)
-if have_command bun
+if want_test bun
 then
-	printf "Bun " >&2
-	bun mandelbrot.node.js "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping Bun benchmark because bun was not found.\n" >&2
+	if have_command bun
+	then
+		printf "Bun " >&2
+		bun mandelbrot.node.js "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping Bun benchmark because bun was not found.\n" >&2
+	fi
 fi
 
 # Test JavaScript (Bun, Compiled)
-if have_command bun
+if want_test bunc
 then
-	bun build --compile --outfile=mandelbrot-bun mandelbrot.node.js >/dev/null 2>&1
-	sleep 1
-	printf "Bun (compiled) " >&2
-	./mandelbrot-bun "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping Bun compiled benchmark because bun was not found.\n" >&2
+	if have_command bun
+	then
+		bun build --compile --outfile=mandelbrot-bun \
+			mandelbrot.node.js >/dev/null 2>&1
+		sleep 1
+		printf "Bun (compiled) " >&2
+		./mandelbrot-bun "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping Bun compiled benchmark because bun was not " \
+			"found.\n" >&2
+	fi
 fi
 
 # Test Java (Interpreted)
-if have_command javac && have_command java
+if want_test javai
 then
-	printf "Interpreted " >&2
-	java -Xint -cp . Mandelbrot "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping interpreted Java benchmark because javac or java was not found.\n" >&2
+	if have_command javac && have_command java
+	then
+		printf "Interpreted " >&2
+		javac -d . mandelbrot.java
+		java -Xint -cp . Mandelbrot "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping interpreted Java benchmark because javac or " \
+			"java was not found.\n" >&2
+	fi
 fi
 
 # Test JavaScript (Node.js, Interpreted)
-if have_command node
+if want_test nodei
 then
-	printf "Node.js (Interpreted) " >&2
-	node --jitless mandelbrot.node.js "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping interpreted Node.js benchmark because node was not found.\n" >&2
+	if have_command node
+	then
+		printf "Node.js (Interpreted) " >&2
+		node --jitless mandelbrot.node.js "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping interpreted Node.js benchmark because node " \
+			"was not found.\n" >&2
+	fi
 fi
 
 # Test JavaScript (QuickJS)
-if have_command qjs
+if want_test qjs
 then
-	qjs --std mandelbrot.quickjs.js "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping QuickJS benchmark because qjs was not found.\n" >&2
+	if have_command qjs
+	then
+		qjs --std mandelbrot.quickjs.js "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping QuickJS benchmark because qjs was not " \
+			"found.\n" >&2
+	fi
 fi
 
 # Test Python
@@ -176,46 +385,64 @@ elif have_command python3
 then
 	pythonCmd=python3
 fi
-if [ -n "$pythonCmd" ]
+if want_test py
 then
-	"$pythonCmd" mandelbrot.py "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping Python benchmark because python was not found.\n" >&2
+	if [ -n "$pythonCmd" ]
+	then
+		"$pythonCmd" mandelbrot.py "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping Python benchmark because python was not " \
+			"found.\n" >&2
+	fi
 fi
 
 # Test Ruby
-if have_command ruby
+if want_test ruby
 then
-	ruby mandelbrot.rb "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping Ruby benchmark because ruby was not found.\n" >&2
+	if have_command ruby
+	then
+		ruby mandelbrot.rb "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping Ruby benchmark because ruby was not found.\n" \
+			>&2
+	fi
 fi
 
 # Test PHP
-if have_command php
+if want_test php
 then
-	php mandelbrot.php "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping PHP benchmark because php was not found.\n" >&2
+	if have_command php
+	then
+		php mandelbrot.php "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping PHP benchmark because php was not found.\n" >&2
+	fi
 fi
 
 # Test Perl
-if have_command perl
+if want_test perl
 then
-	perl mandelbrot.pl "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping Perl benchmark because perl was not found.\n" >&2
+	if have_command perl
+	then
+		perl mandelbrot.pl "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping Perl benchmark because perl was not found.\n" \
+			>&2
+	fi
 fi
 
 # Lua
-if have_command lua
+if want_test lua
 then
-	lua mandelbrot.lua "$count" >/dev/null
-	sleep 1
-else
-	printf "Skipping Lua benchmark because lua was not found.\n" >&2
+	if have_command lua
+	then
+		lua mandelbrot.lua "$count" >/dev/null
+		sleep 1
+	else
+		printf "Skipping Lua benchmark because lua was not found.\n" >&2
+	fi
 fi
