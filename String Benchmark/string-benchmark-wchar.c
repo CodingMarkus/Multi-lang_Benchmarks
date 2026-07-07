@@ -274,9 +274,9 @@ static void run_benchmark(
 			(data->source_length + 1) * sizeof(*wrapped_text)
 		);
 		if (
-			split_buffer == NULL ||
-			split_words_buffer == NULL ||
-			wrapped_text == NULL
+			split_buffer == NULL
+			|| split_words_buffer == NULL
+			|| wrapped_text == NULL
 		) {
 			fprintf(stderr, "Failed to allocate benchmark buffers.\n");
 			free(split_buffer);
