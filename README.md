@@ -3,6 +3,9 @@ Multi-lang Benchmarks
 
 Compare performance of multiple popular languages across different tasks.
 
+The original and actively developed project is hosted on [Codeberg](https://codeberg.org/CodingMarkus/MultiLang-Benchmarks). \
+Additionally this project is also mirrored on [GitHub](https://github.com/CodingMarkus/MultiLang-Benchmarks).
+
 
 Benchmarks
 ----------
