@@ -1,0 +1,685 @@
+#!/bin/sh
+
+# Copyright 2026 CodingMarkus
+#
+# SPDX-License-Identifier: Unlicense
+
+# cspell:words CDPATH TMPDIR
+# cspell:words objc bunc javai nodei rustc swiftc javac
+# cspell:words quickjs scriptc scriptcts
+# cspell:words Xint fobjc jitless
+# cspell:words darwin linux  kbytes
+
+set -eu
+
+projectDirectory=$(CDPATH='' cd "$(dirname "$0")" && pwd)
+
+selectedBenchmarks=
+selectedLanguages=
+iterations=
+
+allBenchmarks=string,integer,fpu
+
+allLanguages=c,c16,rust,rust16,swift,objc,go,scriptc,bunc,java,cs,node
+allLanguages=$allLanguages,bun,scriptcts,javai,nodei,qjs,py,ruby,php,perl,lua
+
+usage( )
+{
+	cat <<'EOF'
+
+Usage: ./run [options] [iterations]
+
+
+Options:
+
+    -h, -help, --help
+        Show this help and exit.
+
+    -b, -bench, --bench LIST
+        Run the comma-separated benchmarks from LIST.
+
+    -l, -lang, --lang LIST
+        Run the comma-separated languages from LIST.
+
+    -it, -iterations, --iterations COUNT
+        Run each benchmark COUNT times.
+
+  LIST means comma separated list of values.
+
+
+Available benchmarks (default iterations):
+
+    string     String processing and hashing (40)
+    integer    Integer arithmetic (3)
+    fpu	       Floating-point arithmetic (20)
+
+
+Available languages:
+
+    c         C compiled with clang -O3.
+    c16       C UTF-16 variant using fixed-width UTF-16 code units.
+    rust      Rust compiled with rustc -C opt-level=3.
+    rust16    Rust UTF-16 variant using UTF-16 code units.
+    swift     Swift compiled with swiftc -O.
+    objc      Objective-C compiled with Foundation support.
+    go        Go compiled with go build.
+    java      Java running with the normal JVM JIT enabled.
+    cs        C# compiled with mcs and run on Mono with optimizations.
+    node      Node.js running with the V8 JIT enabled.
+    bun       JS running on the Bun runtime.
+    bunc      JS compiled to a standalone Bun executable.
+    javai     Java running with -Xint, disabling the JVM JIT.
+    nodei     Node.js running with --jitless, disabling V8 JIT.
+    qjs       QuickJS JavaScript interpreter.
+    scriptc   TypeScript compiled to a native executable with ScriptC.
+    scriptcts TypeScript run with ScriptC.
+    py        Python running on CPython, using python or python3.
+    ruby      Ruby running on the standard Ruby interpreter.
+    php       PHP running on the standard PHP CLI interpreter.
+    perl      Perl running on the standard Perl interpreter.
+    lua       Lua running on the standard Lua interpreter.
+EOF
+}
+
+
+die( )
+{
+	printf '%s\n\n' "$1" >&2
+	usage >&2
+	exit 1
+}
+
+
+contains( )
+{
+	case ",$1," in
+	*",$2,"*) return 0 ;;
+	esac
+	return 1
+}
+
+
+validate_list( )
+{
+	list=$1
+	known=$2
+	kind=$3
+	oldIfs=$IFS
+	IFS=,
+	for item in $list
+	do
+		if ! contains "$known" "$item"
+		then
+			die "Unknown $kind: $item"
+		fi
+	done
+	IFS=$oldIfs
+}
+
+while [ "$#" -gt 0 ]
+do
+	case "$1" in
+	-h | -help | --help)
+		usage
+		exit 0
+		;;
+	-b | -bench | --bench)
+		if [ "$#" -lt 2 ] \
+			|| [ -z "$2" ]
+		then
+			die 'Missing benchmark list.'
+		fi
+		selectedBenchmarks=$2
+		shift 2
+		;;
+	-l | -lang | --lang)
+		if [ "$#" -lt 2 ] \
+			|| [ -z "$2" ]
+		then
+			die 'Missing language list.'
+		fi
+		selectedLanguages=$2
+		shift 2
+		;;
+	-it | -iterations | --iterations)
+		if [ "$#" -lt 2 ]
+		then
+			die 'Missing iteration count.'
+		fi
+		iterations=$2
+		shift 2
+		;;
+	*)
+		if [ -n "$iterations" ] \
+			|| [ "${1#*[!0-9]}" != "$1" ] \
+			|| [ "$1" = 0 ]
+		then
+			die 'Iterations must be a positive integer.'
+		fi
+		iterations=$1
+		shift
+		;;
+	esac
+done
+
+if [ -n "$selectedBenchmarks" ]
+then
+	validate_list "$selectedBenchmarks" "$allBenchmarks" benchmark
+fi
+if [ -n "$selectedLanguages" ]
+then
+	validate_list "$selectedLanguages" "$allLanguages" language
+fi
+if [ -z "$selectedBenchmarks" ]
+then
+	selectedBenchmarks=$allBenchmarks
+fi
+
+timeCommand=/usr/bin/time
+case "$(uname -s)" in
+	Darwin) timeMode=darwin; timeFlags=-l ;;
+	Linux) timeMode=linux; timeFlags=-v ;;
+		*)
+			die 'No supported time tool found.'
+			;;
+esac
+if [ ! -x "$timeCommand" ]
+then
+	die 'No supported time tool found.'
+fi
+
+
+measure( )
+{
+	label=$1
+	binary=$2
+	shift 2
+	binarySize='n/a'
+	if [ -n "$binary" ]
+	then
+		binarySize=$(wc -c < "$binary")
+		binarySize=$(awk "BEGIN { print int(($binarySize + 1023) / 1024) }")
+	fi
+	timeLog=$(mktemp "${TMPDIR:-/tmp}/multi-lang-time.XXXXXX")
+	"$timeCommand" "$timeFlags" "$@" >/dev/null 2>"$timeLog" \
+		|| true
+	if [ "$timeMode" = darwin ]
+	then
+		total=$(awk '/ real / { print $1; exit }' "$timeLog")
+		memory=$(awk '/maximum resident set size/ { print $1; exit }' \
+			"$timeLog")
+	else
+		total=$(awk -F': ' '/Elapsed \(wall clock\) time/ { print $2 }' \
+			"$timeLog")
+		memory=$(awk -F': ' \
+			'/Maximum resident set size \(kbytes\)/ { print $2 }' \
+			"$timeLog")
+		total=$(printf '%s\n' "$total" | awk -F: '
+			NF == 2 { printf "%.3f", $1 * 60 + $2 }
+			NF == 3 { printf "%.3f", $1 * 3600 + $2 * 60 + $3 }
+		')
+		if [ -n "$memory" ]
+		then
+			memory=$(( memory * 1024 ))
+		fi
+	fi
+	benchmark=$(awk '
+		/: [0-9.]+ s$/ {
+			value = $0
+			sub(/^.*: /, "", value)
+			sub(/ s$/, "", value)
+			print value
+			exit
+		}
+	' "$timeLog")
+	if [ -z "$total" ] \
+		|| [ -z "$benchmark" ]
+	then
+		cat "$timeLog" >&2
+		rm -f "$timeLog"
+		return 1
+	fi
+	total=$(awk -v value="$total" '
+		BEGIN {
+			scaled = value * 1000
+			rounded = int(scaled)
+			if (scaled - rounded > 0.000001) rounded++
+			if (rounded < 1) rounded = 1
+			printf "%.3f", rounded / 1000
+		}
+	')
+	benchmark=$(awk -v value="$benchmark" '
+		BEGIN {
+			scaled = value * 1000
+			rounded = int(scaled)
+			if (scaled - rounded > 0.000001) rounded++
+			if (rounded < 1) rounded = 1
+			printf "%.3f", rounded / 1000
+		}
+	')
+	if [ -n "$memory" ]
+	then
+		memory=$(awk "BEGIN {
+			scaled = $memory * 1000 / 1048576
+			rounded = int(scaled)
+			if (scaled - rounded > 0.000001) rounded++
+			printf \"%.3f\", rounded / 1000
+		}")
+	else
+		memory='n/a'
+	fi
+	if [ "$memory" != n/a ]
+	then
+		memory=$memory' MiB'
+	fi
+	printf '%-19s | %9s | %13s | %12s | %12s\n' \
+		"$label" "$total" "$benchmark" "$binarySize" "$memory"
+	rm -f "$timeLog"
+}
+
+
+runCBench( )
+{
+	label=$1
+	source=$2
+	workspace=$(mktemp -d)
+	if ! command -v "${CC:-clang}" >/dev/null 2>&1
+	then
+		printf 'Skipping %s benchmark because C is unavailable.\n' \
+			"$label" >&2
+	elif "${CC:-clang}" -O3 -o "$workspace/benchmark" "$source"
+	then
+		measure "$label" "$workspace/benchmark" "$workspace/benchmark" "$count"
+	else
+		printf 'Skipping %s benchmark because C compilation failed.\n' \
+			"$label" >&2
+	fi
+	rm -rf "$workspace"
+}
+
+
+runRustBench( )
+{
+	label=$1
+	source=$2
+	workspace=$(mktemp -d)
+	if ! command -v rustc >/dev/null 2>&1
+	then
+		printf 'Skipping %s benchmark because Rust is unavailable.\n' \
+			"$label" >&2
+	elif rustc -C opt-level=3 -o "$workspace/benchmark" "$source"
+	then
+		measure "$label" "$workspace/benchmark" "$workspace/benchmark" "$count"
+	else
+		printf 'Skipping %s benchmark because Rust compilation failed.\n' \
+			"$label" >&2
+	fi
+	rm -rf "$workspace"
+}
+
+
+runSwiftBench( )
+{
+	label=$1
+	source=$2
+	workspace=$(mktemp -d)
+	if ! command -v swiftc >/dev/null 2>&1
+	then
+		printf 'Skipping %s benchmark because Swift is unavailable.\n' \
+			"$label" >&2
+	elif swiftc -O -o "$workspace/benchmark" "$source"
+	then
+		measure "$label" "$workspace/benchmark" "$workspace/benchmark" "$count"
+	else
+		printf 'Skipping %s benchmark because Swift compilation failed.\n' \
+			"$label" >&2
+	fi
+	rm -rf "$workspace"
+}
+
+
+runObjectiveCBench( )
+{
+	label=$1
+	source=$2
+	workspace=$(mktemp -d)
+	if ! command -v "${CC:-clang}" >/dev/null 2>&1
+	then
+		printf 'Skipping %s benchmark because Objective-C is unavailable.\n' \
+			"$label" >&2
+	elif "${CC:-clang}" -O3 -fobjc-arc -framework Foundation \
+		-o "$workspace/benchmark" "$source"
+	then
+		measure "$label" "$workspace/benchmark" "$workspace/benchmark" "$count"
+	else
+		printf 'Skipping %s benchmark because %s compilation failed.\n' \
+			"$label" "Objective-C" >&2
+	fi
+	rm -rf "$workspace"
+}
+
+
+runGoBench( )
+{
+	label=$1
+	source=$2
+	workspace=$(mktemp -d)
+	if ! command -v go >/dev/null 2>&1
+	then
+		printf 'Skipping %s benchmark because Go is unavailable.\n' "$label" \
+			>&2
+	elif go build -o "$workspace/benchmark" "$source"
+	then
+		measure "$label" "$workspace/benchmark" "$workspace/benchmark" "$count"
+	else
+		printf 'Skipping %s benchmark because Go is unavailable.\n' \
+			"$label" >&2
+	fi
+	rm -rf "$workspace"
+}
+
+
+runJavaBench( )
+{
+	label=$1
+	source=$2
+	mode=${3:-}
+	sourceName=${source##*/}
+	className=${sourceName%.java}
+	case "$className" in
+	string) className=String ;;
+	integer) className=Integer ;;
+	fpu) className=FPU ;;
+	esac
+	workspace=$(mktemp -d)
+	if ! command -v javac >/dev/null 2>&1 \
+		|| ! command -v java >/dev/null 2>&1
+	then
+		printf 'Skipping %s benchmark because Java is unavailable.\n' \
+			"$label" >&2
+	elif javac -d "$workspace" "$source"
+	then
+		if [ -n "$mode" ]
+		then
+			measure "$label" '' java "$mode" \
+				-cp "$workspace" "$className" \
+				"$count"
+		else
+			measure "$label" '' java \
+				-cp "$workspace" "$className" "$count"
+		fi
+	else
+		printf 'Skipping %s benchmark because Java is unavailable.\n' \
+			"$label" >&2
+	fi
+	rm -rf "$workspace"
+}
+
+
+runCSharpBench( )
+{
+	label=$1
+	source=$2
+	workspace=$(mktemp -d)
+	if ! command -v mcs >/dev/null 2>&1 \
+		|| ! command -v mono >/dev/null 2>&1
+	then
+		printf 'Skipping %s benchmark because Mono is unavailable.\n' \
+			"$label" >&2
+	elif mcs -optimize+ -out:"$workspace/benchmark" "$source"
+	then
+		measure "$label" '' mono --optimize=all \
+			"$workspace/benchmark" "$count"
+	else
+		printf 'Skipping %s benchmark because Mono is unavailable.\n' \
+			"$label" >&2
+	fi
+	rm -rf "$workspace"
+}
+
+
+runNodeBench( )
+{
+	label=$1
+	source=$2
+	mode=${3:-}
+	if command -v node >/dev/null 2>&1
+	then
+		if [ -n "$mode" ]
+		then
+			measure "$label" '' node "$mode" "$source" "$count"
+		else
+			measure "$label" '' node "$source" "$count"
+		fi
+	else
+		printf 'Skipping %s benchmark because Node.js is unavailable.\n' \
+			"$label" >&2
+	fi
+}
+
+
+runBunBench( )
+{
+	label=$1
+	source=$2
+	if command -v bun >/dev/null 2>&1
+	then
+		measure "$label" '' bun "$source" "$count"
+	else
+		printf 'Skipping %s benchmark because Bun is unavailable.\n' \
+			"$label" >&2
+	fi
+}
+
+
+runCompiledBunBench( )
+{
+	label=$1
+	source=$2
+	workspace=$(mktemp -d)
+	if ! command -v bun >/dev/null 2>&1
+	then
+		printf 'Skipping %s benchmark because Bun is unavailable.\n' "$label" \
+			>&2
+	elif bun build --compile --outfile="$workspace/benchmark" "$source" \
+		>/dev/null
+	then
+		measure "$label" "$workspace/benchmark" "$workspace/benchmark" "$count"
+	else
+		printf 'Skipping %s benchmark because Bun compilation failed.\n' \
+			"$label" >&2
+	fi
+	rm -rf "$workspace"
+}
+
+
+runScriptBench( )
+{
+	label=$1
+	commandName=$2
+	source=$3
+	if command -v "$commandName" >/dev/null 2>&1
+	then
+		measure "$label" '' "$commandName" "$source" "$count"
+	else
+		printf 'Skipping %s benchmark because %s is unavailable.\n' \
+			"$label" "$commandName" >&2
+	fi
+}
+
+
+runQuickJSBench( )
+{
+	label=$1
+	source=$2
+	if command -v qjs >/dev/null 2>&1
+	then
+		measure "$label" '' qjs --std "$source" "$count"
+	else
+		printf 'Skipping %s benchmark because QuickJS is unavailable.\n' \
+			"$label" >&2
+	fi
+}
+
+
+runCompiledScriptCBench( )
+{
+	label=$1
+	source=$2
+	workspace=$(mktemp -d)
+	if ! command -v scriptc >/dev/null 2>&1
+	then
+		printf 'Skipping %s benchmark because ScriptC is unavailable.\n' \
+			"$label" >&2
+	elif cp "$source" "$workspace/fpu.ts" \
+		&& (
+			cd "$workspace"
+			scriptc build fpu.ts -o fpu >/dev/null
+		)
+	then
+		measure "$label" "$workspace/fpu" "$workspace/fpu" "$count"
+	else
+		printf 'Skipping %s benchmark because ScriptC compilation failed.\n' \
+			"$label" >&2
+	fi
+	rm -rf "$workspace"
+}
+
+
+runScriptCTypeScriptBench( )
+{
+	label=$1
+	source=$2
+	workspace=$(mktemp -d)
+	if ! command -v scriptc >/dev/null 2>&1
+	then
+		printf 'Skipping %s benchmark because ScriptC is unavailable.\n' \
+			"$label" >&2
+	elif cp "$source" "$workspace/fpu.ts"
+	then
+		(
+			cd "$workspace"
+			measure "$label" '' scriptc run fpu.ts "$count"
+		)
+	else
+		printf 'Skipping %s benchmark because ScriptC could not run.\n' \
+			"$label" >&2
+	fi
+	rm -rf "$workspace"
+}
+
+
+want_language( )
+{
+	if [ -z "$selectedLanguages" ]
+	then
+		return 0
+	fi
+	contains "$selectedLanguages" "$1"
+}
+
+
+run_benchmark( )
+{
+	benchmark=$1
+	directory=$2
+	base=$3
+	available=$4
+	count=${iterations:-$5}
+	heading="$benchmark benchmark"
+	printf '\n%s\n' "$heading"
+	printf '%*s\n\n' "${#heading}" '' | tr ' ' '='
+	printf '%-19s | %9s | %13s | %12s | %12s\n' \
+		Language 'Total (s)' 'Benchmark (s)' 'Binary (KiB)' 'Memory (MiB)'
+	printf '%s%s\n' \
+		'--------------------+-----------+---------------' \
+		'+--------------+-------------'
+	oldIfs=$IFS
+	IFS=,
+	for language in $available
+	do
+		if ! want_language "$language"
+		then
+			continue
+		fi
+		case "$language" in
+		c) source=$directory/$base.c ;;
+		c16) source=$directory/$base-utf16.c ;;
+		rust) source=$directory/$base.rs ;;
+		rust16) source=$directory/$base-utf16.rs ;;
+		swift) source=$directory/$base.swift ;;
+		objc) source=$directory/$base.m ;;
+		go) source=$directory/$base.go ;;
+		java | javai) source=$directory/$base.java ;;
+		cs) source=$directory/$base.cs ;;
+		node | bun | bunc | nodei) source=$directory/$base.node.js ;;
+		qjs) source=$directory/$base.quickjs.js ;;
+		scriptc | scriptcts) source=$directory/$base.ts ;;
+		py) source=$directory/$base.py ;;
+		ruby) source=$directory/$base.rb ;;
+		php) source=$directory/$base.php ;;
+		perl) source=$directory/$base.pl ;;
+		lua) source=$directory/$base.lua ;;
+		esac
+		if [ ! -f "$source" ]
+		then
+			continue
+		fi
+		case "$language" in
+		c) runCBench C "$source" ;;
+		c16) runCBench 'C UTF-16' "$source" ;;
+		rust) runRustBench Rust "$source" ;;
+		rust16) runRustBench 'Rust UTF-16' "$source" ;;
+		swift) runSwiftBench Swift "$source" ;;
+		objc) runObjectiveCBench Objective-C "$source" ;;
+		go) runGoBench Go "$source" ;;
+		java) runJavaBench Java "$source" ;;
+		cs) runCSharpBench 'C#' "$source" ;;
+		node) runNodeBench 'Node.js' "$source" ;;
+		bun) runBunBench 'Bun JS' "$source" ;;
+		bunc) runCompiledBunBench 'Bun Compiled JS' \
+			"$source" ;;
+		javai) runJavaBench 'Interpreted Java' "$source" \
+			-Xint ;;
+		nodei) runNodeBench 'Interpreted Node.js' \
+			"$source" --jitless ;;
+		qjs) runQuickJSBench QuickJS "$source" ;;
+		scriptc) runCompiledScriptCBench 'ScriptC Compiled TS' "$source" ;;
+		scriptcts) runScriptCTypeScriptBench 'ScriptC TS' "$source" ;;
+		py)
+			if command -v python >/dev/null 2>&1
+			then
+				runScriptBench Python python "$source"
+			else
+				runScriptBench Python python3 "$source"
+			fi
+			;;
+		ruby) runScriptBench Ruby ruby "$source" ;;
+		php) runScriptBench PHP php "$source" ;;
+		perl) runScriptBench Perl perl "$source" ;;
+		lua) runScriptBench Lua lua "$source" ;;
+		esac
+	done
+	IFS=$oldIfs
+}
+
+oldIfs=$IFS
+IFS=,
+for benchmark in $selectedBenchmarks
+do
+	case "$benchmark" in
+	string)
+		run_benchmark String "$projectDirectory/benchmarks/String" string \
+			"$allLanguages" 40
+		;;
+	integer)
+		run_benchmark Integer "$projectDirectory/benchmarks/Integer" integer \
+			"$allLanguages" 3
+		;;
+	fpu)
+		run_benchmark FPU "$projectDirectory/benchmarks/FPU" fpu \
+			"$allLanguages" 20
+		;;
+	esac
+done
+IFS=$oldIfs

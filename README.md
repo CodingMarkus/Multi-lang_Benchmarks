@@ -7,9 +7,17 @@ Compare performance of multiple popular languages across different tasks.
 Benchmarks
 ----------
 
-- [String Benchmark](./String%20Benchmark/README.md)
-- [Fractal Benchmark](./Fractal%20Benchmark/README.md)
-- [Integer Benchmark](./Integer%20Benchmark/README.md)
+- [String](./benchmarks/String/README.md)
+- [FPU](./benchmarks/FPU/README.md)
+- [Integer](./benchmarks/Integer/README.md)
+
+Run `./run` to measure every benchmark in every available language. Use
+`-b` or `--bench` to select benchmarks, and `-l` or `--lang` to select
+languages. A selected language that a benchmark does not offer is skipped.
+
+Use `./util/update-benchmarks.sh` after measuring results to refresh each
+benchmark table and its SVG charts. It only accepts benchmark selection and
+always runs every language available for each selected benchmark.
 
 
 Tested Languages
@@ -23,9 +31,9 @@ Tested Languages
 - **Java:** Normal JVM execution with JIT compilation enabled.
 - **Java (interpreted):** JVM execution forced into interpreter mode with `java -Xint`, disabling JIT compilation.
 - **C#:** C# implementation compiled with `mcs` and run on Mono with optimizations enabled.
-- **Node.js JavaScript:** Standard Node.js execution with the normal V8 JIT pipeline enabled.
-- **Node.js (Interpreted) JavaScript:** Node.js run with `--jitless`, disabling the V8 JIT so execution stays in non-JIT mode.
-- **QuickJS JavaScript:** JavaScript executed with QuickJS instead of Node.js and V8.
+- **Node.js:** Standard Node.js execution with the normal V8 JIT pipeline enabled.
+- **Node.js (Interpreted):** Node.js run with `--jitless`, disabling the V8 JIT so execution stays in non-JIT mode.
+- **QuickJS:** JavaScript executed with QuickJS instead of Node.js and V8.
 - **Python:** CPython execution using `python` or `python3`, depending on what is available.
 - **Ruby:** Standard Ruby interpreter execution.
 - **PHP:** Standard PHP CLI interpreter execution.
@@ -52,11 +60,11 @@ Benchmark result charts should use one shared visual style across all benchmark 
 - The left chart margin includes the y-axis labels. The plotted bars should start at the right edge of that margin.
 - If a y-axis label does not fit into the left chart margin at the default font size, reduce that label's font size until it fits, down to a minimum of 13 px.
 - Use a row height of 48 px and a bar height of 26 px.
-- Center the title horizontally near the top with the benchmark name followed by either `(Elapsed Time in Seconds)` or `(Peak RSS in MiB)`.
+- Center the title horizontally near the top with the benchmark name followed by the displayed metric and unit.
 - Draw a solid left and bottom axis line in a medium gray.
 - Draw vertical grid lines in a light gray dashed style.
 - Place language labels to the left of the bars and numeric value labels just to the right of the bar ends.
 - Format displayed benchmark values with three decimal places.
-- Label the x-axis as `Elapsed Time (seconds)` for time charts and `Memory Consumption (MiB)` for memory charts.
+- Label the x-axis with the displayed metric and unit.
 - Keep one bar per benchmarked language in README table order.
 - Use the same repeating color palette for every benchmark chart.

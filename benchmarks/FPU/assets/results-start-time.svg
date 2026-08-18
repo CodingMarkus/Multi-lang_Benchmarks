@@ -1,0 +1,70 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1280' height='960' viewBox='0 0 1280 960'>
+<rect width='100%' height='100%' fill='white'/>
+<style>text{font-family:Arial,sans-serif;fill:#202124}.grid{stroke:#d8d8d8;stroke-dasharray:4 4}.axis{stroke:#777;stroke-width:1.5}</style>
+<text x='640' y='32' font-family='Arial Bold,Arial,sans-serif' font-size='24' font-weight='bold' text-anchor='middle'>FPU (Start Time in Seconds)</text>
+<line x1='300' y1='60' x2='300' y2='906' class='grid'/>
+<text x='300.0' y='930.0' font-size='16' text-anchor='middle'>0.000</text>
+<line x1='488' y1='60' x2='488' y2='906' class='grid'/>
+<text x='488.0' y='930.0' font-size='16' text-anchor='middle'>1.000</text>
+<line x1='676' y1='60' x2='676' y2='906' class='grid'/>
+<text x='676.0' y='930.0' font-size='16' text-anchor='middle'>2.000</text>
+<line x1='864' y1='60' x2='864' y2='906' class='grid'/>
+<text x='864.0' y='930.0' font-size='16' text-anchor='middle'>3.000</text>
+<line x1='1052' y1='60' x2='1052' y2='906' class='grid'/>
+<text x='1052.0' y='930.0' font-size='16' text-anchor='middle'>4.000</text>
+<line x1='1240' y1='60' x2='1240' y2='906' class='grid'/>
+<text x='1240.0' y='930.0' font-size='16' text-anchor='middle'>5.000</text>
+<line x1='300' y1='60' x2='300' y2='906' class='axis'/>
+<line x1='300' y1='906' x2='1240' y2='906' class='axis'/>
+<text x='286' y='90.0' font-size='18' text-anchor='end'>C</text>
+<rect x='300' y='71.0' width='46.4' height='26' rx='2' fill='#4c78a8'/>
+<text x='354.4' y='90.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.247</text>
+<text x='286' y='138.0' font-size='18' text-anchor='end'>Rust</text>
+<rect x='300' y='119.0' width='27.1' height='26' rx='2' fill='#4c78a8'/>
+<text x='335.1' y='138.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.144</text>
+<text x='286' y='186.0' font-size='18' text-anchor='end'>Swift</text>
+<rect x='300' y='167.0' width='25.6' height='26' rx='2' fill='#4c78a8'/>
+<text x='333.6' y='186.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.136</text>
+<text x='286' y='234.0' font-size='18' text-anchor='end'>Go</text>
+<rect x='300' y='215.0' width='27.8' height='26' rx='2' fill='#4c78a8'/>
+<text x='335.8' y='234.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.148</text>
+<text x='286' y='282.0' font-size='18' text-anchor='end'>Java</text>
+<rect x='300' y='263.0' width='9.6' height='26' rx='2' fill='#4c78a8'/>
+<text x='317.6' y='282.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.051</text>
+<text x='286' y='330.0' font-size='18' text-anchor='end'>C#</text>
+<rect x='300' y='311.0' width='3.8' height='26' rx='2' fill='#4c78a8'/>
+<text x='311.8' y='330.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.020</text>
+<text x='286' y='378.0' font-size='18' text-anchor='end'>Node.js JavaScript</text>
+<rect x='300' y='359.0' width='5.3' height='26' rx='2' fill='#4c78a8'/>
+<text x='313.3' y='378.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.028</text>
+<text x='286' y='426.0' font-size='18' text-anchor='end'>Bun JavaScript</text>
+<rect x='300' y='407.0' width='2.8' height='26' rx='2' fill='#4c78a8'/>
+<text x='310.8' y='426.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.015</text>
+<text x='286' y='474.0' font-size='18' text-anchor='end'>Bun (compiled) JavaScript</text>
+<rect x='300' y='455.0' width='112.0' height='26' rx='2' fill='#4c78a8'/>
+<text x='420.0' y='474.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.596</text>
+<text x='286' y='522.0' font-size='18' text-anchor='end'>Interpreted Java</text>
+<rect x='300' y='503.0' width='7.5' height='26' rx='2' fill='#4c78a8'/>
+<text x='315.5' y='522.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.040</text>
+<text x='286' y='570.0' font-size='18' text-anchor='end'>Node.js (Interpreted) JavaScript</text>
+<rect x='300' y='551.0' width='7.0' height='26' rx='2' fill='#4c78a8'/>
+<text x='315.0' y='570.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.037</text>
+<text x='286' y='618.0' font-size='18' text-anchor='end'>QuickJS JavaScript</text>
+<rect x='300' y='599.0' width='-1.1' height='26' rx='2' fill='#4c78a8'/>
+<text x='306.9' y='618.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>-0.006</text>
+<text x='286' y='666.0' font-size='18' text-anchor='end'>Python</text>
+<rect x='300' y='647.0' width='4.1' height='26' rx='2' fill='#4c78a8'/>
+<text x='312.1' y='666.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.022</text>
+<text x='286' y='714.0' font-size='18' text-anchor='end'>Ruby</text>
+<rect x='300' y='695.0' width='12.2' height='26' rx='2' fill='#4c78a8'/>
+<text x='320.2' y='714.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.065</text>
+<text x='286' y='762.0' font-size='18' text-anchor='end'>PHP</text>
+<rect x='300' y='743.0' width='2.8' height='26' rx='2' fill='#4c78a8'/>
+<text x='310.8' y='762.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.015</text>
+<text x='286' y='810.0' font-size='18' text-anchor='end'>Perl</text>
+<rect x='300' y='791.0' width='2.8' height='26' rx='2' fill='#4c78a8'/>
+<text x='310.8' y='810.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.015</text>
+<text x='286' y='858.0' font-size='18' text-anchor='end'>Lua</text>
+<rect x='300' y='839.0' width='0.9' height='26' rx='2' fill='#4c78a8'/>
+<text x='308.9' y='858.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>0.005</text>
+</svg>
