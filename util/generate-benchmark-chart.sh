@@ -8,11 +8,22 @@ set -eu
 
 if [ "$#" -ne 4 ]
 then
-	printf 'Usage: %s <readme> <svg> <title> <column>\n' "$0" >&2
+	printf 'Usage: %s <readme> <image-bundle> <title> <column>\n' \
+		"$0" >&2
 	exit 1
 fi
 
-awk -F'|' -v title="$3" -v metric="$4" '
+readme=$1
+imageBundle=$2
+title=$3
+metric=$4
+mkdir -p "$imageBundle"
+
+generate_chart( )
+{
+	colorScheme=$1
+	awk -F'|' -v title="$title" -v metric="$metric" \
+		-v scheme="$colorScheme" '
 	function xml(text) {
 		gsub(/&/, "\\&amp;", text)
 		gsub(/</, "\\&lt;", text)
@@ -55,14 +66,16 @@ awk -F'|' -v title="$3" -v metric="$4" '
 		axisLabel = title
 		sub(/^[^(]*\(/, "", axisLabel)
 		sub(/\)[[:space:]]*$/, "", axisLabel)
+		textColor = scheme == "dark" ? "#e8eaed" : "#202124"
+		gridColor = scheme == "dark" ? "#5f6368" : "#d8d8d8"
+		axisColor = scheme == "dark" ? "#9aa0a6" : "#777"
+		barColor = scheme == "dark" ? "#8ab4f8" : "#4c78a8"
 		print "<svg xmlns=\047http://www.w3.org/2000/svg\047" \
 			" width=\047" width "\047 height=\047" height \
 			"\047 viewBox=\0470 0 " width " " height "\047>"
-		print "<rect width=\047100%\047 height=\047100%\047" \
-			" fill=\047white\047/>"
-		print "<style>text{font-family:Arial,sans-serif;fill:#202124}" \
-			".grid{stroke:#d8d8d8;stroke-dasharray:4 4}" \
-			".axis{stroke:#777;stroke-width:1.5}</style>"
+		print "<style>text{font-family:Arial,sans-serif;fill:" textColor "}" \
+			".grid{stroke:" gridColor ";stroke-dasharray:4 4}" \
+			".axis{stroke:" axisColor ";stroke-width:1.5}</style>"
 		print "<text x=\047640\047 y=\04732\047" \
 			" font-family=\047Arial Bold,Arial,sans-serif\047" \
 			" font-size=\04724\047 font-weight=\047bold\047" \
@@ -97,7 +110,7 @@ awk -F'|' -v title="$3" -v metric="$4" '
 				labelFontSize, xml(label[row])
 			printf "<rect x=\047%d\047 y=\047%.1f\047 width=\047%.1f\047" \
 				" height=\047%d\047 rx=\0472\047 fill=\047%s\047/>\n", \
-				left, y, barWidth, barHeight, "#4c78a8"
+				left, y, barWidth, barHeight, barColor
 			printf "<text x=\047%.1f\047 y=\047%.1f\047" \
 				" font-family=\047Arial Bold,Arial,sans-serif\047" \
 				" font-size=\04716\047 font-weight=\047bold\047" \
@@ -105,4 +118,8 @@ awk -F'|' -v title="$3" -v metric="$4" '
 		}
 		print "</svg>"
 	}
-' "$1" > "$2"
+' "$readme" > "$imageBundle/$colorScheme.svg"
+}
+
+generate_chart light
+generate_chart dark

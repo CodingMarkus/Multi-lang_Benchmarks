@@ -1,0 +1,46 @@
+/*
+ * Copyright 2026 CodingMarkus
+ *
+ * SPDX-License-Identifier: ISC
+ */
+
+body {
+	padding-bottom: 0.8rem;
+}
+
+footer {
+	color: #656d76;
+	text-align: center;
+}
+
+footer p + p {
+	margin-top: -0.75em;
+	margin-bottom: 0;
+	font-size: max(12px, 0.8em);
+}
+
+footer p:first-of-type {
+	font-size: 0.9em;
+}
+
+footer hr {
+	margin: 0.75em 0;
+}
+
+@media (prefers-color-scheme: dark) {
+	footer {
+		color: #8b949e;
+	}
+}
+
+@media (prefers-contrast: more) {
+	footer {
+		color: #000000;
+	}
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+	footer {
+		color: #e0e0e0;
+	}
+}

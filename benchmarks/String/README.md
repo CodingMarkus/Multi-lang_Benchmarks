@@ -53,8 +53,8 @@ implementations and measures each benchmark command with `/usr/bin/time`.
 | Perl | 21.290 | 20.762 | n/a | 41.469 |
 | Lua | 7.090 | 6.927 | n/a | 85.782 |
 
-![Benchmark time](assets/results-time.svg)
+![Benchmark time](assets/results-time.img/light.svg)
 
-![Peak RSS](assets/results-memory.svg)
+![Peak RSS](assets/results-memory.img/light.svg)
 
-![Binary size](assets/results-binary-size.svg)
+![Binary size](assets/results-binary-size.img/light.svg)

@@ -1,0 +1,5901 @@
+#!/bin/sh
+
+#
+# Copyright 2026 CodingMarkus
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+set -eu
+
+MARKSHUP_EXECUTABLE_PATH=$( CDPATH='' cd "$( dirname "$0" )" && pwd )
+MARKSHUP_EXECUTABLE_PATH=$MARKSHUP_EXECUTABLE_PATH/$( basename "$0" )
+export MARKSHUP_EXECUTABLE_PATH
+MARKSHUP_SELFUPDATE_AVAILABLE=1
+export MARKSHUP_SELFUPDATE_AVAILABLE
+
+markshupTemporaryDirectory=$( mktemp -d \
+"${TMPDIR:-/tmp}/markshup.XXXXXX" )
+markshupReleaseTemporaryDirectory=$markshupTemporaryDirectory
+MARKSHUP_DEFAULT_CSS_PATH=$markshupTemporaryDirectory
+MARKSHUP_DEFAULT_CSS_PATH=$MARKSHUP_DEFAULT_CSS_PATH/default.css
+MARKSHUP_RENDERER_PATH=$markshupTemporaryDirectory
+MARKSHUP_RENDERER_PATH=$MARKSHUP_RENDERER_PATH/parser.awk
+MARKSHUP_TEMPLATE_QUOTER_PATH=$markshupTemporaryDirectory
+MARKSHUP_TEMPLATE_QUOTER_PATH=$MARKSHUP_TEMPLATE_QUOTER_PATH/template-quote.awk
+MARKSHUP_MERMAID_HELPER_PATH=$markshupTemporaryDirectory
+MARKSHUP_MERMAID_HELPER_PATH=$MARKSHUP_MERMAID_HELPER_PATH/mermaid-helper.js
+MARKSHUP_MERMAID_LICENSE_PATH=$markshupTemporaryDirectory
+MARKSHUP_MERMAID_LICENSE_PATH=$MARKSHUP_MERMAID_LICENSE_PATH/
+MARKSHUP_MERMAID_LICENSE_PATH=${MARKSHUP_MERMAID_LICENSE_PATH}mermaid-
+MARKSHUP_MERMAID_LICENSE_PATH=${MARKSHUP_MERMAID_LICENSE_PATH}license.txt
+awk '
+/^: <<\\__MARKSHUP_DEFAULT_CSS__$/ {
+	found = 1
+	next
+}
+/^__MARKSHUP_DEFAULT_CSS__$/ {
+	exit
+}
+found {
+	print
+}
+' "$0" > "$MARKSHUP_DEFAULT_CSS_PATH"
+awk '
+/^: <<\\__MARKSHUP_RENDERER__$/ {
+	found = 1
+	next
+}
+/^__MARKSHUP_RENDERER__$/ {
+	exit
+}
+found {
+	print
+}
+' "$0" > "$MARKSHUP_RENDERER_PATH"
+awk '
+/^: <<\\__MARKSHUP_TEMPLATE_QUOTER__$/ {
+	found = 1
+	next
+}
+/^__MARKSHUP_TEMPLATE_QUOTER__$/ {
+	exit
+}
+found {
+	print
+}
+' "$0" > "$MARKSHUP_TEMPLATE_QUOTER_PATH"
+awk '
+/^: <<\\__MARKSHUP_MERMAID_HELPER__$/ {
+	found = 1
+	next
+}
+/^__MARKSHUP_MERMAID_HELPER__$/ {
+	exit
+}
+found {
+	print
+}
+' "$0" > "$MARKSHUP_MERMAID_HELPER_PATH"
+awk '
+/^: <<\\__MARKSHUP_MERMAID_LICENSE__$/ {
+	found = 1
+	next
+}
+/^__MARKSHUP_MERMAID_LICENSE__$/ {
+	exit
+}
+found {
+	print
+}
+' "$0" > "$MARKSHUP_MERMAID_LICENSE_PATH"
+
+: <<\__MARKSHUP_DEFAULT_CSS__
+/*
+ * Copyright 2026 CodingMarkus
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+body {
+	max-width: 61.25em;
+	margin: 0 auto;
+	padding: 2em;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+		Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+	line-height: 1.5;
+	word-wrap: break-word;
+	color: #242424;
+	background-color: #fafafa;
+}
+
+a {
+	color: #0969da;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+p {
+	margin-top: 0;
+	margin-bottom: 1em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+h1 {
+	margin-top: 0.75em;
+	margin-bottom: 0.5em;
+	padding-bottom: 0.3em;
+	font-size: 2em;
+	border-bottom: 0.03em solid #d8dee4;
+}
+
+main > h1:first-child {
+	margin-top: 0;
+}
+
+h2 {
+	margin-top: 1em;
+	margin-bottom: 0.67em;
+	padding-bottom: 0.3em;
+	font-size: 1.5em;
+	border-bottom: 0.04em solid #d8dee4;
+}
+
+h3 {
+	margin-top: 1.2em;
+	margin-bottom: 0.8em;
+	font-size: 1.37em;
+}
+
+h4 {
+	margin-top: 1.5em;
+	margin-bottom: 1em;
+	font-size: 1.25em;
+}
+
+h5 {
+	margin-top: 1.71em;
+	margin-bottom: 1.14em;
+	font-size: 1.14em;
+}
+
+h6 {
+	margin-top: 1.76em;
+	margin-bottom: 1.18em;
+	font-size: 1.04em;
+	font-weight: 700;
+}
+
+hr {
+	height: 0.25em;
+	margin: 1.5em 0;
+	padding: 0;
+	background-color: #d8dee4;
+	border: 0;
+}
+
+ul, ol {
+	margin-top: 0;
+	margin-bottom: 1em;
+	padding-left: 2em;
+}
+
+li + li {
+	margin-top: 0.25em;
+}
+
+li.task-list-item {
+	list-style-type: none;
+}
+
+li.task-list-item input[type="checkbox"] {
+	margin: 0 0.25em 0.25em -1.5em;
+	vertical-align: middle;
+}
+
+li > p {
+	margin-top: 1em;
+}
+
+li > ul, li > ol {
+	margin-top: 0.25em;
+	margin-bottom: 0;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	box-sizing: content-box;
+}
+
+blockquote {
+	margin: 0 0 1em;
+	padding: 0 1em;
+	color: #656d76;
+	border-left: 0.25em solid #d0d7de;
+}
+
+blockquote.admonition {
+	padding: 0.75em 1em;
+	color: #242424;
+}
+
+blockquote.admonition-note {
+	border-left-color: #0969da;
+}
+
+blockquote.admonition-tip {
+	border-left-color: #1a7f37;
+}
+
+blockquote.admonition-important {
+	border-left-color: #8250df;
+}
+
+blockquote.admonition-warning {
+	border-left-color: #bf8700;
+}
+
+blockquote.admonition-caution {
+	border-left-color: #cf222e;
+}
+
+.admonition-title {
+	margin-bottom: 0.5em;
+	font-weight: 600;
+}
+
+blockquote.admonition > :last-child {
+	margin-bottom: 0;
+}
+
+code, pre {
+	font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono",
+		Menlo, monospace;
+}
+
+code {
+	padding: 0.2em 0.4em;
+	margin: 0;
+	font-size: 85%;
+	background-color: #b0b0b033;
+	border-radius: 0.44em;
+}
+
+pre {
+	margin-top: 0;
+	margin-bottom: 1.18em;
+	overflow: auto;
+	padding: 1em;
+	font-size: 85%;
+	line-height: 1.45;
+	word-wrap: normal;
+	background-color: #eeeeee;
+	border: 0.07em solid #aaaaaa;
+	border-radius: 0.44em;
+}
+
+pre code {
+	padding: 0;
+	font-size: 100%;
+	word-break: normal;
+	white-space: pre;
+	background-color: transparent;
+	border: 0;
+}
+
+table {
+	display: block;
+	width: max-content;
+	max-width: 100%;
+	margin-top: 0;
+	margin-bottom: 1em;
+	overflow: auto;
+	border-spacing: 0;
+	border-collapse: collapse;
+}
+
+table th {
+	font-weight: 600;
+}
+
+table th, table td {
+	padding: 0.38em 0.81em;
+	border: 0.0625em solid #d8dee4;
+}
+
+table tr {
+	background-color: #fafafa;
+	border-top: 0.0625em solid #d8dee4;
+}
+
+kbd {
+	display: inline-block;
+	padding: 0.25em 0.42em;
+	font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono",
+		Menlo, monospace;
+	font-size: 0.75em;
+	line-height: 0.83em;
+	color: #242424;
+	vertical-align: middle;
+	background-color: #f6f8fa;
+	border: solid 0.08em #afb8c1;
+	border-bottom-color: #8c959f;
+	border-radius: 0.5em;
+	box-shadow: inset 0 -0.08em 0 #afb8c1;
+}
+
+details {
+	margin-top: 0;
+	margin-bottom: 1em;
+}
+
+summary {
+	cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+	body {
+		color-scheme: dark;
+		color: #d0d0d0;
+		background-color: #121212;
+	}
+
+	a {
+		color: #58a6ff;
+	}
+
+	h1, h2 {
+		border-bottom-color: #484f58;
+	}
+
+	hr {
+		background-color: #484f58;
+	}
+
+	blockquote {
+		color: #8b949e;
+		border-left-color: #30363d;
+	}
+
+	blockquote.admonition {
+		color: #d0d0d0;
+	}
+
+	blockquote.admonition-note {
+		border-left-color: #58a6ff;
+	}
+
+	blockquote.admonition-tip {
+		border-left-color: #3fb950;
+	}
+
+	blockquote.admonition-important {
+		border-left-color: #a371f7;
+	}
+
+	blockquote.admonition-warning {
+		border-left-color: #d29922;
+	}
+
+	blockquote.admonition-caution {
+		border-left-color: #f85149;
+	}
+
+	code {
+		background-color: #8a8a8a40;
+	}
+
+	pre {
+		background-color: #242424;
+		border: 0.07em solid #4a4a4a;
+	}
+
+	table th, table td {
+		border-color: #30363d;
+	}
+
+	table tr {
+		background-color: #121212;
+		border-top-color: #21262d;
+	}
+
+	kbd {
+		color: #d0d0d0;
+		background-color: #161b22;
+		border-color: #6e7681;
+		border-bottom-color: #8b949e;
+		box-shadow: inset 0 -0.08em 0 #6e7681;
+	}
+}
+
+@media (prefers-contrast: more) {
+	body {
+		color-scheme: light;
+		color: #000000;
+		background-color: #ffffff;
+	}
+
+	a {
+		color: #0000ee;
+		text-decoration: underline;
+	}
+
+	h1, h2 {
+		border-bottom-color: #000000;
+	}
+
+	hr {
+		background-color: #000000;
+	}
+
+	pre, table tr, kbd {
+		background-color: #ffffff;
+	}
+
+	blockquote, blockquote.admonition {
+		color: #000000;
+		border-left-color: #000000;
+	}
+
+	blockquote.admonition-note, blockquote.admonition-tip,
+	blockquote.admonition-important, blockquote.admonition-warning,
+	blockquote.admonition-caution {
+		border-left-color: #000000;
+	}
+
+	code {
+		background-color: #ffffff;
+	}
+
+	pre {
+		border: 0.07em solid #000000;
+	}
+
+	table th, table td {
+		border-color: #000000;
+	}
+
+	table tr {
+		border-top-color: #000000;
+	}
+
+	kbd {
+		color: #000000;
+		border-color: #000000;
+		border-bottom-color: #000000;
+		box-shadow: inset 0 -0.08em 0 #000000;
+	}
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+	body {
+		color-scheme: dark;
+		color: #e0e0e0;
+		background-color: #000000;
+	}
+
+	a {
+		color: #e0e0e0;
+	}
+
+	h1, h2 {
+		border-bottom-color: #e0e0e0;
+	}
+
+	hr {
+		background-color: #e0e0e0;
+	}
+
+	pre, table tr, kbd {
+		background-color: #000000;
+	}
+
+	blockquote, blockquote.admonition {
+		color: #e0e0e0;
+		border-left-color: #e0e0e0;
+	}
+
+	blockquote.admonition-note, blockquote.admonition-tip,
+	blockquote.admonition-important, blockquote.admonition-warning,
+	blockquote.admonition-caution {
+		border-left-color: #e0e0e0;
+	}
+
+	code {
+		background-color: #000000;
+	}
+
+	pre {
+		border-color: #e0e0e0;
+	}
+
+	table th, table td {
+		border-color: #e0e0e0;
+	}
+
+	table tr {
+		border-top-color: #e0e0e0;
+	}
+
+	kbd {
+		color: #e0e0e0;
+		border-color: #e0e0e0;
+		border-bottom-color: #e0e0e0;
+		box-shadow: inset 0 -0.08em 0 #e0e0e0;
+	}
+}
+
+@media (max-width: 48rem) {
+	body {
+		padding: 1em;
+	}
+
+	h1 {
+		font-size: 1.75em;
+	}
+
+	h2 {
+		font-size: 1.35em;
+	}
+
+	h3 {
+		font-size: 1.27em;
+	}
+
+	h4 {
+		font-size: 1.19em;
+	}
+
+	h5 {
+		font-size: 1.11em;
+	}
+
+	h6 {
+		font-size: 1.04em;
+	}
+}
+__MARKSHUP_DEFAULT_CSS__
+: <<\__MARKSHUP_RENDERER__
+#
+# Copyright 2026 CodingMarkus
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+#
+# cspell:words gsub tolower getline sprintf alnum
+# cspell:words apng jfif svgz
+# cspell:words SUBSEP RSTART RLENGTH
+# cspell:words dppx cdata colgroup fieldset figaction basefont frameset
+# cspell:words figcaption noframes optgroup tfoot
+# cspell:words Outdir
+
+
+function escapeHtml( value )
+{
+	gsub(/&/, "\\&amp;", value)
+	gsub(/</, "\\&lt;", value)
+	gsub(/>/, "\\&gt;", value)
+	gsub(/"/, "\\&quot;", value)
+	return value
+}
+
+
+function fileExtension( url, cleanUrl, extension )
+{
+	cleanUrl = url
+	sub(/[?#].*$/, "", cleanUrl)
+	extension = cleanUrl
+	sub(/^.*\./, "", extension)
+	return tolower(extension)
+}
+
+
+function supportsCommonExtensions( )
+{
+	return markdownStyle != "common"
+}
+
+
+function supportsLessCommonExtensions( )
+{
+	return markdownStyle == "extended" || markdownStyle == "markshup"
+}
+
+
+function supportsMarkshupExtensions( )
+{
+	return markdownStyle == "markshup"
+}
+
+
+function faviconMimeType( url, extension )
+{
+	extension = fileExtension(url)
+	if (extension == "apng") return "image/apng"
+	if (extension == "avif") return "image/avif"
+	if (extension == "bmp") return "image/bmp"
+	if (extension == "cur" || extension == "ico") return "image/x-icon"
+	if (extension == "gif") return "image/gif"
+	if (extension == "heic") return "image/heic"
+	if (extension == "jfif" || extension == "jpeg" \
+		|| extension == "jpg") return "image/jpeg"
+	if (extension == "jxl") return "image/jxl"
+	if (extension == "png") return "image/png"
+	if (extension == "svg" || extension == "svgz") return "image/svg+xml"
+	if (extension == "tif" || extension == "tiff") return "image/tiff"
+	if (extension == "webp") return "image/webp"
+	return ""
+}
+
+
+function loadImageBundles( line, fields )
+{
+	if (imageBundlePath == "") return
+	while ((getline line < imageBundlePath) > 0) {
+		split(line, fields, "\t")
+		if (length(fields) == 6) {
+			imageBundleRefs[fields[1]] = 1
+			imageBundleAltPaths[fields[1]] = fields[2]
+			imageBundleUrls[fields[1] SUBSEP fields[3] SUBSEP \
+				fields[4] SUBSEP fields[5]] = normalizeAssetUrl(fields[6])
+		}
+	}
+	close(imageBundlePath)
+}
+
+
+function imageBundleUrl( reference, color, extension, density )
+{
+	return imageBundleUrls[reference SUBSEP color SUBSEP extension \
+		SUBSEP density]
+}
+
+
+function imageBundleAltText( reference, line, output, result )
+{
+	if (reference in imageBundleAltTexts) return imageBundleAltTexts[reference]
+	while ((result = getline line < imageBundleAltPaths[reference]) > 0) {
+		output = output (output == "" ? "" : " ") line
+	}
+	close(imageBundleAltPaths[reference])
+	imageBundleHasAltTexts[reference] = result != -1
+	imageBundleAltTexts[reference] = output
+	return output
+}
+
+
+function imageBundleFallbackColor( reference, path )
+{
+	path = reference
+	sub(/[?#].*$/, "", path)
+	if (path ~ /\/image(@[23]x)?\.[^\/]+$/) return "image"
+	if (path ~ /\/light(@[23]x)?\.[^\/]+$/) return "light"
+	return "dark"
+}
+
+
+function imageBundleHasColor( reference, color, extensionIndex, density )
+{
+	for (extensionIndex = 1; extensionIndex <= 9; extensionIndex += 1) {
+		extension = imageBundleFormatOrder[extensionIndex]
+		for (density = 1; density <= 3; density += 1) {
+			if (imageBundleUrl(reference, color, extension, density) != "") {
+				return 1
+			}
+		}
+	}
+	return 0
+}
+
+
+function imageBundleFormatCount( reference, color, count, extensionIndex,
+	density )
+{
+	count = 0
+	for (extensionIndex = 1; extensionIndex <= 9; extensionIndex += 1) {
+		for (density = 1; density <= 3; density += 1) {
+			if (imageBundleUrl(reference, color,
+				imageBundleFormatOrder[extensionIndex], density) != "") {
+				count += 1
+				break
+			}
+		}
+	}
+	return count
+}
+
+
+function formatImageBundleGroup( reference, color, media, formatCount,
+	output, density, extensionIndex, extension, url )
+{
+	output = ""
+	for (density = 3; density >= 1; density -= 1) {
+		for (extensionIndex = 1; extensionIndex <= 9; extensionIndex += 1) {
+			extension = imageBundleFormatOrder[extensionIndex]
+			url = imageBundleUrl(reference, color, extension, density)
+			if (url != "") {
+				output = output "<source" \
+					(media == "" && density == 1 ? "" : " media=\"" \
+					media (media != "" && density > 1 ? " and " : "") \
+					(density > 1 ? "(min-resolution: " density "dppx)" : "") \
+					"\"") " srcset=\"" escapeHtml(url) "\"" \
+					(formatCount > 1 ? " type=\"" \
+					faviconMimeType("image." extension) "\"" : "") ">"
+			}
+		}
+	}
+	return output
+}
+
+
+function formatImageBundle( reference, fallbackColor, output, formatCount )
+{
+	output = "<picture>"
+	if (imageBundleHasColor(reference, "light")) {
+		formatCount = imageBundleFormatCount(reference, "light")
+		output = output formatImageBundleGroup(reference, "light", \
+			"(prefers-color-scheme: light)", formatCount)
+	}
+	if (imageBundleHasColor(reference, "dark")) {
+		formatCount = imageBundleFormatCount(reference, "dark")
+		output = output formatImageBundleGroup(reference, "dark", \
+			"(prefers-color-scheme: dark)", formatCount)
+	}
+	fallbackColor = imageBundleFallbackColor(reference)
+	formatCount = imageBundleFormatCount(reference, fallbackColor)
+	return output formatImageBundleGroup(reference, fallbackColor, "", \
+		formatCount)
+}
+
+
+function printFaviconLink( url, media, expandedUrl, \
+	mimeType )
+{
+	expandedUrl = expandTemplateLink(url)
+	mimeType = faviconMimeType(expandedUrl)
+	print "<link rel=\"icon\" href=\"" escapeHtml(expandedUrl) "\"" \
+		(mimeType == "" ? "" : " type=\"" mimeType "\"") \
+		(media == "" ? "" : " media=\"" media "\"") ">"
+}
+
+
+function printStylesheetLink( url, expandedUrl )
+{
+	expandedUrl = expandTemplateLink(url)
+	print "<link rel=\"stylesheet\" href=\"" escapeHtml(expandedUrl) "\">"
+}
+
+
+function printJavascriptLink( url, expandedUrl )
+{
+	expandedUrl = expandTemplateLink(url)
+	print "<script src=\"" escapeHtml(expandedUrl) "\"></script>"
+}
+
+
+function printMetaTags( path, line, separator, \
+	name, value )
+{
+	while ((getline line < path) > 0) {
+		separator = index(line, "\t")
+		if (separator == 0) continue
+		name = substr(line, 1, separator - 1)
+		value = substr(line, separator + 1)
+		print "<meta name=\"" escapeHtml(decodeMeta(name)) \
+			"\" content=\"" escapeHtml(decodeMeta(value)) "\">"
+	}
+	close(path)
+}
+
+
+function decodeMeta( value, characterIndex, character, escaped, result )
+{
+	result = ""
+	for (characterIndex = 1; characterIndex <= length(value); characterIndex++) {
+		character = substr(value, characterIndex, 1)
+		if (character != "\\") {
+			result = result character
+			continue
+		}
+		if (++characterIndex > length(value)) return result
+		escaped = substr(value, characterIndex, 1)
+		if (escaped == "n") result = result "\n"
+		else if (escaped == "r") result = result "\r"
+		else if (escaped == "t") result = result "\t"
+		else result = result escaped
+	}
+	return result
+}
+
+
+function emitFile( path, line )
+{
+	while ((getline line < path) > 0) {
+		print line
+	}
+	close(path)
+}
+
+
+function normalizePath( path, pathParts, partCount, \
+	partIndex, result )
+{
+	partCount = split(path, pathParts, "/")
+	result = ""
+	for (partIndex = 1; partIndex <= partCount; partIndex += 1) {
+		if (pathParts[partIndex] == "" || pathParts[partIndex] == ".") {
+			continue
+		}
+		if (pathParts[partIndex] == "..") {
+			sub(/\/[^\/]+$/, "", result)
+			continue
+		}
+		result = result "/" pathParts[partIndex]
+	}
+	return result == "" ? "/" : result
+}
+
+
+function relativePath( \
+	from, \
+	to, \
+	fromParts, \
+	toParts, \
+	fromCount, \
+	toCount, \
+	common, \
+	partIndex, \
+	result  )
+{
+	fromCount = split(from, fromParts, "/")
+	toCount = split(to, toParts, "/")
+	common = 1
+	while (common <= fromCount && common <= toCount \
+		&& fromParts[common] == toParts[common]) {
+		common += 1
+	}
+	result = ""
+	for (partIndex = common; partIndex <= fromCount; partIndex += 1) {
+		if (fromParts[partIndex] != "") {
+			result = result "../"
+		}
+	}
+	for (partIndex = common; partIndex <= toCount; partIndex += 1) {
+		if (toParts[partIndex] != "") {
+			result = result toParts[partIndex] "/"
+		}
+	}
+	sub(/\/$/, "", result)
+	return result == "" ? "." : result
+}
+
+
+function expandOutdirReferences( \
+	line, \
+	reference, \
+	referenceStart, \
+	referenceLength, \
+	target, \
+	suffixIndex, \
+	pathSuffix, \
+	urlSuffix, \
+	replacement  )
+{
+	while (match(line, /\$\{OUTDIR\}[^[:space:]"'<>]*/)) {
+		referenceStart = RSTART
+		referenceLength = RLENGTH
+		reference = substr(line, RSTART, RLENGTH)
+		pathSuffix = substr(reference, length("${OUTDIR}") + 1)
+		suffixIndex = match(pathSuffix, /[?#]/)
+		urlSuffix = ""
+		if (suffixIndex != 0) {
+			urlSuffix = substr(pathSuffix, suffixIndex)
+			pathSuffix = substr(pathSuffix, 1, suffixIndex - 1)
+		}
+		target = normalizePath(outputDirectory pathSuffix)
+		replacement = relativePath(documentDirectory, target) urlSuffix
+		line = substr(line, 1, referenceStart - 1) replacement \
+			substr(line, referenceStart + referenceLength)
+	}
+	return line
+}
+
+
+function emitTemplateFile( path, line )
+{
+	while ((getline line < path) > 0) {
+		print expandOutdirReferences(line)
+	}
+	close(path)
+}
+
+
+function expandTemplateLink( link )
+{
+	if (index(link, templateLinkMarker) == 1) {
+		return expandOutdirReferences( \
+			substr(link, length(templateLinkMarker) + 1))
+	}
+	return link
+}
+
+
+function rewriteUrl( url )
+{
+	if (url ~ /^https?:\/\//) {
+		return stripConfiguredFragment(url)
+	}
+	if (url ~ /^[A-Za-z][A-Za-z0-9+.-]*:/ || url ~ /^\/\// || url ~ /^#/) {
+		return url
+	}
+	if (url ~ /\.md([?#].*)?$/) {
+		url = normalizeMarkdownUrl(url)
+	} else if (url !~ /^\//) {
+		url = normalizeAssetUrl(url)
+	}
+	return url
+}
+
+
+function stripConfiguredFragment( url, fragmentStart )
+{
+	if (stripFragmentValue == "") {
+		return url
+	}
+	fragmentStart = index(url, "#")
+	if (fragmentStart > 0 \
+		&& substr(url, fragmentStart) == stripFragmentValue) {
+		return substr(url, 1, fragmentStart - 1)
+	}
+	return url
+}
+
+
+function rewriteHtmlUrlAttribute( \
+	tag, \
+	attribute, \
+	lowerTag, \
+	matched, \
+	matchedStart, \
+	matchedLength, \
+	equals, \
+	prefix, \
+	value, \
+	quote, \
+	suffix )
+{
+	lowerTag = tolower(tag)
+	if (!match(lowerTag, "[[:space:]]" attribute \
+		"[ \\t]*=[ \\t]*(\"[^\"]*\"|'[^']*'|[^ \\t>]+)")) {
+		return tag
+	}
+	matched = substr(tag, RSTART, RLENGTH)
+	matchedStart = RSTART
+	matchedLength = RLENGTH
+	equals = index(matched, "=")
+	prefix = substr(matched, 1, equals)
+	value = substr(matched, equals + 1)
+	match(value, /^[ \\t]*/)
+	prefix = prefix substr(value, 1, RLENGTH)
+	value = substr(value, RLENGTH + 1)
+	quote = ""
+	if (value ~ /^\"|^'/) {
+		quote = substr(value, 1, 1)
+		value = substr(value, 2, length(value) - 2)
+	}
+	suffix = substr(tag, matchedStart + matchedLength)
+	return substr(tag, 1, matchedStart - 1) prefix quote rewriteUrl(value) \
+		quote suffix
+}
+
+
+function rewriteHtmlReferences( \
+	value, \
+	output, \
+	tag, \
+	lowerTag, \
+	tagStart, \
+	tagLength )
+{
+	output = ""
+	while (match(value, /<[[:space:]]*[[:alpha:]][[:alnum:]:-]*[^>]*>/)) {
+		tagStart = RSTART
+		tagLength = RLENGTH
+		output = output substr(value, 1, tagStart - 1)
+		tag = substr(value, tagStart, tagLength)
+		lowerTag = tolower(tag)
+		if (lowerTag ~ /^<[[:space:]]*a[[:space:]>]/) {
+			tag = rewriteHtmlUrlAttribute(tag, "href")
+		} else if (lowerTag ~ \
+			/^<[[:space:]]*(iframe|img|source|track)[[:space:]>]/) {
+			tag = rewriteHtmlUrlAttribute(tag, "src")
+		}
+		output = output tag
+		value = substr(value, tagStart + tagLength)
+	}
+	return output value
+}
+
+
+function normalizeAssetUrl( \
+	url, \
+	originalUrl, \
+	suffixIndex, \
+	suffix, \
+	partCount, \
+	parts, \
+	partIndex, \
+	result, \
+	extension  )
+{
+	originalUrl = url
+	suffixIndex = match(url, /[?#]/)
+	if (suffixIndex > 0) {
+		suffix = substr(url, suffixIndex)
+		url = substr(url, 1, suffixIndex - 1)
+	} else {
+		suffix = ""
+	}
+	if (copyFiles == 0) {
+		return relativePath(documentDirectory,
+			normalizePath(sourceDirectory "/" url)) suffix
+	}
+	partCount = split(url, parts, "/")
+	for (partIndex = 1; partIndex <= partCount; partIndex += 1) {
+		if (parts[partIndex] != "." && parts[partIndex] != "..") {
+			extension = ""
+			if (parts[partIndex] ~ /.+\..+/) {
+				extension = parts[partIndex]
+				sub(/^.*\./, "", extension)
+				extension = "." extension
+				sub(/\.[^.]*$/, "", parts[partIndex])
+			}
+			parts[partIndex] = normalizeMarkdownName(parts[partIndex]) \
+				extension
+		}
+		if (partIndex > 1) {
+			result = result "/"
+		}
+		result = result parts[partIndex]
+	}
+	if (normalizePath(documentDirectory "/" result) !~ \
+		"^" outputDirectory "(/|$)") {
+		return originalUrl
+	}
+	return result suffix
+}
+
+
+function normalizeMarkdownName( \
+	value, \
+	output, \
+	characterIndex, \
+	character, \
+	previous, \
+	following, \
+	separator, \
+	needsSeparator  )
+{
+	if (mangleStyle == "keep") {
+		return value
+	}
+	separator = mangleStyle == "kebab" ? "-" : "_"
+	output = ""
+	needsSeparator = 0
+	for (characterIndex = 1; characterIndex <= length(value);
+		characterIndex += 1) {
+		character = substr(value, characterIndex, 1)
+		previous = substr(value, characterIndex - 1, 1)
+		following = substr(value, characterIndex + 1, 1)
+		if (character !~ /[A-Za-z0-9]/) {
+			needsSeparator = output != ""
+			continue
+		}
+		if (needsSeparator) {
+			output = output separator
+			needsSeparator = 0
+		}
+		if (character ~ /[A-Z]/) {
+			if (characterIndex > 1 && previous ~ /[a-z0-9]/) {
+				output = output separator
+			} else if (characterIndex > 1 && previous ~ /[A-Z]/ \
+				&& following ~ /[a-z]/) {
+				output = output separator
+			}
+			character = tolower(character)
+		}
+		output = output character
+	}
+	return output
+}
+
+
+function normalizeMarkdownUrl( \
+	url, \
+	suffixIndex, \
+	suffix, \
+	partCount, \
+	parts, \
+	partIndex, \
+	result  )
+{
+	suffixIndex = match(url, /[?#]/)
+	if (suffixIndex > 0) {
+		suffix = substr(url, suffixIndex)
+		url = substr(url, 1, suffixIndex - 1)
+	} else {
+		suffix = ""
+	}
+	partCount = split(url, parts, "/")
+	sub(/\.md$/, "", parts[partCount])
+	for (partIndex = 1; partIndex <= partCount; partIndex += 1) {
+		if (parts[partIndex] != "." && parts[partIndex] != "..") {
+			parts[partIndex] = normalizeMarkdownName(parts[partIndex])
+		}
+		if (partIndex > 1) {
+			result = result "/"
+		}
+		result = result parts[partIndex]
+	}
+	return result ".md.html" suffix
+}
+
+
+function normalizeReferenceLabel( value )
+{
+	value = tolower(trim(value))
+	gsub(/[[:space:]]+/, " ", value)
+	return value
+}
+
+
+function isReferenceDefinition( value, separator, label, \
+	url, title )
+{
+	if (value ~ /^\[\^/) {
+		return 0
+	}
+	if (value !~ /^\[[^]]+\]:[ \t]*[^[:space:]]+/) {
+		return 0
+	}
+	separator = index(value, "]:")
+	label = normalizeReferenceLabel(substr(value, 2, separator - 2))
+	url = trim(substr(value, separator + 2))
+	if (match(url, /[ \t]/)) {
+		title = trim(substr(url, RSTART))
+		url = substr(url, 1, RSTART - 1)
+		if (title ~ /^".*"$/ || title ~ /^\047.*\047$/) {
+			referenceTitles[label] = substr(title, 2, length(title) - 2)
+		}
+	}
+	if (url ~ /^<.*>$/) {
+		url = substr(url, 2, length(url) - 2)
+	}
+	referenceUrls[label] = url
+	return 1
+}
+
+
+function isFootnoteDefinition( value, separator, label, definition )
+{
+	if (!supportsCommonExtensions()) {
+		return 0
+	}
+	if (value !~ /^\[\^[^]]+\]:[ \t]*/) {
+		return 0
+	}
+	separator = index(value, "]:" )
+	label = normalizeReferenceLabel(substr(value, 3, separator - 3))
+	if (label == "") {
+		return 0
+	}
+	definition = substr(value, separator + 2)
+	sub(/^[ \t]*/, "", definition)
+	footnoteDefinitions[label] = definition
+	return 1
+}
+
+
+function parseFence( value, characterIndex, character, count )
+{
+	parsedFenceMarker = ""
+	parsedFenceLength = 0
+	parsedFenceIndent = 0
+	while (parsedFenceIndent < 3 \
+		&& substr(value, parsedFenceIndent + 1, 1) == " ") {
+		parsedFenceIndent += 1
+	}
+	characterIndex = parsedFenceIndent + 1
+	character = substr(value, characterIndex, 1)
+	if (character != "`" && character != "~") {
+		return 0
+	}
+	while (substr(value, characterIndex, 1) == character) {
+		parsedFenceLength += 1
+		characterIndex += 1
+	}
+	if (parsedFenceLength < 3) {
+		return 0
+	}
+	parsedFenceMarker = character
+	parsedFenceInformation = substr(value, characterIndex)
+	if (character == "`" && index(parsedFenceInformation, "`") > 0) {
+		return 0
+	}
+	return 1
+}
+
+
+function isClosingFence( value )
+{
+	return parseFence(value) && parsedFenceMarker == fenceMarker \
+		&& parsedFenceLength >= fenceLength \
+		&& parsedFenceInformation ~ /^[ \t]*$/
+}
+
+
+function fenceLanguage( value, language )
+{
+	value = trim(value)
+	if (match(value, /[ \t]/)) {
+		language = substr(value, 1, RSTART - 1)
+	} else {
+		language = value
+	}
+	return language
+}
+
+
+function stripFenceIndent( value, count )
+{
+	while (count > 0 && substr(value, 1, 1) == " ") {
+		value = substr(value, 2)
+		count -= 1
+	}
+	return value
+}
+
+
+function unclosedFenceLine( lineIndex, openLine, inFence, \
+	openMarker, openLength, value )
+{
+	for (lineIndex = 1; lineIndex <= lineCount; lineIndex += 1) {
+		value = lines[lineIndex]
+		while (value ~ /^>/) {
+			value = stripQuoteMarker(value)
+		}
+		if (parseFence(value)) {
+			if (inFence && parsedFenceMarker == openMarker \
+				&& parsedFenceLength >= openLength \
+				&& parsedFenceInformation ~ /^[ \t]*$/) {
+				inFence = 0
+			} else if (!inFence) {
+				inFence = 1
+				openLine = lineIndex
+				openMarker = parsedFenceMarker
+				openLength = parsedFenceLength
+			}
+		}
+	}
+	if (inFence) {
+		return openLine
+	}
+	return 0
+}
+
+
+function reportError( message, command )
+{
+	command = "cat >&2"
+	if (message !~ /[.!]$/) {
+		message = message "."
+	}
+	print "markshup: " message | command
+	close(command)
+}
+
+
+function escapeMarkdown( value, output, characterIndex, \
+	character )
+{
+	output = ""
+	for (characterIndex = 1; characterIndex <= length(value);
+		characterIndex += 1) {
+		character = substr(value, characterIndex, 1)
+		if (character == "\\" && characterIndex < length(value)) {
+			character = substr(value, characterIndex + 1, 1)
+			if (index(markdownEscapablePunctuation(), character) > 0) {
+				output = output "\034" escapedMarkdownCharacter(character)
+				characterIndex += 1
+				continue
+			}
+		}
+		output = output character
+	}
+	return output
+}
+
+
+function markdownEscapablePunctuation( )
+{
+	return "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+}
+
+
+function escapedMarkdownCharacter( character )
+{
+	return sprintf("%02d", \
+		index(markdownEscapablePunctuation(), character))
+}
+
+
+function restoreEscapedMarkdownCharacter( character )
+{
+	if (character == "&") {
+		return "&amp;"
+	}
+	if (character == "<") {
+		return "&lt;"
+	}
+	if (character == ">") {
+		return "&gt;"
+	}
+	if (character == "\"") {
+		return "&quot;"
+	}
+	return character
+}
+
+
+function restoreEscapedMarkdown( value, token, tokenIndex )
+{
+	while (match(value, /\034[0-9][0-9]/)) {
+		token = substr(value, RSTART, RLENGTH)
+		tokenIndex = substr(token, 2) + 0
+		value = substr(value, 1, RSTART - 1) \
+			restoreEscapedMarkdownCharacter(substr( \
+			markdownEscapablePunctuation(), tokenIndex, 1)) \
+			substr(value, RSTART + RLENGTH)
+	}
+	return value
+}
+
+
+function replaceDelimited( \
+	a, \
+	b, \
+	c, \
+	d, \
+	e, \
+	f, \
+	g, \
+	h  )
+{
+	while ((e = index(a, b)) > 0) {
+		g = substr(a, 1, e - 1)
+		a = substr(a, e + length(b))
+		f = index(a, b)
+		if (f == 0) {
+			return g b a
+		}
+		h = substr(a, 1, f - 1)
+		if (h == "") {
+			return g b b substr(a, f + length(b))
+		}
+		a = g c h d substr(a, f + length(b))
+	}
+	return a
+}
+
+
+function formatStrikethrough( \
+	value, \
+	output, \
+	opening, \
+	openingLength, \
+	markerLength, \
+	openingExtra, \
+	content, \
+	candidate, \
+	candidateLength, \
+	candidateExtra, \
+	search, \
+	matched  )
+{
+	output = ""
+	while (match(value, /~+/)) {
+		opening = RSTART
+		openingLength = RLENGTH
+		output = output substr(value, 1, opening - 1)
+		if (opening > 3 \
+			&& substr(value, opening - 3, 1) == "\034") {
+			output = output substr(value, opening, openingLength)
+			value = substr(value, opening + openingLength)
+			continue
+		}
+		if (openingLength == 1 && !supportsLessCommonExtensions()) {
+			output = output "~"
+			value = substr(value, opening + 1)
+			continue
+		}
+		if (openingLength > 2 && !supportsMarkshupExtensions()) {
+			output = output substr(value, opening, openingLength)
+			value = substr(value, opening + openingLength)
+			continue
+		}
+		markerLength = openingLength == 1 ? 1 : 2
+		openingExtra = substr(value, opening + markerLength, \
+			openingLength - markerLength)
+		search = substr(value, opening + openingLength)
+		content = openingExtra
+		matched = 0
+		while (match(search, /~+/)) {
+			candidate = RSTART
+			candidateLength = RLENGTH
+			content = content substr(search, 1, candidate - 1)
+			if (!(candidate > 3 \
+				&& substr(search, candidate - 3, 1) == "\034") \
+				&& (markerLength == 1 \
+					? candidateLength == 1 : candidateLength >= 2)) {
+				candidateExtra = markerLength == 1 ? "" : \
+					substr(search, candidate, \
+					candidateLength - markerLength)
+				output = output "<del>" content candidateExtra "</del>"
+				value = substr(search, candidate + candidateLength)
+				matched = 1
+				break
+			}
+			content = content substr(search, candidate, candidateLength)
+			search = substr(search, candidate + candidateLength)
+		}
+		if (!matched) {
+			return output value
+		}
+	}
+	return output value
+}
+
+
+function formatSmartDashes( \
+	value, \
+	output, \
+	dashes, \
+	escapedDash )
+{
+	if (!supportsMarkshupExtensions()) {
+		return value
+	}
+	escapedDash = "\034" escapedMarkdownCharacter("-")
+	output = ""
+	while (match(value, /-+/)) {
+		output = output substr(value, 1, RSTART - 1)
+		dashes = substr(value, RSTART, RLENGTH)
+		value = substr(value, RSTART + RLENGTH)
+		if (substr(output, length(output) - length(escapedDash) + 1) \
+			== escapedDash || substr(value, 1, length(escapedDash)) \
+			== escapedDash) {
+			output = output dashes
+			continue
+		}
+		gsub(/---/, "—", dashes)
+		gsub(/--/, "–", dashes)
+		output = output dashes
+	}
+	return output value
+}
+
+
+function replaceBracedScript( \
+	value, \
+	marker, \
+	tag, \
+	output, \
+	opening, \
+	content, \
+	closing  )
+{
+	output = ""
+	while ((opening = index(value, marker "{")) > 0) {
+		output = output substr(value, 1, opening - 1)
+		value = substr(value, opening + 2)
+		closing = index(value, "}")
+		if (closing == 0) {
+			return output marker "{" value
+		}
+		content = substr(value, 1, closing - 1)
+		if (content == "") {
+			output = output marker "{}"
+		} else {
+			output = output "<" tag ">" content "</" tag ">"
+		}
+		value = substr(value, closing + 1)
+	}
+	return output value
+}
+
+
+function isDelimiterPunctuation( character )
+{
+	return index("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~", character) > 0
+}
+
+
+function isDelimiterWhitespace( character )
+{
+	return character == "" || character ~ /[[:space:]]/
+}
+
+
+function delimiterLiteral( marker, count, output )
+{
+	output = ""
+	while (count > 0) {
+		output = output marker
+		count -= 1
+	}
+	return output
+}
+
+
+function formatEmphasis( \
+	value, \
+	characterIndex, \
+	character, \
+	runStart, \
+	runLength, \
+	previous, \
+	following, \
+	leftFlanking, \
+	rightFlanking, \
+	delimiterCount, \
+	pieceCount, \
+	lastTextStart, \
+	delimiterIndex, \
+	openingIndex, \
+	useLength, \
+	matched, \
+	output )
+{
+	if (supportsLessCommonExtensions()) {
+		value = replaceDelimited(value, "==", "<mark>", "</mark>")
+	}
+	if (supportsCommonExtensions()) {
+		value = formatStrikethrough(value)
+	}
+	if (supportsMarkshupExtensions()) {
+		value = replaceBracedScript(value, "^", "sup")
+		value = replaceBracedScript(value, "_", "sub")
+		value = formatSmartDashes(value)
+	}
+	for (delimiterIndex in emphasisMarker) {
+		delete emphasisMarker[delimiterIndex]
+		delete emphasisLength[delimiterIndex]
+		delete emphasisCanOpen[delimiterIndex]
+		delete emphasisCanClose[delimiterIndex]
+		delete emphasisOpeningTags[delimiterIndex]
+		delete emphasisClosingTags[delimiterIndex]
+	}
+	for (pieceCount in emphasisPieceType) {
+		delete emphasisPieceType[pieceCount]
+		delete emphasisPieceValue[pieceCount]
+	}
+	delimiterCount = 0
+	pieceCount = 0
+	lastTextStart = 1
+	characterIndex = 1
+	while (characterIndex <= length(value)) {
+		character = substr(value, characterIndex, 1)
+		if (character != "*" && character != "_") {
+			characterIndex += 1
+			continue
+		}
+		runStart = characterIndex
+		while (substr(value, characterIndex, 1) == character) {
+			characterIndex += 1
+		}
+		runLength = characterIndex - runStart
+		if (runStart > lastTextStart) {
+			pieceCount += 1
+			emphasisPieceType[pieceCount] = "text"
+			emphasisPieceValue[pieceCount] = substr(value, lastTextStart, \
+				runStart - lastTextStart)
+		}
+		previous = runStart == 1 ? "" : \
+			substr(value, runStart - 1, 1)
+		following = characterIndex > length(value) ? "" : \
+			substr(value, characterIndex, 1)
+		leftFlanking = !isDelimiterWhitespace(following) \
+			&& (!isDelimiterPunctuation(following) \
+			|| isDelimiterWhitespace(previous) \
+			|| isDelimiterPunctuation(previous))
+		rightFlanking = !isDelimiterWhitespace(previous) \
+			&& (!isDelimiterPunctuation(previous) \
+			|| isDelimiterWhitespace(following) \
+			|| isDelimiterPunctuation(following))
+		delimiterCount += 1
+		emphasisMarker[delimiterCount] = character
+		emphasisLength[delimiterCount] = runLength
+		emphasisCanOpen[delimiterCount] = leftFlanking \
+			&& (character == "*" || !rightFlanking \
+			|| isDelimiterPunctuation(previous))
+		emphasisCanClose[delimiterCount] = rightFlanking \
+			&& (character == "*" || !leftFlanking \
+			|| isDelimiterPunctuation(following))
+		pieceCount += 1
+		emphasisPieceType[pieceCount] = "delimiter"
+		emphasisPieceValue[pieceCount] = delimiterCount
+		lastTextStart = characterIndex
+	}
+	if (lastTextStart <= length(value)) {
+		pieceCount += 1
+		emphasisPieceType[pieceCount] = "text"
+		emphasisPieceValue[pieceCount] = substr(value, lastTextStart)
+	}
+	for (delimiterIndex = 1; delimiterIndex <= delimiterCount;
+		delimiterIndex += 1) {
+		if (!emphasisCanClose[delimiterIndex]) {
+			continue
+		}
+		while (emphasisLength[delimiterIndex] > 0) {
+			matched = 0
+			for (openingIndex = delimiterIndex - 1; openingIndex >= 1;
+				openingIndex -= 1) {
+				if (emphasisMarker[openingIndex] \
+					!= emphasisMarker[delimiterIndex] \
+					|| !emphasisCanOpen[openingIndex] \
+					|| emphasisLength[openingIndex] == 0) {
+					continue
+				}
+				if ((emphasisCanClose[openingIndex] \
+					|| emphasisCanOpen[delimiterIndex]) \
+					&& (emphasisLength[openingIndex] \
+					+ emphasisLength[delimiterIndex]) % 3 == 0 \
+					&& (emphasisLength[openingIndex] % 3 != 0 \
+					|| emphasisLength[delimiterIndex] % 3 != 0)) {
+					continue
+				}
+				useLength = emphasisLength[openingIndex] >= 2 \
+					&& emphasisLength[delimiterIndex] >= 2 ? 2 : 1
+				emphasisLength[openingIndex] -= useLength
+				emphasisLength[delimiterIndex] -= useLength
+				if (useLength == 2) {
+					emphasisOpeningTags[openingIndex] = "<strong>" \
+						emphasisOpeningTags[openingIndex]
+					emphasisClosingTags[delimiterIndex] = \
+						emphasisClosingTags[delimiterIndex] "</strong>"
+				} else {
+					emphasisOpeningTags[openingIndex] = "<em>" \
+						emphasisOpeningTags[openingIndex]
+					emphasisClosingTags[delimiterIndex] = \
+						emphasisClosingTags[delimiterIndex] "</em>"
+				}
+				matched = 1
+				break
+			}
+			if (!matched) {
+				break
+			}
+		}
+	}
+	output = ""
+	for (pieceCount = 1; emphasisPieceType[pieceCount] != "";
+		pieceCount += 1) {
+		if (emphasisPieceType[pieceCount] == "text") {
+			output = output emphasisPieceValue[pieceCount]
+			continue
+		}
+		delimiterIndex = emphasisPieceValue[pieceCount]
+		output = output emphasisClosingTags[delimiterIndex] \
+			delimiterLiteral(emphasisMarker[delimiterIndex], \
+			emphasisLength[delimiterIndex]) \
+			emphasisOpeningTags[delimiterIndex]
+	}
+	return output
+}
+
+
+function inlineHtmlToken( value, token )
+{
+	token = "\035t" ++inlineHtmlTokenCount "\036"
+	inlineHtmlTokens[inlineHtmlTokenCount] = value
+	return token
+}
+
+
+function automaticLink( url, text )
+{
+	url = stripConfiguredFragment(url)
+	return inlineHtmlToken("<a href=\"" escapeHtml(url) "\">" \
+		escapeHtml(text) "</a>")
+}
+
+
+function trimAutomaticUrl( url )
+{
+	while (url != "" && index(".,;:!?\042\047", \
+		substr(url, length(url), 1)) > 0) {
+		url = substr(url, 1, length(url) - 1)
+	}
+	while (url ~ /\)$/ && index(url, "(") == 0) {
+		url = substr(url, 1, length(url) - 1)
+	}
+	return url
+}
+
+
+function formatAngleAutomaticLinks( value, output, text )
+{
+	output = ""
+	while (value != "") {
+		if (match(value, /^<https?:\/\/[^[:space:]<>]+>/)) {
+			text = substr(value, 2, RLENGTH - 2)
+			output = output automaticLink(text, text)
+			value = substr(value, RLENGTH + 1)
+			continue
+		}
+		if (match(value, /^<[[:alnum:]._%+-]+@[[:alnum:]-]+(\.[[:alnum:]-]+)+>/)) {
+			text = substr(value, 2, RLENGTH - 2)
+			output = output automaticLink("mailto:" text, text)
+			value = substr(value, RLENGTH + 1)
+			continue
+		}
+		if (value ~ /^<!--.*-->/) {
+			match(value, /^<!--.*-->/)
+			output = output substr(value, 1, RLENGTH)
+			value = substr(value, RLENGTH + 1)
+			continue
+		}
+		if (value ~ /^<\/?[[:alpha:]][^>]*>/) {
+			match(value, /^<\/?[[:alpha:]][^>]*>/)
+			output = output substr(value, 1, RLENGTH)
+			value = substr(value, RLENGTH + 1)
+			continue
+		}
+		output = output substr(value, 1, 1)
+		value = substr(value, 2)
+	}
+	return output
+}
+
+
+function formatAutomaticLinks( value, output, candidate, \
+	url, text, previous )
+{
+	output = ""
+	previous = ""
+	while (value != "") {
+		if (match(value, /^<https?:\/\/[^[:space:]<>]+>/)) {
+			text = substr(value, 2, RLENGTH - 2)
+			output = output automaticLink(text, text)
+			value = substr(value, RLENGTH + 1)
+			previous = "x"
+			continue
+		}
+		if (match(value, /^<[[:alnum:]._%+-]+@[[:alnum:]-]+(\.[[:alnum:]-]+)+>/)) {
+			text = substr(value, 2, RLENGTH - 2)
+			output = output automaticLink("mailto:" text, text)
+			value = substr(value, RLENGTH + 1)
+			previous = "x"
+			continue
+		}
+		if (value ~ /^<!--.*-->/) {
+			match(value, /^<!--.*-->/)
+			output = output substr(value, 1, RLENGTH)
+			value = substr(value, RLENGTH + 1)
+			previous = ">"
+			continue
+		}
+		if (value ~ /^<\/?[[:alpha:]][^>]*>/) {
+			match(value, /^<\/?[[:alpha:]][^>]*>/)
+			output = output substr(value, 1, RLENGTH)
+			value = substr(value, RLENGTH + 1)
+			previous = ">"
+			continue
+		}
+		if (previous !~ /[[:alnum:]_]/ \
+			&& match(value, /^https?:\/\/[^[:space:]<>]+/)) {
+			candidate = substr(value, 1, RLENGTH)
+			url = trimAutomaticUrl(candidate)
+			if (url != "") {
+				output = output automaticLink(url, url)
+				value = substr(value, length(url) + 1)
+				previous = "x"
+				continue
+			}
+		}
+		if (previous !~ /[[:alnum:]_.%+-]/ \
+			&& match(value, /^[[:alnum:]._%+-]+@[[:alnum:]-]+(\.[[:alnum:]-]+)+/)) {
+			candidate = substr(value, 1, RLENGTH)
+			text = trimAutomaticUrl(candidate)
+			if (text != "") {
+				output = output automaticLink("mailto:" text, text)
+				value = substr(value, length(text) + 1)
+				previous = "x"
+				continue
+			}
+		}
+		previous = substr(value, 1, 1)
+		output = output previous
+		value = substr(value, 2)
+	}
+	return output
+}
+
+
+function initializeEmojiShortcodes( )
+{
+	if (emojiShortcodesInitialized) {
+		return
+	}
+	emojiShortcodes["100"] = "💯"
+	emojiShortcodes["+1"] = "👍"
+	emojiShortcodes["-1"] = "👎"
+	emojiShortcodes["bug"] = "🐛"
+	emojiShortcodes["clap"] = "👏"
+	emojiShortcodes["coffee"] = "☕"
+	emojiShortcodes["computer"] = "💻"
+	emojiShortcodes["eyes"] = "👀"
+	emojiShortcodes["exclamation"] = "❗"
+	emojiShortcodes["fire"] = "🔥"
+	emojiShortcodes["grinning"] = "😀"
+	emojiShortcodes["heart"] = "❤️"
+	emojiShortcodes["heavy_check_mark"] = "✔️"
+	emojiShortcodes["information_source"] = "ℹ️"
+	emojiShortcodes["joy"] = "😂"
+	emojiShortcodes["laughing"] = "😆"
+	emojiShortcodes["lock"] = "🔒"
+	emojiShortcodes["memo"] = "📝"
+	emojiShortcodes["pray"] = "🙏"
+	emojiShortcodes["question"] = "❓"
+	emojiShortcodes["rocket"] = "🚀"
+	emojiShortcodes["smile"] = "😄"
+	emojiShortcodes["smiley"] = "😃"
+	emojiShortcodes["sparkles"] = "✨"
+	emojiShortcodes["star"] = "⭐"
+	emojiShortcodes["tada"] = "🎉"
+	emojiShortcodes["thinking"] = "🤔"
+	emojiShortcodes["thumbs_down"] = "👎"
+	emojiShortcodes["thumbs_up"] = "👍"
+	emojiShortcodes["unlock"] = "🔓"
+	emojiShortcodes["warning"] = "⚠️"
+	emojiShortcodes["wave"] = "👋"
+	emojiShortcodes["white_check_mark"] = "✅"
+	emojiShortcodes["wink"] = "😉"
+	emojiShortcodes["x"] = "❌"
+	emojiShortcodesInitialized = 1
+}
+
+
+function formatEmojiShortcodes( value, output, shortcode )
+{
+	if (!supportsCommonExtensions()) {
+		return value
+	}
+	initializeEmojiShortcodes()
+	output = ""
+	while (match(value, /:[[:alnum:]_+-]+:/)) {
+		output = output substr(value, 1, RSTART - 1)
+		shortcode = substr(value, RSTART + 1, RLENGTH - 2)
+		if (shortcode in emojiShortcodes) {
+			output = output emojiShortcodes[shortcode]
+		} else {
+			output = output substr(value, RSTART, RLENGTH)
+		}
+		value = substr(value, RSTART + RLENGTH)
+	}
+	return output value
+}
+
+
+function footnoteReferenceToken( label, number, referenceNumber, token )
+{
+	if (!(label in footnoteNumbers)) {
+		number = ++footnoteCount
+		footnoteNumbers[label] = number
+		footnoteOrder[number] = label
+	}
+	number = footnoteNumbers[label]
+	referenceNumber = ++footnoteReferenceCounts[label]
+	token = "\035t" ++inlineHtmlTokenCount "\036"
+	inlineHtmlTokens[inlineHtmlTokenCount] = "<sup id=\"fnref-" number \
+		(referenceNumber == 1 ? "" : "-" referenceNumber) \
+		"\"><a href=\"#fn-" number "\">" number "</a></sup>"
+	return token
+}
+
+
+function protectFootnoteReferences( value, output, label )
+{
+	if (!supportsCommonExtensions()) {
+		return value
+	}
+	output = ""
+	while (match(value, /\[\^[^]]+\]/)) {
+		output = output substr(value, 1, RSTART - 1)
+		label = normalizeReferenceLabel(substr(value, RSTART + 2, \
+			RLENGTH - 3))
+		if (label in footnoteDefinitions) {
+			output = output footnoteReferenceToken(label)
+		} else {
+			output = output substr(value, RSTART, RLENGTH)
+		}
+		value = substr(value, RSTART + RLENGTH)
+	}
+	return output value
+}
+
+
+function emitFootnotes( label, number, referenceNumber )
+{
+	if (footnoteCount == 0) {
+		return
+	}
+	print "<section class=\"footnotes\">"
+	print "<ol>"
+	for (number = 1; number <= footnoteCount; number += 1) {
+		label = footnoteOrder[number]
+		printf "%s", "<li id=\"fn-" number "\">" \
+			formatInline(footnoteDefinitions[label])
+		for (referenceNumber = 1;
+			referenceNumber <= footnoteReferenceCounts[label];
+			referenceNumber += 1) {
+			printf "%s", " <a href=\"#fnref-" number \
+				(referenceNumber == 1 ? "" : "-" referenceNumber) \
+				"\" class=\"footnote-backref\">&#8617;</a>"
+		}
+		print "</li>"
+	}
+	print "</ol>"
+	print "</section>"
+}
+
+
+function trimInlineWhitespace( value )
+{
+	sub(/^[ \t]+/, "", value)
+	sub(/[ \t]+$/, "", value)
+	return value
+}
+
+
+function parseLinkDestination( value, titleMarker, titleEnd, \
+	separator )
+{
+	value = trimInlineWhitespace(value)
+	linkUrl = ""
+	linkTitle = ""
+	if (substr(value, 1, 1) == "<") {
+		titleEnd = index(value, ">")
+		if (titleEnd == 0) {
+			return 0
+		}
+		linkUrl = substr(value, 2, titleEnd - 2)
+		value = trimInlineWhitespace(substr(value, titleEnd + 1))
+	} else {
+		separator = match(value, /[ \t]/)
+		if (separator == 0) {
+			linkUrl = value
+			return linkUrl != ""
+		}
+		linkUrl = substr(value, 1, separator - 1)
+		value = trimInlineWhitespace(substr(value, separator))
+	}
+	if (value == "") {
+		return linkUrl != ""
+	}
+	titleMarker = substr(value, 1, 1)
+	titleEnd = titleMarker == "(" ? ")" : titleMarker
+	if ((titleMarker != "\"" && titleMarker != "'" \
+		&& titleMarker != "(") \
+		|| substr(value, length(value), 1) != titleEnd) {
+		return 0
+	}
+	linkTitle = substr(value, 2, length(value) - 2)
+	return linkUrl != ""
+}
+
+
+function findInlineLink( value, position, character, \
+	labelStart, labelEnd, depth, destinationStart, destinationEnd, \
+	quote, referenceEnd, reference, destination )
+{
+	inlineLinkFound = 0
+	for (position = 1; position <= length(value); position += 1) {
+		if (substr(value, position, 1) != "[") {
+			continue
+		}
+		labelStart = position + 1
+		depth = 1
+		for (labelEnd = labelStart; labelEnd <= length(value);
+			labelEnd += 1) {
+			character = substr(value, labelEnd, 1)
+			if (character == "[") {
+				depth += 1
+			} else if (character == "]") {
+				depth -= 1
+				if (depth == 0) {
+					break
+				}
+			}
+		}
+		if (depth != 0) {
+			continue
+		}
+		inlineLinkStart = position > 1 \
+			&& substr(value, position - 1, 1) == "!" \
+			? position - 1 : position
+		inlineLinkImage = inlineLinkStart != position
+		inlineLinkLabel = substr(value, labelStart, labelEnd - labelStart)
+		destinationStart = labelEnd + 1
+		if (substr(value, destinationStart, 1) == "(") {
+			depth = 1
+			quote = ""
+			for (destinationEnd = destinationStart + 1;
+				destinationEnd <= length(value); destinationEnd += 1) {
+				character = substr(value, destinationEnd, 1)
+				if (quote != "") {
+					if (character == quote) {
+						quote = ""
+					}
+					continue
+				}
+				if (character == "\"" || character == "'") {
+					quote = character
+					continue
+				}
+				if (character == "(") {
+					depth += 1
+				} else if (character == ")") {
+					depth -= 1
+					if (depth == 0) {
+						break
+					}
+				}
+			}
+			if (depth != 0 \
+				|| !parseLinkDestination(substr(value, \
+				destinationStart + 1, \
+				destinationEnd - destinationStart - 1))) {
+				continue
+			}
+			inlineLinkLength = destinationEnd - inlineLinkStart + 1
+			inlineLinkFound = 1
+			return 1
+		}
+		if (substr(value, destinationStart, 1) == "[") {
+			referenceEnd = index(substr(value, destinationStart + 1), "]")
+			if (referenceEnd == 0) {
+				continue
+			}
+			reference = substr(value, destinationStart + 1, referenceEnd - 1)
+			inlineLinkLength = destinationStart + referenceEnd \
+				- inlineLinkStart + 1
+		} else {
+			reference = inlineLinkLabel
+			inlineLinkLength = labelEnd - inlineLinkStart + 1
+		}
+		reference = normalizeReferenceLabel(reference)
+		if (reference == "" || !(reference in referenceUrls)) {
+			continue
+		}
+		linkUrl = referenceUrls[reference]
+		linkTitle = referenceTitles[reference]
+		inlineLinkFound = 1
+		return 1
+	}
+	return 0
+}
+
+
+function formatImageAltText( value )
+{
+	value = formatInline(value, 0)
+	gsub(/<[^>]*>/, "", value)
+	return value
+}
+
+
+function formatPlainText( \
+	a, \
+	allowAutomaticLinks, \
+	b, \
+	c, \
+	d, \
+	e, \
+	linkHtml, \
+	linkHref, \
+	linkTitleText )
+{
+	if (allowAutomaticLinks == "") {
+		allowAutomaticLinks = 1
+	}
+	a = escapeMarkdown(a)
+	if (allowAutomaticLinks) {
+		a = formatAngleAutomaticLinks(a)
+	}
+	a = protectInlineHtml(a)
+	a = protectFootnoteReferences(a)
+	b = ""
+	while (findInlineLink(a)) {
+		d = inlineLinkStart
+		e = inlineLinkLength
+		if (allowAutomaticLinks && supportsCommonExtensions()) {
+			b = b formatEmphasis(escapeHtml(formatEmojiShortcodes( \
+				formatAutomaticLinks(substr(a, 1, d - 1)))))
+		} else {
+			b = b formatEmphasis(escapeHtml(formatEmojiShortcodes( \
+				substr(a, 1, d - 1))))
+		}
+		linkHref = escapeHtml(linkUrl)
+		linkTitleText = linkTitle == "" ? "" : " title=\"" \
+			escapeHtml(linkTitle) "\""
+		if (inlineLinkImage) {
+			if (linkUrl in imageBundleRefs) {
+				linkHtml = formatImageBundle(linkUrl) "<img src=\"" linkHref
+				linkAltText = imageBundleAltText(linkUrl)
+				if (!imageBundleHasAltTexts[linkUrl]) {
+					linkAltText = formatImageAltText(inlineLinkLabel)
+				}
+			} else {
+				linkHtml = "<img src=\"" linkHref
+				linkAltText = formatImageAltText(inlineLinkLabel)
+			}
+			linkHtml = linkHtml \
+				"\" alt=\"" escapeHtml(linkAltText) "\"" \
+				linkTitleText ">" (linkUrl in imageBundleRefs ? \
+				"</picture>" : "")
+		} else {
+			linkHref = escapeHtml(stripConfiguredFragment(linkUrl))
+			linkHtml = "<a href=\"" linkHref "\"" linkTitleText \
+				">" \
+				formatInline(inlineLinkLabel, 0) "</a>"
+		}
+		b = b inlineHtmlToken(linkHtml)
+		a = substr(a, d + e)
+	}
+	if (allowAutomaticLinks) {
+		a = formatAutomaticLinks(a)
+	}
+	b = b escapeHtml(formatEmojiShortcodes(a))
+	return restoreInlineHtml(restoreEscapedMarkdown(formatEmphasis(b)))
+}
+
+
+function protectInlineHtml( value, output, start, \
+	token, tokenLength )
+{
+	output = ""
+	while (match(value, /[<&]/)) {
+		start = RSTART
+		output = output substr(value, 1, start - 1)
+		value = substr(value, start)
+		tokenLength = 0
+		if (value ~ /^<!--.*-->/) {
+			match(value, /^<!--.*-->/)
+			tokenLength = RLENGTH
+		} else if (value ~ /^<\/?[[:alpha:]][^>]*>/) {
+			match(value, /^<\/?[[:alpha:]][^>]*>/)
+			tokenLength = RLENGTH
+		} else if (value ~ \
+			/^&([[:alpha:]][[:alnum:]]*|#[0-9]+|#[xX][0-9A-Fa-f]+);/) {
+			match(value, /^&([[:alpha:]][[:alnum:]]*|#[0-9]+|#[xX][0-9A-Fa-f]+);/)
+			tokenLength = RLENGTH
+		}
+		if (tokenLength == 0) {
+			output = output substr(value, 1, 1)
+			value = substr(value, 2)
+			continue
+		}
+		token = "\035t" ++inlineHtmlTokenCount "\036"
+		inlineHtmlTokens[inlineHtmlTokenCount] = substr(value, 1, tokenLength)
+		output = output token
+		value = substr(value, tokenLength + 1)
+	}
+	return output value
+}
+
+
+function restoreInlineHtml( \
+	value, \
+	token, \
+	tokenIndex, \
+	tokenStart, \
+	tokenLength )
+{
+	while (match(value, /\035t[0-9]+\036/)) {
+		tokenStart = RSTART
+		tokenLength = RLENGTH
+		token = substr(value, RSTART, RLENGTH)
+		tokenIndex = token
+		sub(/^\035t/, "", tokenIndex)
+		sub(/\036$/, "", tokenIndex)
+		value = substr(value, 1, tokenStart - 1) \
+			rewriteHtmlReferences(inlineHtmlTokens[tokenIndex]) \
+			substr(value, tokenStart + tokenLength)
+	}
+	return value
+}
+
+
+function normalizeCodeSpan( value )
+{
+	gsub(/[\t\n]/, " ", value)
+	if (value !~ /^ +$/ && value ~ /^ / && value ~ / $/) {
+		value = substr(value, 2, length(value) - 2)
+	}
+	return value
+}
+
+
+function formatInline( value, allowAutomaticLinks, output, \
+	opening, openingLength, search, searchOffset, closing, \
+	closingLength, code, matched )
+{
+	if (allowAutomaticLinks == "") {
+		allowAutomaticLinks = 1
+	}
+	output = ""
+	while (match(value, /`+/)) {
+		opening = RSTART
+		openingLength = RLENGTH
+		output = output substr(value, 1, opening - 1)
+		search = substr(value, opening + openingLength)
+		searchOffset = 1
+		matched = 0
+		while (match(substr(search, searchOffset), /`+/)) {
+			closing = searchOffset + RSTART - 1
+			closingLength = RLENGTH
+			if (closingLength == openingLength) {
+				code = normalizeCodeSpan(substr(search, 1, closing - 1))
+				output = output inlineHtmlToken("<code>" \
+					escapeHtml(code) "</code>")
+				value = substr(search, closing + closingLength)
+				matched = 1
+				break
+			}
+			searchOffset = closing + closingLength
+		}
+		if (!matched) {
+			output = output delimiterLiteral("`", openingLength)
+			value = search
+			continue
+		}
+	}
+	return formatPlainText(output value, allowAutomaticLinks)
+}
+
+
+function htmlBlockStartType( value, lowerValue, tag )
+{
+	lowerValue = tolower(value)
+	if (value ~ /^<!--/) {
+		return "comment"
+	}
+	if (value ~ /^<\?/) {
+		return "processing"
+	}
+	if (value ~ /^<!\[CDATA\[/) {
+		return "cdata"
+	}
+	if (value ~ /^<![A-Z]/) {
+		return "declaration"
+	}
+	if (match(lowerValue, /^<(script|pre|style|textarea)([ \t>]|$)/)) {
+		tag = substr(lowerValue, 2, RLENGTH - 1)
+		sub(/[ \t>].*$/, "", tag)
+		htmlBlockTag = tag
+		return "tag"
+	}
+	if (lowerValue ~ ("^<(address|article|aside|base|basefont|" \
+		"blockquote|body|caption|center|col|colgroup|dd|details|dialog|" \
+		"dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|" \
+		"frameset|h[1-6]|head|header|hr|html|iframe|legend|li|link|" \
+		"main|menu|menuitem|nav|noframes|ol|optgroup|option|p|param|" \
+		"section|source|summary|table|tbody|td|tfoot|th|thead|title|" \
+		"tr|track|ul)([ \t>]|$)")) {
+		return "blank"
+	}
+	if (value ~ /^<\/?[[:alpha:]][[:alnum:]:-]*([^>]*>)[ \t]*$/) {
+		return "blank"
+	}
+	return ""
+}
+
+
+function isHtmlBlockStart( value )
+{
+	return htmlBlockStartType(value) != ""
+}
+
+
+function htmlBlockEnds( value, lowerValue )
+{
+	lowerValue = tolower(value)
+	if (htmlBlockType == "tag") {
+		return lowerValue ~ ("</" htmlBlockTag "[ \t>]")
+	}
+	if (htmlBlockType == "processing") {
+		return value ~ /\?>/
+	}
+	if (htmlBlockType == "declaration") {
+		return value ~ />/
+	}
+	if (htmlBlockType == "cdata") {
+		return value ~ /\]\]>/
+	}
+	return value == ""
+}
+
+
+function flushParagraph( )
+{
+	if (paragraph != "") {
+		print "<p>" paragraph "</p>"
+		paragraph = ""
+	}
+}
+
+
+function formatParagraphLine( value, hardBreak )
+{
+	hardBreak = value ~ /\\$/ || value ~ /  +$/
+	if (value ~ /  +$/) {
+		sub(/  +$/, "", value)
+	} else if (hardBreak) {
+		value = substr(value, 1, length(value) - 1)
+	}
+	value = formatInline(value)
+	return hardBreak ? value "<br>" : value
+}
+
+
+function appendParagraph( value )
+{
+	if (paragraph != "") {
+		paragraph = paragraph "\n"
+	}
+	paragraph = paragraph formatParagraphLine(value)
+}
+
+
+function admonitionType( value )
+{
+	if (value !~ /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]$/) {
+		return ""
+	}
+	sub(/^\[!/, "", value)
+	sub(/\]$/, "", value)
+	return tolower(value)
+}
+
+
+function admonitionTitle( type )
+{
+	if (type == "tip") {
+		return "Tip"
+	}
+	if (type == "important") {
+		return "Important"
+	}
+	if (type == "warning") {
+		return "Warning"
+	}
+	if (type == "caution") {
+		return "Caution"
+	}
+	return "Note"
+}
+
+
+function flushListItem( )
+{
+	if (listItem != "") {
+		closeListBlocks()
+		closeNestedLists(1)
+		print "<li" listItemAttributes ">" listItem "</li>"
+		listItem = ""
+		listItemAttributes = ""
+	}
+}
+
+
+function stripListIndent( value, count )
+{
+	while (count > 0 && substr(value, 1, 1) == " ") {
+		value = substr(value, 2)
+		count -= 1
+	}
+	return value
+}
+
+
+function isListContinuation( value, indentation )
+{
+	indentation = 0
+	while (substr(value, indentation + 1, 1) == " ") {
+		indentation += 1
+	}
+	return indentation >= listContentIndent
+}
+
+
+function isLazyListContinuation( value )
+{
+	if (value ~ /^>/ || value ~ /^#{1,6}[ \t]/ \
+		|| value ~ /^[-+*][ \t]+/ \
+		|| value ~ /^[0-9][0-9]*\.[ \t]+/ || value ~ /^---+$/ \
+		|| value ~ /^[`~][`~][`~]/ || value ~ /^(    |\t|<)/) {
+		return 0
+	}
+	return listType != "" && !pendingListBreak \
+		&& nestedListDepth <= 1 && listBlockType == ""
+}
+
+
+function closeListBlocks( )
+{
+	if (listBlockType == "fence" || listBlockType == "indented-code") {
+		listItem = listItem "\n</code></pre>"
+	}
+	if (listBlockType == "quote") {
+		listItem = listItem "</p>\n</blockquote>"
+	}
+	if (inListParagraph) {
+		listItem = listItem "</p>"
+	}
+	listBlockType = ""
+	inListParagraph = 0
+}
+
+
+function openListFence( value, language )
+{
+	language = fenceLanguage(parsedFenceInformation)
+	listItem = listItem "\n<pre><code" \
+		(language == "" ? "" : " class=\"language-" \
+		escapeHtml(language) "\"") ">"
+	listBlockType = "fence"
+	listFenceMarker = parsedFenceMarker
+	listFenceLength = parsedFenceLength
+	listFenceIndent = parsedFenceIndent
+	listFenceHasContent = 0
+}
+
+
+function isClosingListFence( value )
+{
+	return parseFence(value) && parsedFenceMarker == listFenceMarker \
+		&& parsedFenceLength >= listFenceLength \
+		&& parsedFenceInformation ~ /^[ \t]*$/
+}
+
+
+function appendListContinuation( value, content )
+{
+	content = stripListIndent(value, listContentIndent)
+	if (listBlockType == "fence") {
+		if (isClosingListFence(content)) {
+			listItem = listItem "\n</code></pre>"
+			listBlockType = ""
+		} else {
+			listItem = listItem (listFenceHasContent ? "\n" : "") \
+				escapeHtml( \
+				stripFenceIndent(content, listFenceIndent))
+			listFenceHasContent = 1
+		}
+		pendingListBreak = 0
+		return
+	}
+	if (listBlockType == "indented-code") {
+		if (content ~ /^    /) {
+			listItem = listItem "\n" escapeHtml(substr(content, 5))
+			pendingListBreak = 0
+			return
+		}
+		if (content ~ /^\t/) {
+			listItem = listItem "\n" escapeHtml(substr(content, 2))
+			pendingListBreak = 0
+			return
+		}
+		listItem = listItem "\n</code></pre>"
+		listBlockType = ""
+	}
+	if (listBlockType == "quote") {
+		if (content ~ /^>/) {
+			content = stripQuoteMarker(content)
+			listItem = listItem "\n" formatParagraphLine(content)
+			pendingListBreak = 0
+			return
+		}
+		listItem = listItem "</p>\n</blockquote>"
+		listBlockType = ""
+	}
+	if (parseFence(content)) {
+		openListFence(content)
+		pendingListBreak = 0
+		return
+	}
+	if (content ~ /^    /) {
+		listItem = listItem "\n<pre><code>" \
+			escapeHtml(substr(content, 5))
+		listBlockType = "indented-code"
+		pendingListBreak = 0
+		return
+	}
+	if (content ~ /^\t/) {
+		listItem = listItem "\n<pre><code>" \
+			escapeHtml(substr(content, 2))
+		listBlockType = "indented-code"
+		pendingListBreak = 0
+		return
+	}
+	if (content ~ /^>/) {
+		content = stripQuoteMarker(content)
+		listItem = listItem "\n<blockquote>\n<p>" \
+			formatParagraphLine(content)
+		listBlockType = "quote"
+		pendingListBreak = 0
+		return
+	}
+	if (pendingListBreak) {
+		listItem = listItem "\n<p>" formatParagraphLine(content)
+		inListParagraph = 1
+	} else {
+		listItem = listItem "\n" formatParagraphLine(content)
+	}
+	pendingListBreak = 0
+}
+
+
+function appendListTableRow( tag, cells, count, columnCount, \
+	alignment, columnIndex, value )
+{
+	listItem = listItem "\n<tr>"
+	for (columnIndex = 1; columnIndex <= columnCount;
+		columnIndex += 1) {
+		value = columnIndex <= count ? cells[columnIndex] : ""
+		listItem = listItem "\n<" tag \
+			(alignment[columnIndex] == "" ? "" : " align=\"" \
+			alignment[columnIndex] "\"") ">" formatInline(value) \
+			"</" tag ">"
+	}
+	listItem = listItem "\n</tr>"
+}
+
+
+function emitListTable( sourceLines, sourceCount, lineIndex, \
+	content, columnCount, dividerCount, rowCount )
+{
+	if (inListParagraph) {
+		listItem = listItem "</p>"
+		inListParagraph = 0
+	}
+	content = stripListIndent(sourceLines[lineIndex], listContentIndent)
+	columnCount = splitTableRow(content, tableHeaderCells)
+	content = stripListIndent(sourceLines[lineIndex + 1], listContentIndent)
+	dividerCount = splitTableRow(content, tableDividerCells)
+	if (columnCount != dividerCount) {
+		return lineIndex
+	}
+	for (cellIndex = 1; cellIndex <= columnCount; cellIndex += 1) {
+		tableAlignments[cellIndex] = tableAlignment(tableDividerCells[cellIndex])
+	}
+	listItem = listItem "\n<table>\n<thead>"
+	appendListTableRow("th", tableHeaderCells, columnCount, columnCount,
+		tableAlignments)
+	listItem = listItem "\n</thead>"
+	lineIndex += 2
+	if (lineIndex <= sourceCount && isListContinuation(sourceLines[lineIndex]) \
+		&& index(stripListIndent(sourceLines[lineIndex], \
+		listContentIndent), "|") > 0) {
+		listItem = listItem "\n<tbody>"
+		while (lineIndex <= sourceCount \
+			&& isListContinuation(sourceLines[lineIndex]) \
+			&& index(stripListIndent(sourceLines[lineIndex], \
+			listContentIndent), "|") > 0) {
+			content = stripListIndent(sourceLines[lineIndex], \
+				listContentIndent)
+			rowCount = splitTableRow(content, tableBodyCells)
+			appendListTableRow("td", tableBodyCells, rowCount, columnCount,
+				tableAlignments)
+			lineIndex += 1
+		}
+		listItem = listItem "\n</tbody>"
+	}
+	listItem = listItem "\n</table>"
+	pendingListBreak = 0
+	return lineIndex - 1
+}
+
+
+function closeList( )
+{
+	if (listType != "") {
+		flushListItem()
+		print "</" listType ">"
+		listType = ""
+	}
+	pendingListBreak = 0
+}
+
+
+function closeIndentedCode( )
+{
+	if (inIndentedCode) {
+		print "</code></pre>"
+		inIndentedCode = 0
+		pendingIndentedCodeBreaks = 0
+	}
+}
+
+
+function flushBlocks( )
+{
+	flushParagraph()
+	closeList()
+	closeIndentedCode()
+}
+
+
+function headingSlug( value )
+{
+	value = tolower(value)
+	gsub(/[^[:alnum:]_ -]/, "", value)
+	gsub(/[[:space:]_-]+/, "-", value)
+	sub(/^-/, "", value)
+	sub(/-$/, "", value)
+	return value
+}
+
+
+function emitHeading( level, value, identifier, \
+	count )
+{
+	flushBlocks()
+	identifier = ""
+	if (supportsLessCommonExtensions() \
+		&& match(value, /[[:space:]]+\{#[^[:space:]{}]+\}[[:space:]]*$/)) {
+		identifier = substr(value, RSTART, RLENGTH)
+		sub(/^[[:space:]]+\{#/, "", identifier)
+		sub(/\}[[:space:]]*$/, "", identifier)
+		value = substr(value, 1, RSTART - 1)
+		sub(/[[:space:]]+$/, "", value)
+	}
+	if (identifier == "" && supportsCommonExtensions()) {
+		identifier = headingSlug(value)
+	}
+	if (identifier == "") {
+		print "<h" level ">" formatInline(value) "</h" level ">"
+		return
+	}
+	count = headingIdentifiers[identifier]
+	headingIdentifiers[identifier] += 1
+	if (count > 0) {
+		identifier = identifier "-" count
+	}
+	print "<h" level " id=\"" escapeHtml(identifier) "\">" \
+		formatInline(value) "</h" level ">"
+}
+
+
+function emitAtxHeading( value, level )
+{
+	level = 0
+	while (substr(value, level + 1, 1) == "#") {
+		level += 1
+	}
+	if (level == 0 || level > 6 || substr(value, level + 1, 1) !~ /[[:space:]]/) {
+		return 0
+	}
+	value = substr(value, level + 1)
+	sub(/[[:space:]]+#+[[:space:]]*$/, "", value)
+	sub(/^[[:space:]]+/, "", value)
+	emitHeading(level, value)
+	return 1
+}
+
+
+function appendListItem( value, type, markerWidth, start )
+{
+	flushParagraph()
+	if (listType != "" && listType != type) {
+		closeList()
+	}
+	if (listType == "") {
+		listType = type
+		print "<" type (type == "ol" && start != 1 \
+			? " start=\"" start "\"" : "") ">"
+	}
+	pendingListBreak = 0
+	flushListItem()
+	listItem = formatListItem(value)
+	listItemAttributes = taskListItemAttributes
+	listContentIndent = markerWidth
+}
+
+
+function nestedListLevel( value, indentation, depth )
+{
+	indentation = 0
+	while (substr(value, indentation + 1, 1) == " ") {
+		indentation += 1
+	}
+	if (indentation < listContentIndent) {
+		return 1
+	}
+	depth = 2
+	while (nestedListTypes[depth] != "" \
+		&& indentation >= nestedListContentIndents[depth]) {
+		depth += 1
+	}
+	return depth
+}
+
+
+function flushNestedListItem( depth )
+{
+	if (nestedListItems[depth] != "") {
+		nestedListOutput[depth] = nestedListOutput[depth] "<li" \
+			nestedListItemAttributes[depth] ">" nestedListItems[depth] \
+			"</li>\n"
+		nestedListItems[depth] = ""
+		delete nestedListItemAttributes[depth]
+	}
+}
+
+
+function closeNestedLists( depth, closingDepth, output )
+{
+	for (closingDepth = nestedListDepth; closingDepth > depth;
+		closingDepth -= 1) {
+		flushNestedListItem(closingDepth)
+		output = "<" nestedListTypes[closingDepth] \
+			(nestedListTypes[closingDepth] == "ol" \
+			&& nestedListStarts[closingDepth] != 1 \
+			? " start=\"" nestedListStarts[closingDepth] "\"" : "") \
+			">\n" \
+			nestedListOutput[closingDepth] "</" \
+			nestedListTypes[closingDepth] ">"
+		if (closingDepth == 2) {
+			listItem = listItem "\n" output
+		} else {
+			nestedListItems[closingDepth - 1] = \
+				nestedListItems[closingDepth - 1] "\n" output
+		}
+		delete nestedListItems[closingDepth]
+		delete nestedListOutput[closingDepth]
+		delete nestedListTypes[closingDepth]
+		delete nestedListContentIndents[closingDepth]
+		delete nestedListStarts[closingDepth]
+	}
+	nestedListDepth = depth
+}
+
+
+function appendNestedListItem( value, type, depth, markerWidth, start )
+{
+	if (nestedListTypes[depth] != "" && nestedListTypes[depth] != type) {
+		closeNestedLists(depth - 1)
+	} else {
+		closeNestedLists(depth)
+	}
+	if (nestedListTypes[depth] == "") {
+		nestedListTypes[depth] = type
+		nestedListStarts[depth] = start
+	}
+	flushNestedListItem(depth)
+	nestedListItems[depth] = formatListItem(value)
+	nestedListItemAttributes[depth] = taskListItemAttributes
+	nestedListContentIndents[depth] = markerWidth
+	nestedListDepth = depth
+}
+
+
+function formatListItem( value, state )
+{
+	taskListItemAttributes = ""
+	if (supportsLessCommonExtensions() \
+		&& value ~ /^\[[ xX]\]([ \t]+|$)/) {
+		state = tolower(substr(value, 2, 1))
+		sub(/^\[[ xX]\][ \t]*/, "", value)
+		taskListItemAttributes = " class=\"task-list-item\""
+		value = "<input type=\"checkbox\" disabled" \
+			(state == "x" ? " checked" : "") "> " value
+	}
+	return formatParagraphLine(value)
+}
+
+
+function trim( value )
+{
+	sub(/^[[:space:]]+/, "", value)
+	sub(/[[:space:]]+$/, "", value)
+	return value
+}
+
+
+function splitTableRow( value, cells, count, \
+	characterIndex, character, inCode )
+{
+	value = trim(value)
+	if (substr(value, 1, 1) == "|") {
+		value = substr(value, 2)
+	}
+	if (substr(value, length(value), 1) == "|") {
+		value = substr(value, 1, length(value) - 1)
+	}
+	count = 1
+	cells[count] = ""
+	inCode = 0
+	for (characterIndex = 1; characterIndex <= length(value);
+		characterIndex += 1) {
+		character = substr(value, characterIndex, 1)
+		if (character == "\\" && characterIndex < length(value)) {
+			cells[count] = cells[count] character \
+				substr(value, characterIndex + 1, 1)
+			characterIndex += 1
+			continue
+		}
+		if (character == "`") {
+			inCode = !inCode
+		}
+		if (character == "|" && !inCode) {
+			count += 1
+			cells[count] = ""
+		} else {
+			cells[count] = cells[count] character
+		}
+	}
+	for (cellIndex = 1; cellIndex <= count; cellIndex += 1) {
+		cells[cellIndex] = trim(cells[cellIndex])
+	}
+	return count
+}
+
+
+function tableAlignment( value )
+{
+	if (value ~ /^:-+:[[:space:]]*$/) {
+		return "center"
+	}
+	if (value ~ /^:-+[[:space:]]*$/) {
+		return "left"
+	}
+	if (value ~ /^-+:[[:space:]]*$/) {
+		return "right"
+	}
+	return ""
+}
+
+
+function isTableDivider( value, count )
+{
+	value = trim(value)
+	if (index(value, "|") == 0) {
+		return 0
+	}
+	count = splitTableRow(value, tableDividerCells)
+	if (count == 0) {
+		return 0
+	}
+	for (cellIndex = 1; cellIndex <= count; cellIndex += 1) {
+		if (tableDividerCells[cellIndex] !~ /^:?-+:?$/) {
+			return 0
+		}
+	}
+	return 1
+}
+
+
+function isTableStart( sourceLines, sourceCount, lineIndex, \
+	headerCount, dividerCount )
+{
+	if (inFence || inIndentedCode || listType != "" \
+		|| lineIndex >= sourceCount \
+		|| sourceLines[lineIndex] ~ \
+			/^(    |\t|>|[-+*][ \t]+|[0-9][0-9]*\.[ \t]+)/ \
+		|| index(sourceLines[lineIndex], "|") == 0) {
+		return 0
+	}
+	if (!isTableDivider(sourceLines[lineIndex + 1])) {
+		return 0
+	}
+	headerCount = splitTableRow(sourceLines[lineIndex], tableHeaderCells)
+	dividerCount = splitTableRow(sourceLines[lineIndex + 1], \
+		tableDividerCells)
+	return headerCount == dividerCount
+}
+
+
+function emitTableRow( tag, cells, count, \
+	columnCount, alignment )
+{
+	print "<tr>"
+	for (cellIndex = 1; cellIndex <= columnCount; cellIndex += 1) {
+		if (cellIndex <= count) {
+			cell = cells[cellIndex]
+		} else {
+			cell = ""
+		}
+		if (alignment[cellIndex] != "") {
+			print "<" tag " align=\"" alignment[cellIndex] "\">" \
+				formatInline(cell) "</" tag ">"
+		} else {
+			print "<" tag ">" formatInline(cell) "</" tag ">"
+		}
+	}
+	print "</tr>"
+}
+
+
+function emitTable( sourceLines, sourceCount, lineIndex, \
+	columnCount, rowCount )
+{
+	flushBlocks()
+	columnCount = splitTableRow(sourceLines[lineIndex], tableHeaderCells)
+	splitTableRow(sourceLines[lineIndex + 1], tableDividerCells)
+	for (cellIndex = 1; cellIndex <= columnCount; cellIndex += 1) {
+		tableAlignments[cellIndex] = tableAlignment(tableDividerCells[cellIndex])
+	}
+	print "<table>"
+	print "<thead>"
+	emitTableRow("th", tableHeaderCells, columnCount, columnCount,
+		tableAlignments)
+	print "</thead>"
+	lineIndex += 2
+	if (lineIndex <= sourceCount \
+		&& index(sourceLines[lineIndex], "|") > 0) {
+		print "<tbody>"
+		while (lineIndex <= sourceCount \
+			&& index(sourceLines[lineIndex], "|") > 0) {
+			rowCount = splitTableRow(sourceLines[lineIndex], \
+				tableBodyCells)
+			emitTableRow("td", tableBodyCells, rowCount, columnCount,
+				tableAlignments)
+			lineIndex += 1
+		}
+		print "</tbody>"
+	}
+	print "</table>"
+	return lineIndex - 1
+}
+
+
+function isSetextHeading( sourceLines, sourceCount, lineIndex, marker )
+{
+	return !inFence \
+		&& !inIndentedCode \
+		&& sourceLines[lineIndex] !~ /^[[:space:]]*$/ \
+		&& lineIndex < sourceCount \
+		&& sourceLines[lineIndex + 1] ~ ("^" marker "+[[:space:]]*$")
+}
+
+
+function isDefinitionListStart( sourceLines, sourceCount, lineIndex )
+{
+	return !inFence \
+		&& !inIndentedCode \
+		&& sourceLines[lineIndex] !~ /^[[:space:]]*$/ \
+		&& sourceLines[lineIndex] !~ \
+			/^(    |\t|>|[-+*][ \t]+|[0-9][0-9]*\.[ \t]+)/ \
+		&& lineIndex < sourceCount \
+		&& sourceLines[lineIndex + 1] ~ /^:[ \t]+/
+}
+
+
+function emitDefinitionList( sourceLines, sourceCount, lineIndex, \
+	term, definition )
+{
+	flushBlocks()
+	print "<dl>"
+	while (lineIndex < sourceCount \
+		&& isDefinitionListStart(sourceLines, sourceCount, lineIndex)) {
+		term = sourceLines[lineIndex]
+		print "<dt>" formatInline(term) "</dt>"
+		lineIndex += 1
+		while (lineIndex <= sourceCount \
+			&& sourceLines[lineIndex] ~ /^:[ \t]+/) {
+			definition = sourceLines[lineIndex]
+			sub(/^:[ \t]+/, "", definition)
+			print "<dd>" formatParagraphLine(definition) "</dd>"
+			lineIndex += 1
+		}
+	}
+	print "</dl>"
+	return lineIndex - 1
+}
+
+
+function stripQuoteMarker( value )
+{
+	sub(/^>/, "", value)
+	sub(/^ /, "", value)
+	return value
+}
+
+
+function emitBlockQuote( sourceLines, sourceCount, lineIndex, \
+	quoteLineCount, quoteIndex, quoteBodyCount, type )
+{
+	flushBlocks()
+	quoteLineCount = 0
+	while (lineIndex <= sourceCount && sourceLines[lineIndex] ~ /^>/) {
+		quoteLines[++quoteLineCount] = \
+			stripQuoteMarker(sourceLines[lineIndex])
+		lineIndex += 1
+	}
+	for (quoteIndex = 1; quoteIndex <= quoteLineCount; quoteIndex += 1) {
+		isReferenceDefinition(quoteLines[quoteIndex])
+	}
+	type = supportsLessCommonExtensions() \
+		? admonitionType(quoteLines[1]) : ""
+	if (type == "") {
+		print "<blockquote>"
+		processLines(quoteLines, quoteLineCount)
+	} else {
+		print "<blockquote class=\"admonition admonition-" type "\">"
+		print "<p class=\"admonition-title\">" admonitionTitle(type) "</p>"
+		quoteBodyCount = 0
+		for (quoteIndex = 2; quoteIndex <= quoteLineCount; quoteIndex += 1) {
+			quoteBodyLines[++quoteBodyCount] = quoteLines[quoteIndex]
+		}
+		processLines(quoteBodyLines, quoteBodyCount)
+		for (quoteIndex = 1; quoteIndex <= quoteBodyCount; quoteIndex += 1) {
+			delete quoteBodyLines[quoteIndex]
+		}
+	}
+	flushBlocks()
+	print "</blockquote>"
+	for (quoteIndex = 1; quoteIndex <= quoteLineCount; quoteIndex += 1) {
+		delete quoteLines[quoteIndex]
+	}
+	return lineIndex - 1
+}
+
+
+function processLines( sourceLines, sourceCount, lineIndex )
+{
+	for (lineIndex = 1; lineIndex <= sourceCount; lineIndex += 1) {
+		if (inFence || inHtmlBlock || inHtmlComment) {
+			processLine(sourceLines[lineIndex])
+			continue
+		}
+		if (inIndentedCode && sourceLines[lineIndex] !~ /^(    |\t|$)/) {
+			closeIndentedCode()
+		}
+		if (isFootnoteDefinition(sourceLines[lineIndex]) \
+			|| isReferenceDefinition(sourceLines[lineIndex])) {
+			continue
+		}
+		if (listType != "" && nestedListDepth <= 1 \
+			&& isListContinuation(sourceLines[lineIndex]) \
+			&& lineIndex < sourceCount \
+			&& isListContinuation(sourceLines[lineIndex + 1]) \
+			&& isTableDivider(stripListIndent( \
+			sourceLines[lineIndex + 1], listContentIndent))) {
+			lineIndex = emitListTable(sourceLines, sourceCount, lineIndex)
+			continue
+		}
+		if (pendingListBreak \
+			&& sourceLines[lineIndex] != "" \
+			&& !isListContinuation(sourceLines[lineIndex]) \
+			&& sourceLines[lineIndex] !~ /^[-+*][ \t]+/ \
+			&& sourceLines[lineIndex] !~ /^[0-9][0-9]*\.[ \t]+/ \
+			&& sourceLines[lineIndex] !~ /^[ \t]+[-+*][ \t]+/ \
+			&& sourceLines[lineIndex] !~ \
+				/^[ \t]+[0-9][0-9]*\.[ \t]+/) {
+			closeList()
+		}
+		if (isSetextHeading(sourceLines, sourceCount, lineIndex, "=")) {
+			emitHeading(1, sourceLines[lineIndex])
+			lineIndex += 1
+			continue
+		}
+		if (isSetextHeading(sourceLines, sourceCount, lineIndex, "-")) {
+			emitHeading(2, sourceLines[lineIndex])
+			lineIndex += 1
+			continue
+		}
+		if (supportsCommonExtensions() \
+			&& isTableStart(sourceLines, sourceCount, lineIndex)) {
+			lineIndex = emitTable(sourceLines, sourceCount, lineIndex)
+			continue
+		}
+		if (supportsLessCommonExtensions() \
+			&& isDefinitionListStart(sourceLines, sourceCount, lineIndex)) {
+			lineIndex = emitDefinitionList(sourceLines, sourceCount, \
+				lineIndex)
+			continue
+		}
+		if (sourceLines[lineIndex] ~ /^>/) {
+			lineIndex = emitBlockQuote(sourceLines, sourceCount, lineIndex)
+			continue
+		}
+		processLine(sourceLines[lineIndex])
+	}
+}
+
+
+function processLine( value, content )
+{
+	if (inFence) {
+		if (isClosingFence(value)) {
+			print inMermaidFence ? "</pre>" : "</code></pre>"
+			inFence = 0
+			inMermaidFence = 0
+			fenceMarker = ""
+			fenceLength = 0
+			fenceIndent = 0
+		} else {
+			print escapeHtml(stripFenceIndent(value, fenceIndent))
+		}
+		return
+	}
+	if (inIndentedCode) {
+		if (value ~ /^    /) {
+			while (pendingIndentedCodeBreaks > 0) {
+				print ""
+				pendingIndentedCodeBreaks -= 1
+			}
+			print escapeHtml(substr(value, 5))
+			return
+		}
+		if (value ~ /^\t/) {
+			while (pendingIndentedCodeBreaks > 0) {
+				print ""
+				pendingIndentedCodeBreaks -= 1
+			}
+			print escapeHtml(substr(value, 2))
+			return
+		}
+		if (value == "") {
+			pendingIndentedCodeBreaks += 1
+			return
+		}
+		closeIndentedCode()
+	}
+	if (inHtmlBlock) {
+		if (htmlBlockType == "blank" && value == "") {
+			inHtmlBlock = 0
+			htmlBlockType = ""
+			htmlBlockTag = ""
+			return
+		}
+		print rewriteHtmlReferences(value)
+		if (htmlBlockEnds(value)) {
+			inHtmlBlock = 0
+			htmlBlockType = ""
+			htmlBlockTag = ""
+		}
+		return
+	}
+	if (inHtmlComment) {
+		print rewriteHtmlReferences(value)
+		if (value ~ /-->/) {
+			inHtmlComment = 0
+		}
+		return
+	}
+	if (pendingListBreak \
+		&& value != "" \
+		&& !isListContinuation(value) \
+		&& value !~ /^[-+*][ \t]+/ \
+		&& value !~ /^[0-9][0-9]*\.[ \t]+/ \
+		&& value !~ /^[ \t]+[-+*][ \t]+/ \
+		&& value !~ /^[ \t]+[0-9][0-9]*\.[ \t]+/) {
+		closeList()
+	}
+	if (listType != "" \
+		&& value ~ /^[ \t]+[-+*][ \t]+/) {
+		if (nestedListLevel(value) > 1) {
+			content = value
+			sub(/^[ \t]+[-+*][ \t]+/, "", content)
+			markerWidth = length(value) - length(content)
+			appendNestedListItem(content, "ul", nestedListLevel(value), \
+				markerWidth, 1)
+			pendingListBreak = 0
+			return
+		}
+	}
+	if (listType != "" \
+		&& value ~ /^[ \t]+[0-9][0-9]*\.[ \t]+/) {
+		if (nestedListLevel(value) > 1) {
+			content = value
+			start = value
+			sub(/^[ \t]+/, "", start)
+			sub(/\..*$/, "", start)
+			sub(/^[ \t]+[0-9][0-9]*\.[ \t]+/, "", content)
+			markerWidth = length(value) - length(content)
+			appendNestedListItem(content, "ol", nestedListLevel(value), \
+				markerWidth, start)
+			pendingListBreak = 0
+			return
+		}
+	}
+	if (value == "") {
+		flushParagraph()
+		if (listType != "") {
+			if (listBlockType == "quote") {
+				listItem = listItem "</p>\n</blockquote>"
+				listBlockType = ""
+			}
+			if (inListParagraph) {
+				listItem = listItem "</p>"
+				inListParagraph = 0
+			}
+			if (listBlockType == "fence" \
+				|| listBlockType == "indented-code") {
+				listItem = listItem "\n"
+				return
+			}
+			pendingListBreak = 1
+		}
+		return
+	}
+	if (listType != "" && (isListContinuation(value) \
+		|| isLazyListContinuation(value))) {
+		if (nestedListDepth > 1) {
+			content = value
+			sub(/^  /, "", content)
+			nestedListItems[nestedListDepth] = \
+				nestedListItems[nestedListDepth] "\n" \
+				formatParagraphLine(content)
+			pendingListBreak = 0
+			return
+		}
+		appendListContinuation(value)
+		return
+	}
+	if (parseFence(value)) {
+		flushParagraph()
+		closeList()
+		fenceLanguageName = fenceLanguage(parsedFenceInformation)
+		inMermaidFence = mermaidEnabled && fenceLanguageName == "mermaid"
+		if (inMermaidFence) {
+			printf "%s", "<pre class=\"mermaid\">"
+		} else {
+			printf "%s", "<pre><code" \
+				(fenceLanguageName == "" ? "" : " class=\"language-" \
+				escapeHtml(fenceLanguageName) "\"") ">"
+		}
+		inFence = 1
+		fenceMarker = parsedFenceMarker
+		fenceLength = parsedFenceLength
+		fenceIndent = parsedFenceIndent
+		return
+	}
+	if (value ~ /^    /) {
+		flushParagraph()
+		closeList()
+		printf "%s", "<pre><code>"
+		print escapeHtml(substr(value, 5))
+		inIndentedCode = 1
+		return
+	}
+	if (value ~ /^\t/) {
+		flushParagraph()
+		closeList()
+		printf "%s", "<pre><code>"
+		print escapeHtml(substr(value, 2))
+		inIndentedCode = 1
+		return
+	}
+	if ((htmlBlockType = htmlBlockStartType(value)) != "") {
+		flushBlocks()
+		print rewriteHtmlReferences(value)
+		if (htmlBlockType == "comment") {
+			inHtmlComment = value !~ /-->/
+		} else {
+			inHtmlBlock = !htmlBlockEnds(value)
+		}
+		return
+	}
+	if (value ~ /^[-+*][ \t]+/) {
+		content = value
+		sub(/^[-+*][ \t]+/, "", content)
+		appendListItem(content, "ul", length(value) - length(content), 1)
+		return
+	}
+	if (value ~ /^[0-9][0-9]*\.[ \t]+/) {
+		content = value
+		start = value
+		sub(/\..*$/, "", start)
+		sub(/^[0-9][0-9]*\.[ \t]+/, "", content)
+		appendListItem(content, "ol", length(value) - length(content), start)
+		return
+	}
+	if (listType != "") {
+		closeList()
+	}
+	if (value ~ /^---+$/) {
+		flushParagraph()
+		print "<hr>"
+		return
+	}
+	if (emitAtxHeading(value)) {
+		return
+	}
+	appendParagraph(value)
+}
+
+
+{
+	lines[++lineCount] = $0
+}
+
+
+END {
+	loadImageBundles()
+	imageBundleFormatOrder[1] = "svg"
+	imageBundleFormatOrder[2] = "avif"
+	imageBundleFormatOrder[3] = "heic"
+	imageBundleFormatOrder[4] = "webp"
+	imageBundleFormatOrder[5] = "apng"
+	imageBundleFormatOrder[6] = "png"
+	imageBundleFormatOrder[7] = "jpg"
+	imageBundleFormatOrder[8] = "gif"
+	imageBundleFormatOrder[9] = "bmp"
+	imageBundleColorOrder[1] = "light"
+	imageBundleColorOrder[2] = "dark"
+	if (markdownStyle == "") {
+		markdownStyle = "markshup"
+	}
+	if ((fenceLine = unclosedFenceLine()) != 0) {
+		reportError("unclosed fenced code block starting on line " fenceLine)
+		exit 1
+	}
+	for (lineIndex = 1; lineIndex <= lineCount; lineIndex += 1) {
+		isFootnoteDefinition(lines[lineIndex])
+		isReferenceDefinition(lines[lineIndex])
+	}
+	print "<!doctype html>"
+	print "<html lang=\"en\">"
+	print "<head>"
+	print "<meta charset=\"utf-8\">"
+	print "<meta name=\"viewport\"" \
+		" content=\"width=device-width, initial-scale=1\">"
+	print "<title>" escapeHtml(pageTitle) "</title>"
+	printMetaTags(metaPath)
+	if (defaultCss) {
+		print "<style>"
+		emitFile(defaultCssPath)
+		print "</style>"
+	}
+	faviconCount = split(faviconUrls, faviconList, "\t")
+	for (faviconIndex = 1; faviconIndex <= faviconCount;
+		faviconIndex += 1) {
+		if (faviconList[faviconIndex] != "") {
+			printFaviconLink(faviconList[faviconIndex], "")
+		}
+	}
+	faviconLightCount = split(faviconLightUrls, faviconLightList, "\t")
+	for (faviconIndex = 1; faviconIndex <= faviconLightCount;
+		faviconIndex += 1) {
+		if (faviconLightList[faviconIndex] != "") {
+			printFaviconLink(faviconLightList[faviconIndex], \
+				"(prefers-color-scheme: light)")
+		}
+	}
+	faviconDarkCount = split(faviconDarkUrls, faviconDarkList, "\t")
+	for (faviconIndex = 1; faviconIndex <= faviconDarkCount;
+		faviconIndex += 1) {
+		if (faviconDarkList[faviconIndex] != "") {
+			printFaviconLink(faviconDarkList[faviconIndex], \
+				"(prefers-color-scheme: dark)")
+		}
+	}
+	stylesheetCount = split(stylesheetUrls, stylesheetList, "\t")
+	for (stylesheetIndex = 1; stylesheetIndex <= stylesheetCount;
+		stylesheetIndex += 1) {
+		if (stylesheetList[stylesheetIndex] != "") {
+			printStylesheetLink(stylesheetList[stylesheetIndex])
+		}
+	}
+	javascriptCount = split(javascriptUrls, javascriptList, "\t")
+	for (javascriptIndex = 1; javascriptIndex <= javascriptCount;
+		javascriptIndex += 1) {
+		if (javascriptList[javascriptIndex] != "") {
+			printJavascriptLink(javascriptList[javascriptIndex])
+		}
+	}
+	if (mermaidJavascriptPath != "") {
+		print "<script>"
+		emitFile(mermaidJavascriptPath)
+		print "</script>"
+	}
+	print "</head>"
+	print "<body>"
+	if (headerEnabled) {
+		print "<header>"
+		if (headerPath != "") {
+			emitTemplateFile(headerPath)
+		}
+		print "</header>"
+	}
+	print "<main>"
+	processLines(lines, lineCount)
+	flushBlocks()
+	emitFootnotes()
+	if (inFence) {
+		print "</code></pre>"
+	}
+	print "</main>"
+	if (footerEnabled) {
+		print "<footer>"
+		if (footerPath != "") {
+			emitTemplateFile(footerPath)
+		}
+		print "</footer>"
+	}
+	print "</body>"
+	print "</html>"
+}
+__MARKSHUP_RENDERER__
+: <<\__MARKSHUP_TEMPLATE_QUOTER__
+function templateDecodeEscape( character )
+{
+	if (character == "n") return "\n"
+	if (character == "r") return "\r"
+	if (character == "t") return "\t"
+	if (character == "\\" || character == "\"") return character
+	exit 1
+}
+
+
+function templateParseQuoted( value, start,    character, characterIndex,
+	result )
+{
+	characterIndex = start + 1
+	result = ""
+	while (characterIndex <= length(value)) {
+		character = substr(value, characterIndex++, 1)
+		if (character == "\"") {
+			templateParsed = result
+			templatePosition = characterIndex
+			return
+		}
+		if (character == "\\") {
+			if (characterIndex > length(value)) exit 1
+			character = templateDecodeEscape( \
+				substr(value, characterIndex++, 1) )
+		}
+		result = result character
+	}
+	exit 1
+}
+
+
+function templateParseUnquoted( value, start, end,    character,
+	characterIndex, result )
+{
+	result = ""
+	for (characterIndex = start; characterIndex <= end; characterIndex++) {
+		character = substr(value, characterIndex, 1)
+		if (character == "\"") exit 1
+		if (character == "\\") {
+			if (++characterIndex > end) exit 1
+			result = result templateDecodeEscape( \
+				substr(value, characterIndex, 1) )
+		} else result = result character
+	}
+	templateParsed = result
+}
+
+
+function templateParseToken( value, start,    character, characterIndex,
+	quoted, result )
+{
+	characterIndex = start
+	while (characterIndex <= length(value) \
+		&& substr(value, characterIndex, 1) ~ /[ \t]/) characterIndex++
+	result = ""
+	quoted = 0
+	while (characterIndex <= length(value)) {
+		character = substr(value, characterIndex, 1)
+		if (character == "\"") {
+			quoted = !quoted
+		} else if (character == "\\") {
+			if (characterIndex == length(value)) exit 1
+			character = substr(value, ++characterIndex, 1)
+			if (character == "n") result = result "\\n"
+			else if (character == "r") result = result "\\r"
+			else if (character == "t") result = result "\\t"
+			else if (character == "\\") result = result "\\\\"
+			else if (character == "\"") result = result "\\\""
+			else exit 1
+		} else if (!quoted && character ~ /[ \t]/) {
+			break
+		} else if (character == "\t") {
+			result = result "\\t"
+		} else {
+			result = result character
+		}
+		characterIndex++
+	}
+	if (quoted) exit 1
+	templateParsed = result
+	templatePosition = characterIndex
+}
+
+
+function templateParseRest( value, start,    character, characterIndex,
+	quoted, result )
+{
+	characterIndex = start
+	while (characterIndex <= length(value) \
+		&& substr(value, characterIndex, 1) ~ /[ \t]/) characterIndex++
+	result = ""
+	quoted = 0
+	while (characterIndex <= length(value)) {
+		character = substr(value, characterIndex, 1)
+		if (character == "\"") {
+			quoted = !quoted
+		} else if (character == "\\") {
+			if (characterIndex == length(value)) exit 1
+			character = substr(value, ++characterIndex, 1)
+			if (character == "n") result = result "\\n"
+			else if (character == "r") result = result "\\r"
+			else if (character == "t") result = result "\\t"
+			else if (character == "\\") result = result "\\\\"
+			else if (character == "\"") result = result "\\\""
+			else exit 1
+		} else if (character == "\t") {
+			result = result "\\t"
+		} else {
+			result = result character
+		}
+		characterIndex++
+	}
+	if (quoted) exit 1
+	templateParsed = result
+	templatePosition = characterIndex
+}
+
+
+function templateEncode( value,    character, characterIndex, result )
+{
+	result = ""
+	for (characterIndex = 1; characterIndex <= length(value); \
+		characterIndex++) {
+		character = substr(value, characterIndex, 1)
+		if (character == "\\") result = result "\\\\"
+		else if (character == "\t") result = result "\\t"
+		else if (character == "\n") result = result "\\n"
+		else if (character == "\r") result = result "\\r"
+		else if (character == "\"") result = result "\\\""
+		else result = result character
+	}
+	return result
+}
+__MARKSHUP_TEMPLATE_QUOTER__
+: <<\__MARKSHUP_MERMAID_HELPER__
+/*
+ * Copyright 2026 CodingMarkus
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+mermaid.initialize({ startOnLoad: true });
+__MARKSHUP_MERMAID_HELPER__
+: <<\__MARKSHUP_MERMAID_LICENSE__
+The MIT License (MIT)
+
+Copyright (c) 2014 - 2022 Knut Sveidqvist
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+__MARKSHUP_MERMAID_LICENSE__
+
+# shellcheck shell=sh
+#
+# Copyright 2026 CodingMarkus
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+
+# Returns success if curl or wget is available.
+markshupHasDownloader( )
+{
+	command -v curl > /dev/null 2>&1 || command -v wget > /dev/null 2>&1
+}
+
+
+# $1 - URL.
+# $2 - Output path.
+markshupDownload( )
+{
+	if command -v curl > /dev/null 2>&1
+	then
+		curl -fsSL --output "$2" "$1"
+		return
+	fi
+	if command -v wget > /dev/null 2>&1
+	then
+		wget -q --max-redirect=10 -O "$2" "$1"
+		return
+	fi
+	return 1
+}
+
+# shellcheck shell=sh
+#
+# Copyright 2026 CodingMarkus
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+# shellcheck disable=SC2154 # Initialized by cli.sh before rendering starts.
+
+
+# $1 - Markdown source path.
+#
+# Returns success if the source contains a Mermaid fenced code block.
+markshupSourceHasMermaid( )
+{
+	awk '
+		function parseFence(value, indentation, characterIndex, marker,
+			fenceSize, information) {
+			indentation = 0
+			while (indentation < 3 && \
+				substr(value, indentation + 1, 1) == " ") {
+				indentation += 1
+			}
+			characterIndex = indentation + 1
+			marker = substr(value, characterIndex, 1)
+			if (marker != "`" && marker != "~") {
+				return 0
+			}
+			fenceSize = 0
+			while (substr(value, characterIndex, 1) == marker) {
+				fenceSize += 1
+				characterIndex += 1
+			}
+			if (fenceSize < 3) {
+				return 0
+			}
+			information = substr(value, characterIndex)
+			if (marker == "`" && index(information, "`") > 0) {
+				return 0
+			}
+			parsedMarker = marker
+			parsedLength = fenceSize
+			parsedInformation = information
+			return 1
+		}
+		{
+			value = $0
+			while (value ~ /^>/) {
+				sub(/^>[ \t]?/, "", value)
+			}
+			if (!parseFence(value)) {
+				next
+			}
+			if (inFence) {
+				if (parsedMarker == fenceMarker \
+					&& parsedLength >= fenceLength \
+					&& parsedInformation ~ /^[ \t]*$/) {
+					inFence = 0
+				}
+				next
+			}
+			information = parsedInformation
+			sub(/^[ \t]*/, "", information)
+			sub(/[ \t].*$/, "", information)
+			if (information == "mermaid") {
+				found = 1
+				exit
+			}
+			inFence = 1
+			fenceMarker = parsedMarker
+			fenceLength = parsedLength
+		}
+		END {
+			exit(!found)
+		}
+	' "$1"
+}
+
+
+# Adds external Mermaid Tiny and its inline MarkShup adapter.
+# Adds external Mermaid Tiny and its inline MarkShup adapter.
+markshupUseExternalMermaid( )
+{
+	_mue_url='https://cdn.jsdelivr.net/npm/@mermaid-js/tiny@11.15.0'
+	_mue_url=$_mue_url/dist/mermaid.tiny.js
+	_ms_mermaidJavascriptRefs=$( markshupAppendValue \
+		"$_ms_mermaidJavascriptRefs" "$_mue_url" )
+	_ms_mermaidJavascriptInlinePath=$MARKSHUP_MERMAID_HELPER_PATH
+}
+
+
+# Downloads Mermaid Tiny and writes its MarkShup adapter.
+markshupPrepareLocalMermaidHelper( )
+{
+	mkdir -p "$_ms_jsHelperPath" || markshupFail \
+		"Could not create JavaScript helper directory: $_ms_jsHelperPath"
+	_ms_jsHelperPath=$( CDPATH='' cd "$_ms_jsHelperPath" && pwd )
+	_mpm_bundlePath=$_ms_jsHelperPath/mermaid.tiny.js
+	_mpm_temporaryPath=$_ms_temporaryDirectory/mermaid.tiny.js
+	_mpm_url='https://cdn.jsdelivr.net/npm/@mermaid-js/tiny@11.15.0'
+	_mpm_url=$_mpm_url/dist/mermaid.tiny.js
+	if ! markshupDownload \
+		"$_mpm_url" \
+		"$_mpm_temporaryPath"
+	then
+		rm -f "$_mpm_temporaryPath"
+		markshupFail 'Could not download Mermaid Tiny'
+	fi
+	mv "$_mpm_temporaryPath" "$_mpm_bundlePath"
+	cp "$MARKSHUP_MERMAID_HELPER_PATH" \
+		"$_ms_jsHelperPath/markshup-mermaid.js"
+	cp "$MARKSHUP_MERMAID_LICENSE_PATH" \
+		"$_ms_jsHelperPath/mermaid.LICENSE.txt"
+	_ms_mermaidJavascriptPaths=$( markshupAppendValue \
+		"$_ms_mermaidJavascriptPaths" "$_mpm_bundlePath" )
+	_ms_mermaidJavascriptPaths=$( markshupAppendValue \
+		"$_ms_mermaidJavascriptPaths" \
+		"$_ms_jsHelperPath/markshup-mermaid.js" )
+}
+
+
+# Selects the Mermaid helper source according to the JavaScript helper mode.
+markshupPrepareMermaidHelper( )
+{
+	case $_ms_jsHelperMode in
+		local)
+			[ -n "$_ms_jsHelperPath" ] || markshupFail \
+				'Local JavaScript helpers require --js-helper DIR'
+			markshupHasDownloader || markshupFail \
+				'Local JavaScript helpers require curl or wget'
+			markshupPrepareLocalMermaidHelper
+			;;
+		external)
+			markshupUseExternalMermaid
+			;;
+		auto)
+			if [ -z "$_ms_jsHelperPath" ]
+			then
+				printf 'Using external JavaScript helpers because %s.\n' \
+					'no helper directory was set'
+				markshupUseExternalMermaid
+			elif markshupHasDownloader
+			then
+				markshupPrepareLocalMermaidHelper
+			else
+				printf 'Using external JavaScript helpers because %s.\n' \
+					'curl and wget are unavailable'
+				markshupUseExternalMermaid
+			fi
+			;;
+	esac
+}
+
+
+# shellcheck shell=sh
+#
+# Copyright 2026 CodingMarkus
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+#
+# cspell:words maop mvear mcad matm matl mtfp mcra mcib
+# cspell:words tolower RSTART RLENGTH apng gsub
+
+
+# shellcheck disable=SC2154 # Initialized by cli.sh before rendering starts.
+
+# $1 - File or directory name.
+markshupNormalizeName( )
+{
+	case $_ms_mangleStyle in
+		keep)
+			printf '%s\n' "$1"
+			return
+			;;
+		kebab)
+		_mnn_separator=-
+			;;
+		snake)
+			_mnn_separator=_
+			;;
+	esac
+	printf '%s\n' "$1" | awk -v separator="$_mnn_separator" '
+	{
+		result = ""
+		needsSeparator = 0
+		for (characterIndex = 1; characterIndex <= length($0);
+			characterIndex += 1) {
+			character = substr($0, characterIndex, 1)
+			previous = substr($0, characterIndex - 1, 1)
+			following = substr($0, characterIndex + 1, 1)
+			if (character !~ /[A-Za-z0-9]/) {
+				needsSeparator = result != ""
+				continue
+			}
+			if (needsSeparator) {
+				result = result separator
+				needsSeparator = 0
+			}
+			if (character ~ /[A-Z]/) {
+				if (characterIndex > 1 && previous ~ /[a-z0-9]/) {
+					result = result separator
+				} else if (characterIndex > 1 && previous ~ /[A-Z]/ \
+					&& following ~ /[a-z]/) {
+					result = result separator
+				}
+				character = tolower(character)
+			}
+			result = result character
+		}
+		print result
+	}'
+}
+
+
+# $1 - Absolute source path below _ms_inputRoot.
+markshupOutputPath( )
+{
+	_mop_relativePath=${1#"$_ms_inputRoot/"}
+	_mop_directory=${_mop_relativePath%/*}
+	_mop_name=${_mop_relativePath##*/}
+	_mop_stem=${_mop_name%.md}
+	_mop_name=$( markshupNormalizeName "$_mop_stem" ).md.html
+	if [ "$_mop_directory" = "$_mop_relativePath" ]
+	then
+		printf '%s/%s\n' "$_ms_outputDirectory" "$_mop_name"
+	else
+		_mop_normalizedDirectory=
+		_mop_oldIfs=$IFS
+		IFS=/
+		for _mop_component in $_mop_directory
+		do
+			_mop_component=$( markshupNormalizeName "$_mop_component" )
+			if [ -n "$_mop_normalizedDirectory" ]
+			then
+				_mop_normalizedDirectory=$_mop_normalizedDirectory/
+			fi
+			_mop_normalizedDirectory=$_mop_normalizedDirectory$_mop_component
+		done
+		IFS=$_mop_oldIfs
+		printf '%s/%s/%s\n' \
+			"$_ms_outputDirectory" "$_mop_normalizedDirectory" "$_mop_name"
+	fi
+}
+
+
+# $1 - File or directory name.
+markshupNormalizeAssetName( )
+{
+	_man_name=$1
+	_man_extension=
+	case $_man_name in
+		?*.*)
+			_man_extension=.${_man_name##*.}
+			_man_name=${_man_name%.*}
+			;;
+	esac
+	printf '%s%s\n' "$( markshupNormalizeName "$_man_name" )" \
+		"$_man_extension"
+}
+
+
+# $1 - Absolute output directory.
+# $2 - Relative asset path.
+#
+# Prints an absolute output path. Fails when the asset would escape $1.
+markshupAssetOutputPath( )
+{
+	_maop_directory=$1
+	_maop_path=$2
+	_maop_oldIfs=$IFS
+	IFS=/
+	for _maop_component in $_maop_path
+	do
+		case $_maop_component in
+			''|.) continue ;;
+			..)
+				[ "$_maop_directory" != "$_ms_outputDirectory" ] \
+					|| return 1
+				_maop_directory=${_maop_directory%/*}
+				;;
+			*)
+				_maop_directory=$_maop_directory/$( markshupNormalizeAssetName \
+					"$_maop_component" )
+				;;
+		esac
+	done
+	IFS=$_maop_oldIfs
+	printf '%s\n' "$_maop_directory"
+}
+
+
+# $1 - Absolute directory containing an output HTML file.
+# $2 - Relative asset path.
+#
+# Records an unresolved reference outside the output directory. MarkShup
+# cannot copy files there, but must finish generating every document first.
+markshupVerifyExternalAssetReference( )
+{
+	_mvear_path=$1/$2
+	[ -f "$_mvear_path" ] || printf '%s\n' "$2" \
+		>> "$_ms_brokenReferencePaths"
+}
+
+
+# Prints unresolved references after every document has been generated.
+#
+# Returns unsuccessfully when any references are unresolved.
+markshupReportBrokenReferences( )
+{
+	[ -s "$_ms_brokenReferencePaths" ] || return 0
+	printf '\nBroken references:\n' >&2
+	sort -u "$_ms_brokenReferencePaths" | sed 's/^/- /' >&2
+	printf '\n%s%s%s%s\n' \
+		'markshup: Generated output is complete. These errors identify ' \
+		'references that do not yet resolve. After adding the missing files, ' \
+		'the generated pages will work without running markshup again. ' \
+		'Running it again only verifies the references.' >&2
+	return 1
+}
+
+
+# $1 - Absolute path to display.
+# Prints a path relative to the current working directory when possible.
+markshupDisplayPath( )
+{
+	_mdp_path=$1
+	_mdp_currentDirectory=$( pwd )
+	case $_mdp_path in
+		"$_mdp_currentDirectory")
+			printf '.\n'
+			;;
+		"$_mdp_currentDirectory"/*)
+			printf '%s\n' "${_mdp_path#$_mdp_currentDirectory/}"
+			;;
+		*)
+			printf '%s\n' "$_mdp_path"
+			;;
+	esac
+}
+
+
+# $1 - Absolute asset output path.
+#
+# Creates its containing directory without following a symlink below the output
+# directory.
+markshupCreateAssetDirectory( )
+{
+	_mcad_relative=${1#"$_ms_outputDirectory"/}
+	case $_mcad_relative in
+		*/*) _mcad_relative=${_mcad_relative%/*} ;;
+		*) _mcad_relative= ;;
+	esac
+	_mcad_directory=$_ms_outputDirectory
+	_mcad_oldIfs=$IFS
+	IFS=/
+	for _mcad_component in $_mcad_relative
+	do
+		[ -n "$_mcad_component" ] || continue
+		_mcad_directory=$_mcad_directory/$_mcad_component
+		if [ -e "$_mcad_directory" ] || [ -L "$_mcad_directory" ]
+		then
+			[ -d "$_mcad_directory" ] && [ ! -L "$_mcad_directory" ] \
+				|| markshupFail \
+				"Asset output directory is unsafe: $_mcad_directory"
+		else
+			mkdir "$_mcad_directory" || markshupFail \
+				"Could not create asset output directory: $_mcad_directory"
+		fi
+	done
+	IFS=$_mcad_oldIfs
+}
+
+
+# $1 - Absolute directory containing an output HTML file.
+# $2 - Absolute asset path.
+markshupRelativePath( )
+{
+	awk -v from="$1" -v to="$2" '
+	BEGIN {
+		fromCount = split(from, fromParts, "/")
+		toCount = split(to, toParts, "/")
+		common = 1
+		while (common <= fromCount && common <= toCount \
+			&& fromParts[common] == toParts[common]) {
+			common += 1
+		}
+		result = ""
+		for (componentIndex = common; componentIndex <= fromCount;
+			componentIndex += 1) {
+			if (fromParts[componentIndex] != "") {
+				result = result "../"
+			}
+		}
+		for (componentIndex = common; componentIndex <= toCount;
+			componentIndex += 1) {
+			if (toParts[componentIndex] == "") {
+				continue
+			}
+			if (result != "" && substr(result, length(result), 1) != "/") {
+				result = result "/"
+			}
+			result = result toParts[componentIndex]
+		}
+		if (result == "") {
+			result = "."
+		}
+		print result
+	}'
+}
+
+
+# $1 - Tab-separated absolute paths.
+# $2 - Absolute output file path.
+markshupAssetUrls( )
+{
+	_mau_paths=$1
+	_mau_outputDirectory=${2%/*}
+	_mau_urls=
+	_mau_oldIfs=$IFS
+	IFS='	'
+	for _mau_path in $_mau_paths
+	do
+		_mau_url=$( markshupRelativePath \
+			"$_mau_outputDirectory" "$_mau_path" )
+		_mau_urls=$( markshupAppendValue "$_mau_urls" "$_mau_url" )
+	done
+	IFS=$_mau_oldIfs
+	printf '%s\n' "$_mau_urls"
+}
+
+
+# $1 - Template directory to apply.
+markshupApplyTemplateDirectory( )
+{
+	markshupApplyTemplateOverrides "$1/overrides.txt"
+	_mst_headerPath=$_ms_headerPath
+	_mst_footerPath=$_ms_footerPath
+	if [ -f "$1/header.html" ]
+	then
+		_mst_headerPath=$1/header.html
+		_mst_headerEnabled=1
+		[ -s "$_mst_headerPath" ] || _mst_headerEnabled=0
+		if [ "$_mst_headerEnabled" -eq 1 ]
+		then
+			markshupTemplateMarker "$_mst_headerPath"
+			case $_mtm_marker in
+				'--')
+					_mst_headerPath=$_mst_headerFallbackPath
+					[ -n "$_mst_headerPath" ] \
+						|| _mst_headerEnabled=0
+					;;
+				+|--+)
+					markshupFail \
+						"Invalid header template marker: $_mtm_marker"
+					;;
+			esac
+		fi
+	fi
+	if [ -f "$1/footer.html" ]
+	then
+		_mst_footerPath=$1/footer.html
+		_mst_footerEnabled=1
+		[ -s "$_mst_footerPath" ] || _mst_footerEnabled=0
+		if [ "$_mst_footerEnabled" -eq 1 ]
+		then
+			markshupTemplateMarker "$_mst_footerPath"
+			case $_mtm_marker in
+				'--')
+					_mst_footerPath=$_mst_footerFallbackPath
+					[ -n "$_mst_footerPath" ] \
+						|| _mst_footerEnabled=0
+					;;
+				+|--+)
+					markshupFail \
+						"Invalid footer template marker: $_mtm_marker"
+					;;
+			esac
+		fi
+	fi
+	markshupApplyTemplateLinks "$1/css.txt" stylesheet
+	markshupApplyTemplateLinks "$1/icon.txt" favicon
+	markshupApplyTemplateLinks "$1/icon-light.txt" favicon-light
+	markshupApplyTemplateLinks "$1/icon-dark.txt" favicon-dark
+	markshupApplyTemplateLinks "$1/js.txt" javascript
+	markshupApplyTemplateMeta "$1/meta.txt"
+}
+
+
+# $1 - Overrides file path.
+#
+# Applies one overrides.txt file. Values are encoded by awk so that tabs,
+# quotes, and the escape sequences supported by this file survive the shell
+# argument boundary.
+markshupApplyTemplateOverrides( )
+{
+	[ -f "$1" ] || return 0
+	grep -Eq '^[[:space:]]*[^#[:space:]]' "$1" || return 0
+	_mso_marker=
+	markshupTemplateMarker "$1"
+	case $_mtm_marker in
+		'--')
+			markshupResetTemplateOptions
+			_mso_hasTemplateOverrides=1
+			;;
+		+)
+			;;
+		--+)
+			if [ "$_mso_hasTemplateOverrides" -eq 0 ]
+			then
+				markshupResetTemplateOptions
+			fi
+			_mso_hasTemplateOverrides=1
+			;;
+		*)
+			markshupResetTemplateOptions
+			_mso_hasTemplateOverrides=1
+			;;
+	esac
+	_mso_lines=$_ms_temporaryDirectory/override-lines
+	_mso_directory=${1%/*}
+	if ! awk -v marker="$_mtm_marker" \
+		-f "$MARKSHUP_TEMPLATE_QUOTER_PATH" -f - "$1" \
+		<<'EOF' > "$_mso_lines"
+		BEGIN { first = 1 }
+		{
+			line = $0
+			sub(/^[ \t]*/, "", line)
+			if (line == "" || line ~ /^#/) next
+			if (first && marker != "") {
+				first = 0
+				next
+			}
+			first = 0
+			templateParseToken(line, 1)
+			option = templateParsed
+			position = templatePosition
+			if (option != "--strip-fragment" && option != "--title" \
+				&& option != "--header" && option != "--footer" \
+				&& option != "--mangle" && option != "--flavor" \
+				&& option != "--copy-files" \
+				&& option != "--no-copy-files" \
+				&& option != "--detect-img" \
+				&& option != "--no-detect-img" \
+				&& option != "--default-css" \
+				&& option != "--no-default-css") exit 1
+			templateParseRest(line, position)
+			value = templateParsed
+			print option "\t" value
+		}
+EOF
+	then
+		markshupFail "Invalid option in overrides file: $1"
+	fi
+	while IFS="$( printf '\t' )" read -r _mso_option _mso_value \
+		|| [ -n "$_mso_option" ]
+	do
+		_mso_value=$( printf '%b' "${_mso_value:-}" )
+		case $_mso_option in
+			--strip-fragment)
+				case $_mso_value in
+					\#*) _ms_stripFragment=$_mso_value ;;
+					*) _ms_stripFragment=#$_mso_value ;;
+				esac
+				;;
+			--title) _ms_title=$_mso_value ;;
+			--header)
+				case $_mso_value in
+					/*) _ms_headerPath=$_mso_value ;;
+					*) _ms_headerPath=$_mso_directory/$_mso_value ;;
+				esac
+				;;
+			--footer)
+				case $_mso_value in
+					/*) _ms_footerPath=$_mso_value ;;
+					*) _ms_footerPath=$_mso_directory/$_mso_value ;;
+				esac
+				;;
+			--mangle)
+				case $_mso_value in
+					kebab|snake|keep) _ms_mangleStyle=$_mso_value ;;
+					*) markshupFail "Unknown mangle style: $_mso_value" ;;
+				esac
+				;;
+			--flavor)
+				case $_mso_value in
+					markshup|common|common+|extended) \
+						_ms_markdownStyle=$_mso_value ;;
+					*) markshupFail \
+						"Unknown Markdown flavor: $_mso_value" ;;
+				esac
+				;;
+			--copy-files|--no-copy-files|--detect-img|--no-detect-img|\
+			--default-css|--no-default-css)
+				[ -z "$_mso_value" ] || markshupFail \
+					"Unexpected value for $_mso_option"
+				case $_mso_option in
+					--copy-files) _ms_copyFiles=1 ;;
+					--no-copy-files) _ms_copyFiles=0 ;;
+					--detect-img) _ms_imgEnabled=1 ;;
+					--no-detect-img) _ms_imgEnabled=0 ;;
+					--default-css) _ms_defaultCss=1 ;;
+					--no-default-css) _ms_defaultCss=0 ;;
+				esac
+				;;
+		esac
+	done < "$_mso_lines"
+	_mst_headerFallbackPath=$_ms_headerPath
+	_mst_footerFallbackPath=$_ms_footerPath
+	_mst_metaEntries=$_ms_metaEntries
+	[ -z "$_ms_headerPath" ] || [ -f "$_ms_headerPath" ] \
+		|| markshupFail "Header file not found: $_ms_headerPath"
+	[ -z "$_ms_footerPath" ] || [ -f "$_ms_footerPath" ] \
+		|| markshupFail "Footer file not found: $_ms_footerPath"
+}
+
+
+# Restores the command-line values before selecting a source directory.
+markshupResetTemplateOptions( )
+{
+	_ms_metaEntries=$_ms_cli_metaEntries
+	_ms_stripFragment=$_ms_cli_stripFragment
+	_ms_title=$_ms_cli_title
+	_ms_headerPath=$_ms_cli_headerPath
+	_ms_footerPath=$_ms_cli_footerPath
+	_ms_mangleStyle=$_ms_cli_mangleStyle
+	_ms_markdownStyle=$_ms_cli_markdownStyle
+	_ms_defaultCss=$_ms_cli_defaultCss
+	_ms_imgEnabled=$_ms_cli_imgEnabled
+	_ms_copyFiles=$_ms_cli_copyFiles
+	_mso_hasTemplateOverrides=0
+}
+
+
+# $1 - Absolute Markdown source directory.
+markshupApplyTemplateOverridesForSource( )
+{
+	markshupResetTemplateOptions
+	[ -n "$_ms_templatesPath" ] || return 0
+	_mst_templatePath=$_ms_templatesPath
+	markshupApplyTemplateOverrides "$_mst_templatePath/overrides.txt"
+	_mst_relativeDirectory=${1#"$_ms_inputRoot"}
+	_mst_relativeDirectory=${_mst_relativeDirectory#/}
+	_mst_oldIfs=$IFS
+	IFS=/
+	for _mst_component in $_mst_relativeDirectory
+	do
+		_mst_templatePath=$_mst_templatePath/$_mst_component
+		markshupApplyTemplateOverrides \
+			"$_mst_templatePath/overrides.txt"
+	done
+	IFS=$_mst_oldIfs
+}
+
+
+# $1 - Template file path.
+#
+# Sets _mtm_marker to the first non-blank, non-comment line when it is a
+# template marker. Fails for invalid marker syntax.
+markshupTemplateMarker( )
+{
+	_mtm_marker=
+	while IFS= read -r _mtm_line || [ -n "$_mtm_line" ]
+	do
+		_mtm_line=$( printf '%s\n' "$_mtm_line" | sed \
+			's/^[[:space:]]*//; s/[[:space:]]*$//' )
+		[ -n "$_mtm_line" ] || continue
+		case $_mtm_line in
+			\#*) continue ;;
+		esac
+		case $_mtm_line in
+			--|+|--+) _mtm_marker=$_mtm_line ;;
+			+--|'-- +')
+				markshupFail \
+					"Invalid template marker in $1: $_mtm_line"
+				;;
+		esac
+		return 0
+	done < "$1"
+}
+
+
+# $1 - Asset type.
+markshupTemplateUrls( )
+{
+	case $1 in
+		stylesheet) printf '%s\n' "$_mst_stylesheetUrls" ;;
+		favicon) printf '%s\n' "$_mst_faviconUrls" ;;
+		favicon-light) printf '%s\n' "$_mst_faviconLightUrls" ;;
+		favicon-dark) printf '%s\n' "$_mst_faviconDarkUrls" ;;
+		javascript) printf '%s\n' "$_mst_javascriptUrls" ;;
+	esac
+}
+
+
+# $1 - Asset type.
+markshupTemplateFallbackUrls( )
+{
+	case $1 in
+		stylesheet) printf '%s\n' "$_mst_stylesheetFallbackUrls" ;;
+		favicon) printf '%s\n' "$_mst_faviconFallbackUrls" ;;
+		favicon-light) printf '%s\n' "$_mst_faviconLightFallbackUrls" ;;
+		favicon-dark) printf '%s\n' "$_mst_faviconDarkFallbackUrls" ;;
+		javascript) printf '%s\n' "$_mst_javascriptFallbackUrls" ;;
+	esac
+}
+
+
+# $1 - Asset type.
+markshupTemplateInheritsFallback( )
+{
+	case $1 in
+		stylesheet) printf '%s\n' "$_mst_stylesheetInheritsFallback" ;;
+		favicon) printf '%s\n' "$_mst_faviconInheritsFallback" ;;
+		favicon-light) printf '%s\n' "$_mst_faviconLightInheritsFallback" ;;
+		favicon-dark) printf '%s\n' "$_mst_faviconDarkInheritsFallback" ;;
+		javascript) printf '%s\n' "$_mst_javascriptInheritsFallback" ;;
+	esac
+}
+
+
+# $1 - First tab-separated value list.
+# $2 - Second tab-separated value list.
+markshupAppendValues( )
+{
+	if [ -z "$1" ]
+	then
+		printf '%s\n' "$2"
+	elif [ -z "$2" ]
+	then
+		printf '%s\n' "$1"
+	else
+		printf '%s\t%s\n' "$1" "$2"
+	fi
+}
+
+
+# $1 - Template metadata list path.
+markshupApplyTemplateMeta( )
+{
+	[ -f "$1" ] || return 0
+	_matm_entries=
+	markshupTemplateMarker "$1"
+	case $_mtm_marker in
+		'--')
+			_matm_entries=$_mst_metaFallbackEntries
+			_matm_inheritsFallback=1
+			;;
+		+)
+			_matm_entries=$_mst_metaEntries
+			_matm_inheritsFallback=$_mst_metaInheritsFallback
+			;;
+		--+)
+			_matm_entries=$_mst_metaEntries
+			_matm_inheritsFallback=$_mst_metaInheritsFallback
+			if [ "$_matm_inheritsFallback" -eq 0 ]
+			then
+				_matm_entries=$( markshupAppendLine \
+					"$_mst_metaFallbackEntries" "$_matm_entries" )
+				_matm_inheritsFallback=1
+			fi
+			;;
+		*) _matm_inheritsFallback=0 ;;
+	esac
+	if ! _matm_templateEntries=$( awk -v marker="$_mtm_marker" \
+		-f "$MARKSHUP_TEMPLATE_QUOTER_PATH" -f - "$1" <<'EOF'
+		BEGIN {
+			first = 1
+		}
+		function fail( ) {
+			exit 1
+		}
+		{
+			line = $0
+			trimmed = line
+			gsub(/^[[:space:]]*|[[:space:]]*$/, "", trimmed)
+			if (trimmed == "" || trimmed ~ /^#/) next
+			if (first && marker != "") {
+				first = 0
+				next
+			}
+			first = 0
+			start = 1
+			while (substr(line, start, 1) ~ /[ \t]/) start++
+			if (substr(line, start, 1) == "\"") {
+				templateParseQuoted(line, start)
+				name = templateParsed
+				while (substr(line, templatePosition, 1) ~ /[ \t]/) \
+					templatePosition++
+				if (substr(line, templatePosition++, 1) != ":") fail()
+				position = templatePosition
+			} else {
+				separator = index(substr(line, start), ":")
+				if (separator == 0) fail()
+				separator += start - 1
+				end = separator - 1
+				while (substr(line, end, 1) ~ /[ \t]/) end--
+				if (end < start) fail()
+				templateParseUnquoted(line, start, end)
+				name = templateParsed
+				position = separator + 1
+			}
+			while (substr(line, position, 1) ~ /[ \t]/) position++
+			if (substr(line, position, 1) == "\"") {
+				templateParseQuoted(line, position)
+				value = templateParsed
+				while (substr(line, templatePosition, 1) ~ /[ \t]/) \
+					templatePosition++
+				if (templatePosition <= length(line)) fail()
+			} else {
+				end = length(line)
+				while (substr(line, end, 1) ~ /[ \t]/) end--
+				templateParseUnquoted(line, position, end)
+				value = templateParsed
+			}
+			print templateEncode(name) "\t" templateEncode(value)
+		}
+EOF
+	)
+	then
+		markshupFail "Invalid metadata entry in $1"
+	fi
+	if [ -n "$_matm_templateEntries" ]
+	then
+		_matm_entries=$( markshupAppendLine \
+			"$_matm_entries" "$_matm_templateEntries" )
+	fi
+	_mst_metaEntries=$_matm_entries
+	_mst_metaInheritsFallback=$_matm_inheritsFallback
+}
+
+
+# $1 - Template asset list path.
+# $2 - Asset type: stylesheet, favicon, favicon-light, favicon-dark, or
+# javascript.
+markshupApplyTemplateLinks( )
+{
+	[ -f "$1" ] || return 0
+	_matl_urls=
+	_matl_firstLine=1
+	markshupTemplateMarker "$1"
+	case $_mtm_marker in
+		'--')
+			_matl_urls=$( markshupTemplateFallbackUrls "$2" )
+			_matl_inheritsFallback=1
+			;;
+		+)
+			_matl_urls=$( markshupTemplateUrls "$2" )
+			_matl_inheritsFallback=$( markshupTemplateInheritsFallback "$2" )
+			;;
+		--+)
+			_matl_urls=$( markshupTemplateUrls "$2" )
+			_matl_inheritsFallback=$( markshupTemplateInheritsFallback "$2" )
+			if [ "$_matl_inheritsFallback" -eq 0 ]
+			then
+				_matl_urls=$( markshupAppendValues \
+					"$( markshupTemplateFallbackUrls "$2" )" \
+					"$_matl_urls" )
+				_matl_inheritsFallback=1
+			fi
+			;;
+		*)
+			_matl_inheritsFallback=0
+			;;
+	esac
+	while IFS= read -r _matl_url || [ -n "$_matl_url" ]
+	do
+		_matl_url=$( printf '%s\n' "$_matl_url" | sed \
+			's/^[[:space:]]*//; s/[[:space:]]*$//' )
+		[ -n "$_matl_url" ] || continue
+		case $_matl_url in
+			\#*) continue ;;
+		esac
+		if [ "$_matl_firstLine" -eq 1 ] \
+			&& [ -n "$_mtm_marker" ]
+		then
+			:
+		else
+			case $_matl_url in
+				*\$\{OUTDIR\}*)
+					_matl_url=$_ms_templateLinkMarker$_matl_url
+					;;
+			esac
+			_matl_urls=$( markshupAppendValue \
+				"$_matl_urls" "$_matl_url" )
+		fi
+		_matl_firstLine=0
+	done < "$1"
+	case $2 in
+		stylesheet)
+			_mst_stylesheetUrls=$_matl_urls
+			_mst_stylesheetInheritsFallback=$_matl_inheritsFallback
+			;;
+		favicon)
+			_mst_faviconUrls=$_matl_urls
+			_mst_faviconInheritsFallback=$_matl_inheritsFallback
+			;;
+		favicon-light)
+			_mst_faviconLightUrls=$_matl_urls
+			_mst_faviconLightInheritsFallback=$_matl_inheritsFallback
+			;;
+		favicon-dark)
+			_mst_faviconDarkUrls=$_matl_urls
+			_mst_faviconDarkInheritsFallback=$_matl_inheritsFallback
+			;;
+		javascript)
+			_mst_javascriptUrls=$_matl_urls
+			_mst_javascriptInheritsFallback=$_matl_inheritsFallback
+			;;
+	esac
+}
+
+
+# $1 - Absolute Markdown source directory below _ms_inputRoot.
+markshupSelectTemplates( )
+{
+	markshupResetTemplateOptions
+	_mst_headerPath=$_ms_headerPath
+	_mst_footerPath=$_ms_footerPath
+	_mst_headerFallbackPath=$_ms_headerPath
+	_mst_footerFallbackPath=$_ms_footerPath
+	_mst_headerEnabled=1
+	_mst_footerEnabled=1
+	_mst_stylesheetUrls=$_mrf_stylesheetUrls
+	_mst_faviconUrls=$_mrf_faviconUrls
+	_mst_javascriptUrls=$_mrf_javascriptUrls
+	_mst_metaEntries=$_ms_metaEntries
+	_mst_stylesheetInheritsFallback=1
+	_mst_faviconInheritsFallback=1
+	_mst_javascriptInheritsFallback=1
+	_mst_metaInheritsFallback=1
+	_mst_stylesheetFallbackUrls=$_mrf_stylesheetUrls
+	_mst_faviconFallbackUrls=$_mrf_faviconUrls
+	_mst_faviconLightUrls=$_mrf_faviconLightUrls
+	_mst_faviconLightInheritsFallback=1
+	_mst_faviconLightFallbackUrls=$_mrf_faviconLightUrls
+	_mst_faviconDarkUrls=$_mrf_faviconDarkUrls
+	_mst_faviconDarkInheritsFallback=1
+	_mst_faviconDarkFallbackUrls=$_mrf_faviconDarkUrls
+	_mst_javascriptFallbackUrls=$_mrf_javascriptUrls
+	_mst_metaFallbackEntries=$_ms_metaEntries
+	[ -n "$_ms_templatesPath" ] || return 0
+
+	_mst_templatePath=$_ms_templatesPath
+	markshupApplyTemplateDirectory "$_mst_templatePath"
+	_mst_relativeDirectory=${1#"$_ms_inputRoot"}
+	_mst_relativeDirectory=${_mst_relativeDirectory#/}
+	_mst_oldIfs=$IFS
+	IFS=/
+	for _mst_component in $_mst_relativeDirectory
+	do
+		_mst_templatePath=$_mst_templatePath/$_mst_component
+		markshupApplyTemplateDirectory "$_mst_templatePath"
+	done
+	IFS=$_mst_oldIfs
+}
+
+
+# $1 - Markdown source path.
+# $2 - HTML output path.
+# $3 - HTML document title.
+markshupRenderFile( )
+{
+	_mrf_input=$1
+	_mrf_output=$2
+	_mrf_title=$3
+	_ms_templateLinkMarker=$( printf '\037' )
+	_mrf_temporaryOutput=$_ms_temporaryDirectory/output.html
+	_mrf_stylesheetUrls=$( markshupAssetUrls \
+		"$_ms_stylesheetPaths" "$_mrf_output" )
+	_mrf_stylesheetUrls=$( markshupAppendValue \
+		"$_mrf_stylesheetUrls" "$_ms_stylesheetRefs" )
+	_mrf_faviconUrls=$( markshupAssetUrls \
+		"$_ms_faviconPaths" "$_mrf_output" )
+	_mrf_faviconUrls=$( markshupAppendValue \
+		"$_mrf_faviconUrls" "$_ms_faviconRefs" )
+	_mrf_faviconLightUrls=$( markshupAssetUrls \
+		"$_ms_faviconLightPaths" "$_mrf_output" )
+	_mrf_faviconLightUrls=$( markshupAppendValue \
+		"$_mrf_faviconLightUrls" "$_ms_faviconLightRefs" )
+	_mrf_faviconDarkUrls=$( markshupAssetUrls \
+		"$_ms_faviconDarkPaths" "$_mrf_output" )
+	_mrf_faviconDarkUrls=$( markshupAppendValue \
+		"$_mrf_faviconDarkUrls" "$_ms_faviconDarkRefs" )
+	_mrf_javascriptUrls=$( markshupAssetUrls \
+		"$_ms_javascriptPaths" "$_mrf_output" )
+	_mrf_javascriptUrls=$( markshupAppendValue \
+		"$_mrf_javascriptUrls" "$_ms_javascriptRefs" )
+	markshupSelectTemplates "${_mrf_input%/*}"
+	_mrf_title=$( markshupTitleFromPath "$_mrf_input" )
+	if [ -n "$_ms_title" ]
+	then
+		_mrf_title=$_ms_title': '$_mrf_title
+	fi
+	if [ "$_ms_mermaidEnabled" -eq 1 ] \
+		&& markshupSourceHasMermaid "$_mrf_input"
+	then
+		_mrf_mermaidUrls=$( markshupAssetUrls \
+			"$_ms_mermaidJavascriptPaths" "$_mrf_output" )
+		_mrf_mermaidUrls=$( markshupAppendValue \
+			"$_mrf_mermaidUrls" "$_ms_mermaidJavascriptRefs" )
+		_mst_javascriptUrls=$( markshupAppendValue \
+			"$_mst_javascriptUrls" "$_mrf_mermaidUrls" )
+		_mrf_mermaidJavascriptPath=$_ms_mermaidJavascriptInlinePath
+		_mrf_mermaidEnabled=1
+	else
+		_mrf_mermaidEnabled=0
+		_mrf_mermaidJavascriptPath=
+	fi
+	_mrf_metaPath=$_ms_temporaryDirectory/meta.txt
+	_mrf_imageBundlePath=$_ms_temporaryDirectory/image-bundles-render
+	printf '%s\n' "$_mst_metaEntries" > "$_mrf_metaPath"
+	awk -F '\t' -v source="$_mrf_input" '$1 == source {
+		print $2 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7
+	}' "$_ms_imageBundlePath" > "$_mrf_imageBundlePath"
+	mkdir -p "$( dirname "$_mrf_output" )"
+	if ! LC_ALL=C awk \
+		-v defaultCssPath="$MARKSHUP_DEFAULT_CSS_PATH" \
+		-v documentDirectory="${_mrf_output%/*}" \
+		-v footerEnabled="$_mst_footerEnabled" \
+		-v footerPath="$_mst_footerPath" \
+		-v headerEnabled="$_mst_headerEnabled" \
+		-v headerPath="$_mst_headerPath" \
+		-v imageBundlePath="$_mrf_imageBundlePath" \
+		-v outputDirectory="$_ms_outputDirectory" \
+		-v pageTitle="$_mrf_title" \
+		-v defaultCss="$_ms_defaultCss" \
+		-v copyFiles="$_ms_copyFiles" \
+		-v faviconUrls="$_mst_faviconUrls" \
+		-v faviconLightUrls="$_mst_faviconLightUrls" \
+		-v faviconDarkUrls="$_mst_faviconDarkUrls" \
+		-v javascriptUrls="$_mst_javascriptUrls" \
+		-v mermaidJavascriptPath="$_mrf_mermaidJavascriptPath" \
+		-v markdownStyle="$_ms_markdownStyle" \
+		-v mermaidEnabled="$_mrf_mermaidEnabled" \
+		-v mangleStyle="$_ms_mangleStyle" \
+		-v metaPath="$_mrf_metaPath" \
+		-v stylesheetUrls="$_mst_stylesheetUrls" \
+		-v stripFragmentValue="$_ms_stripFragment" \
+		-v sourceDirectory="${_mrf_input%/*}" \
+		-v templateLinkMarker="$_ms_templateLinkMarker" \
+		-f "$MARKSHUP_RENDERER_PATH" \
+		"$_mrf_input" > "$_mrf_temporaryOutput"
+	then
+		rm -f "$_mrf_temporaryOutput"
+		return 1
+	fi
+	mv "$_mrf_temporaryOutput" "$_mrf_output"
+	_mrf_displayInput=$( markshupDisplayPath "$_mrf_input" )
+	_mrf_displayOutput=$( markshupDisplayPath "$_mrf_output" )
+	printf 'Converted %s to %s\n' \
+		"$_mrf_displayInput" "$_mrf_displayOutput"
+}
+
+
+# $1 - Markdown source path.
+markshupTitleFromPath( )
+{
+	_mtfp_path=$1
+	_mtfp_name=${_mtfp_path##*/}
+	_mtfp_title=$( LC_ALL=C awk '
+		inFence {
+			if (/^```/) {
+				inFence = 0
+			}
+			next
+		}
+		/^```/ {
+			inFence = 1
+			next
+		}
+		/^#[[:space:]]/ {
+			sub(/^#[[:space:]]+/, "")
+			print
+			exit
+		}
+		previous !~ /^[[:space:]]*$/ && /^=+[[:space:]]*$/ {
+			print previous
+			exit
+		}
+		{
+			previous = $0
+		}
+	' "$_mtfp_path" )
+	if [ -n "$_mtfp_title" ]
+	then
+		printf '%s\n' "$_mtfp_title"
+	else
+		printf '%s\n' "$_mtfp_name"
+	fi
+}
+
+
+# $1 - Markdown source path.
+#
+# Prints local Markdown paths referenced by the source.
+markshupReferencedUrls( )
+{
+	LC_ALL=C awk '
+	function printMarkdownUrl(url) {
+		gsub(/^[ \t]+|[ \t]+$/, "", url)
+		if (url ~ /^<.*>$/) {
+			url = substr(url, 2, length(url) - 2)
+		}
+		if (url !~ /^[A-Za-z][A-Za-z0-9+.-]*:/ \
+			&& url !~ /^\/\// && url !~ /^#/ \
+			&& url ~ /\.md([?#].*)?$/) {
+			print url
+		}
+	}
+	/^```/ {
+		inFence = !inFence
+		next
+	}
+	inFence {
+		next
+	}
+	/^\[[^]]+\]:[ \t]*/ {
+		url = $0
+		sub(/^\[[^]]+\]:[ \t]*/, "", url)
+		sub(/[ \t].*$/, "", url)
+		printMarkdownUrl(url)
+	}
+	{
+		line = $0
+		while (match(line, /\]\([^)]+\)/)) {
+			url = substr(line, RSTART + 2, RLENGTH - 3)
+			printMarkdownUrl(url)
+			line = substr(line, RSTART + RLENGTH)
+		}
+	}' "$1"
+}
+
+
+# $1 - Markdown source path.
+#
+# Prints local non-Markdown file paths referenced by the source.
+markshupReferencedAssetUrls( )
+{
+	LC_ALL=C awk '
+	function htmlReferenceUrl(tag, attribute, lowerTag, value) {
+		lowerTag = tolower(tag)
+		if (!match(lowerTag, "[[:space:]]" attribute \
+			"[ \\t]*=[ \\t]*(\\\"[^\\\"]*\\\"|'"'"'[^'"'"']*'"'"'|[^ \\t>]+)")) {
+			return ""
+		}
+		value = substr(tag, RSTART, RLENGTH)
+		sub(/^[^=]*=[ \\t]*/, "", value)
+		if (value ~ /^\"/) {
+			return substr(value, 2, length(value) - 2)
+		}
+		if (value ~ /^'"'"'/) {
+			return substr(value, 2, length(value) - 2)
+		}
+		return value
+	}
+	function printHtmlAssetUrls(line, tag, lowerTag, url) {
+		while (match(line, /<[[:space:]]*[[:alpha:]][[:alnum:]:-]*[^>]*>/)) {
+			tag = substr(line, RSTART, RLENGTH)
+			line = substr(line, RSTART + RLENGTH)
+			lowerTag = tolower(tag)
+			if (lowerTag ~ /^<[[:space:]]*a[[:space:]>]/) {
+				url = htmlReferenceUrl(tag, "href")
+			} else if (lowerTag ~ \
+				/^<[[:space:]]*(iframe|img|source|track)[[:space:]>]/) {
+				url = htmlReferenceUrl(tag, "src")
+			} else {
+				continue
+			}
+			printAssetUrl(url)
+		}
+	}
+	function printAssetUrl(url) {
+		gsub(/^[ \t]+|[ \t]+$/, "", url)
+		if (url ~ /^<.*>$/) {
+			url = substr(url, 2, length(url) - 2)
+		} else {
+			sub(/[ \t].*$/, "", url)
+		}
+		if (url !~ /^[A-Za-z][A-Za-z0-9+.-]*:/ \
+			&& url !~ /^\/\// && url !~ /^\// && url !~ /^#/ \
+			&& url !~ /\.md([?#].*)?$/) {
+			print url
+		}
+	}
+	/^```/ {
+		inFence = !inFence
+		next
+	}
+	inFence {
+		next
+	}
+	/^\[[^]]+\]:[ \t]*/ {
+		url = $0
+		sub(/^\[[^]]+\]:[ \t]*/, "", url)
+		sub(/[ \t].*$/, "", url)
+		printAssetUrl(url)
+	}
+	{
+		line = $0
+		while (match(line, /\]\([^)]+\)/)) {
+			url = substr(line, RSTART + 2, RLENGTH - 3)
+			printAssetUrl(url)
+			line = substr(line, RSTART + RLENGTH)
+		}
+		printHtmlAssetUrls($0)
+	}' "$1"
+}
+
+
+# $1 - Markdown source path.
+# $2 - Corresponding HTML output path.
+markshupCopyReferencedAssets( )
+{
+	[ "$_ms_copyFiles" -eq 1 ] || return 0
+	_mcra_sourceDirectory=${1%/*}
+	_mcra_outputDirectory=${2%/*}
+	markshupReferencedAssetUrls "$1" | while IFS= read -r _mcra_url
+	do
+		_mcra_path=${_mcra_url%%[?#]*}
+		_mcra_output=$( markshupAssetOutputPath \
+			"$_mcra_outputDirectory" "$_mcra_path" ) \
+			|| {
+				markshupVerifyExternalAssetReference \
+					"$_mcra_outputDirectory" "$_mcra_path"
+				continue
+			}
+		_mcra_source=$( markshupAbsoluteFilePath \
+			"$_mcra_sourceDirectory/$_mcra_path" ) || continue
+		case $_mcra_source in
+			"$_ms_inputRoot"/*) ;;
+			*)
+				markshupVerifyExternalAssetReference \
+					"$_mcra_outputDirectory" "$_mcra_path"
+				continue
+				;;
+		esac
+		if grep -F -x "$_mcra_output" "$_ms_assetOutputPaths" \
+			> /dev/null 2>&1
+		then
+			continue
+		fi
+		printf '%s\n' "$_mcra_output" >> "$_ms_assetOutputPaths"
+		markshupCreateAssetDirectory "$_mcra_output"
+		cp "$_mcra_source" "$_mcra_output" || markshupFail \
+			"Could not copy referenced file: $_mcra_path"
+	done
+}
+
+
+# $1 - Markdown source path.
+# $2 - Corresponding HTML output path.
+markshupCopyImageBundles( )
+{
+	[ "$_ms_imgEnabled" -eq 1 ] || return 0
+	_mcib_sourceDirectory=${1%/*}
+	_mcib_outputDirectory=${2%/*}
+	markshupReferencedAssetUrls "$1" | while IFS= read -r _mcib_url
+	do
+		_mcib_url=${_mcib_url%%[[:space:]]*}
+		_mcib_path=${_mcib_url%%[?#]*}
+		case $_mcib_path in
+			*.img/*)
+				_mcib_directoryPath=${_mcib_path%%.img/*}.img
+				;;
+			*) continue ;;
+		esac
+		if [ "$_ms_copyFiles" -eq 1 ]
+		then
+			markshupAssetOutputPath "$_mcib_outputDirectory" \
+				"$_mcib_path" > /dev/null || continue
+		fi
+		_mcib_directory=$( markshupAbsoluteDirectoryPath \
+			"$_mcib_sourceDirectory/$_mcib_directoryPath" ) || continue
+		case $_mcib_directory in
+			"$_ms_inputRoot"/*) ;;
+			*) continue ;;
+		esac
+		_mcib_inventory=$_ms_temporaryDirectory/image-bundle-inventory
+		: > "$_mcib_inventory"
+		_mcib_hasLight=0
+		_mcib_hasDark=0
+		_mcib_hasImage=0
+		_mcib_referenceName=${_mcib_path##*/}
+		case $_mcib_referenceName in
+			image.*|image@2x.*|image@3x.*) _mcib_fallbackColor=image ;;
+			light.*|light@2x.*|light@3x.*) _mcib_fallbackColor=light ;;
+			dark.*|dark@2x.*|dark@3x.*) _mcib_fallbackColor=dark ;;
+			*) continue ;;
+		esac
+		find "$_mcib_directory" -maxdepth 1 -type f -print | sort | \
+		while IFS= read -r _mcib_image
+		do
+			_mcib_name=${_mcib_image##*/}
+			case $_mcib_name in
+				light.*) _mcib_color=light; _mcib_density=1 ;;
+				light@2x.*) _mcib_color=light; _mcib_density=2 ;;
+				light@3x.*) _mcib_color=light; _mcib_density=3 ;;
+				dark.*) _mcib_color=dark; _mcib_density=1 ;;
+				dark@2x.*) _mcib_color=dark; _mcib_density=2 ;;
+				dark@3x.*) _mcib_color=dark; _mcib_density=3 ;;
+				image.*) _mcib_color=image; _mcib_density=1 ;;
+				image@2x.*) _mcib_color=image; _mcib_density=2 ;;
+				image@3x.*) _mcib_color=image; _mcib_density=3 ;;
+				*) continue ;;
+			esac
+			_mcib_extension=${_mcib_name##*.}
+			case $_mcib_extension in
+				svg|avif|heic|webp|apng|png|jpg|gif|bmp) ;;
+				*) continue ;;
+			esac
+			printf '%s\t%s\t%s\t%s\n' "$_mcib_color" \
+				"$_mcib_extension" "$_mcib_density" "$_mcib_image" \
+				>> "$_mcib_inventory"
+		done
+		grep -F -q 'light	' "$_mcib_inventory" && _mcib_hasLight=1
+		grep -F -q 'dark	' "$_mcib_inventory" && _mcib_hasDark=1
+		grep -F -q 'image	' "$_mcib_inventory" && _mcib_hasImage=1
+		if [ "$_mcib_fallbackColor" = image ]
+		then
+			[ "$_mcib_hasImage" -eq 1 ] || continue
+		elif [ "$_mcib_hasLight" -ne 1 ] || [ "$_mcib_hasDark" -ne 1 ]
+		then
+			continue
+		fi
+		while IFS='	' read -r _mcib_color _mcib_extension \
+			_mcib_density _mcib_image
+		do
+			if [ "$_mcib_color" = image ] \
+				&& [ "$_mcib_fallbackColor" != image ]
+			then
+				continue
+			fi
+			if [ "$_mcib_color" != image ] \
+				&& { [ "$_mcib_hasLight" -ne 1 ] \
+				|| [ "$_mcib_hasDark" -ne 1 ]; }
+			then
+				continue
+			fi
+			_mcib_name=${_mcib_image##*/}
+			if [ "$_ms_copyFiles" -eq 1 ]
+			then
+				_mcib_output=$( markshupAssetOutputPath \
+					"$_mcib_outputDirectory" \
+					"$_mcib_directoryPath/$_mcib_name" ) \
+					|| markshupFail \
+					"Referenced file escapes the output directory: " \
+					"$_mcib_directoryPath"
+				if ! grep -F -x "$_mcib_output" "$_ms_assetOutputPaths" \
+					> /dev/null 2>&1
+				then
+					printf '%s\n' "$_mcib_output" >> "$_ms_assetOutputPaths"
+					markshupCreateAssetDirectory "$_mcib_output"
+					cp "$_mcib_image" "$_mcib_output" || markshupFail \
+						"Could not copy referenced image: " \
+						"$_mcib_directoryPath/$_mcib_name"
+				fi
+			fi
+			printf '%s\t%s\t%s\t%s\t%s\t%s\t%s/%s\n' "$1" \
+				"$_mcib_url" "$_mcib_directory/alt.txt" "$_mcib_color" \
+				"$_mcib_extension" "$_mcib_density" \
+				"$_mcib_directoryPath" "$_mcib_name" \
+				>> "$_ms_imageBundlePath"
+		done < "$_mcib_inventory"
+	done
+}
+
+
+# $1 - Absolute Markdown source path.
+markshupQueueSource( )
+{
+	_mqs_source=$1
+	case $_mqs_source in
+		"$_ms_inputRoot"/*) ;;
+		*) markshupFail \
+			"Referenced Markdown file is outside the input directory: $_mqs_source" ;;
+	esac
+	if ! grep -F -x "$_mqs_source" "$_ms_seenPaths" > /dev/null 2>&1
+	then
+		printf '%s\n' "$_mqs_source" >> "$_ms_seenPaths"
+		printf '%s\n' "$_mqs_source" >> "$_ms_queuedPaths"
+	fi
+}
+
+
+# $1 - Absolute Markdown source path.
+markshupQueueReferences( )
+{
+	_mqr_sourceDirectory=${1%/*}
+	{
+		markshupReferencedUrls "$1"
+		LC_ALL=C awk '
+		function htmlReferenceUrl(tag, attribute, lowerTag, value) {
+			lowerTag = tolower(tag)
+			if (!match(lowerTag, "[[:space:]]" attribute \
+				"[ \\t]*=[ \\t]*" \
+				"(\\\"[^\\\"]*\\\"|'"'"'[^'"'"']*'"'"'|[^ \\t>]+)")) {
+				return ""
+			}
+			value = substr(tag, RSTART, RLENGTH)
+			sub(/^[^=]*=[ \\t]*/, "", value)
+			if (value ~ /^\"|^'"'"'/) {
+				return substr(value, 2, length(value) - 2)
+			}
+			return value
+		}
+		{
+			line = $0
+			while (match(line, /<[[:space:]]*[[:alpha:]][[:alnum:]:-]*[^>]*>/)) {
+				tagStart = RSTART
+				tagLength = RLENGTH
+				tag = substr(line, tagStart, tagLength)
+				lowerTag = tolower(tag)
+				if (lowerTag ~ /^<[[:space:]]*a[[:space:]>]/) {
+					attribute = "href"
+				} else if (lowerTag ~ \
+					/^<[[:space:]]*(iframe|img|source|track)[[:space:]>]/) {
+					attribute = "src"
+				} else {
+					line = substr(line, tagStart + tagLength)
+					continue
+				}
+				url = htmlReferenceUrl(tag, attribute)
+				if (url ~ /^[A-Za-z][A-Za-z0-9+.-]*:/ \
+					|| url ~ /^\/\// || url ~ /^#/) {
+					line = substr(line, tagStart + tagLength)
+					continue
+				}
+				if (url ~ /\.md([?#].*)?$/) {
+					print url
+				}
+				line = substr(line, tagStart + tagLength)
+			}
+		}' "$1"
+	} | while IFS= read -r _mqr_url
+	do
+		_mqr_path=${_mqr_url%%[?#]*}
+		_mqr_target=$( markshupAbsoluteFilePath \
+			"$_mqr_sourceDirectory/$_mqr_path" ) \
+			|| markshupFail "Referenced Markdown file not found: $_mqr_path"
+		markshupQueueSource "$_mqr_target"
+	done
+}
+
+
+# $@ - Initial absolute Markdown source paths.
+markshupConvert( )
+{
+	_ms_seenPaths=$_ms_temporaryDirectory/seen
+	_ms_queuedPaths=$_ms_temporaryDirectory/queue
+	_ms_outputPaths=$_ms_temporaryDirectory/outputs
+	_ms_assetOutputPaths=$_ms_temporaryDirectory/asset-outputs
+	_ms_imageBundlePath=$_ms_temporaryDirectory/image-bundles
+	_ms_brokenReferencePaths=$_ms_temporaryDirectory/broken-references
+	: > "$_ms_seenPaths"
+	: > "$_ms_queuedPaths"
+	: > "$_ms_outputPaths"
+	: > "$_ms_assetOutputPaths"
+	: > "$_ms_imageBundlePath"
+	: > "$_ms_brokenReferencePaths"
+	for _mc_source
+	do
+		markshupQueueSource "$_mc_source"
+	done
+
+	while IFS= read -r _mc_source
+	do
+		markshupQueueReferences "$_mc_source"
+	done < "$_ms_queuedPaths"
+
+	_ms_mermaidEnabled=0
+	while IFS= read -r _mc_source
+	do
+		if markshupSourceHasMermaid "$_mc_source"
+		then
+			_ms_mermaidEnabled=1
+			break
+		fi
+	done < "$_ms_queuedPaths"
+	if [ "$_ms_mermaidEnabled" -eq 1 ]
+	then
+		_ms_mermaidJavascriptPaths=
+		_ms_mermaidJavascriptRefs=
+		_ms_mermaidJavascriptInlinePath=
+		markshupPrepareMermaidHelper
+	fi
+
+	while IFS= read -r _mc_source
+	do
+		markshupApplyTemplateOverridesForSource "$_mc_source"
+		_mc_output=$( markshupOutputPath "$_mc_source" )
+		markshupCopyReferencedAssets "$_mc_source" "$_mc_output"
+		markshupCopyImageBundles "$_mc_source" "$_mc_output"
+	done < "$_ms_queuedPaths"
+
+	while IFS= read -r _mc_source
+	do
+		markshupApplyTemplateOverridesForSource "$_mc_source"
+		_mc_output=$( markshupOutputPath "$_mc_source" )
+		if grep -F -x "$_mc_output" "$_ms_outputPaths" > /dev/null 2>&1
+		then
+			markshupFail \
+				"Multiple Markdown files use output path: $_mc_output"
+		fi
+		printf '%s\n' "$_mc_output" >> "$_ms_outputPaths"
+		_mc_title=$( markshupTitleFromPath "$_mc_source" )
+		if [ -n "$_ms_title" ]
+		then
+			_mc_title=$_ms_title': '$_mc_title
+		fi
+		markshupRenderFile "$_mc_source" "$_mc_output" "$_mc_title"
+	done < "$_ms_queuedPaths"
+	markshupReportBrokenReferences
+}
+
+
+# $1 - Absolute source directory path.
+markshupConvertDirectory( )
+{
+	_mcd_paths=$_ms_temporaryDirectory/directory-paths
+	if [ "$_ms_recursive" -eq 1 ]
+	then
+		find "$1" -type f -name '*.md' -print | sort > "$_mcd_paths"
+	else
+		: > "$_mcd_paths"
+		for _mcd_path in "$1"/*.md
+		do
+			[ -f "$_mcd_path" ] || continue
+			printf '%s\n' "$_mcd_path" >> "$_mcd_paths"
+		done
+	fi
+	# Positional arguments preserve paths containing spaces.
+	set --
+	while IFS= read -r _mcd_path
+	do
+		set -- "$@" "$_mcd_path"
+	done < "$_mcd_paths"
+	markshupConvert "$@"
+}
+
+# shellcheck shell=sh
+#
+# Copyright 2026 CodingMarkus
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+#
+# cspell:words msdrc mssum mssu
+
+# shellcheck disable=SC2154 # Initialized by cli.sh before self-update starts.
+
+# $1 - First version.
+# $2 - Second version.
+# Returns success when the first version is older than the second version.
+markshupVersionIsOlder( )
+{
+	awk -v first="$1" -v second="$2" '
+		BEGIN {
+			firstCount = split(first, firstParts, ".")
+			secondCount = split(second, secondParts, ".")
+			count = firstCount > secondCount ? firstCount : secondCount
+			for (partIndex = 1; partIndex <= count; partIndex++) {
+				firstPart = partIndex <= firstCount ? \
+					firstParts[partIndex] : 0
+				secondPart = partIndex <= secondCount ? \
+					secondParts[partIndex] : 0
+				if (firstPart + 0 < secondPart + 0) exit 0
+				if (firstPart + 0 > secondPart + 0) exit 1
+			}
+			exit 1
+		}
+	'
+}
+
+
+# $1 - ZIP archive path.
+# $1 - ZIP archive path.
+# $2 - Output directory.
+markshupExtractZip( )
+{
+	if command -v unzip > /dev/null 2>&1
+	then
+		unzip -q "$1" -d "$2"
+		return
+	fi
+	if command -v bsdtar > /dev/null 2>&1
+	then
+		bsdtar -xf "$1" -C "$2"
+		return
+	fi
+	if command -v ditto > /dev/null 2>&1
+	then
+		ditto -x -k "$1" "$2"
+		return
+	fi
+	if command -v jar > /dev/null 2>&1
+	then
+		( cd "$2" && jar xf "$1" )
+		return
+	fi
+	if command -v 7z > /dev/null 2>&1
+	then
+		7z x -y "-o$2" "$1" > /dev/null
+		return
+	fi
+	if command -v python3 > /dev/null 2>&1
+	then
+		python3 -m zipfile -e "$1" "$2" > /dev/null
+		return
+	fi
+	return 1
+}
+
+
+# $1 - tar.xz archive path.
+# $2 - Output directory.
+markshupExtractXz( )
+{
+	xz -dc "$1" | tar -xf - -C "$2"
+}
+
+
+# $1 - Major version.
+# $2 - Output CSV path.
+# Returns success only if the release CSV is available.
+markshupDownloadReleaseCsv( )
+{
+	_msdrc_baseUrl=${MARKSHUP_DOWNLOAD_BASE_URL:-\
+https://codingmarkus.codeberg.page/MarkShup}
+	markshupDownload "$_msdrc_baseUrl/latest-$1.x.csv" "$2"
+}
+
+
+# $1 - Major version.
+# $2 - CSV path.
+# Writes the latest version and matching archive URL, separated by a tab.
+markshupReadRelease( )
+{
+	_msr_csvPath=$2
+	_msr_zipUrl=
+	IFS=, read -r _msr_type _msr_version _msr_extra < "$_msr_csvPath" \
+		|| return 1
+	case $_msr_type in
+		version) ;;
+		*) return 1 ;;
+	esac
+	case $_msr_version in
+		"$1".*) ;;
+		*) return 1 ;;
+	esac
+	while IFS=, read -r _msr_type _msr_size _msr_url
+	do
+		_msr_url=${_msr_url%"$( printf '\r' )"}
+		case $_msr_type in
+		xz)
+			if command -v tar > /dev/null 2>&1 && \
+				command -v xz > /dev/null 2>&1
+			then
+				printf '%s\t%s\t%s\n' \
+					"$_msr_version" xz "$_msr_url"
+				return
+			fi
+			;;
+		zip)
+			if command -v unzip > /dev/null 2>&1 || \
+				command -v bsdtar > /dev/null 2>&1 || \
+				command -v ditto > /dev/null 2>&1 || \
+				command -v jar > /dev/null 2>&1 || \
+				command -v 7z > /dev/null 2>&1 || \
+				command -v python3 > /dev/null 2>&1
+			then
+				_msr_zipUrl=$_msr_url
+			fi
+			;;
+		esac
+	done < "$_msr_csvPath"
+	if [ -n "$_msr_zipUrl" ]
+	then
+		printf '%s\t%s\t%s\n' "$_msr_version" zip "$_msr_zipUrl"
+		return
+	fi
+	return 2
+}
+
+
+# $1 - Major version to update to.
+markshupSelfUpdateMajor( )
+{
+	_mssum_major=$1
+	_mssum_csvPath=$_ms_temporaryDirectory/release.csv
+	_mssum_archivePath=$_ms_temporaryDirectory/archive
+	_mssum_extractPath=$_ms_temporaryDirectory/extract
+
+	markshupHasDownloader || markshupFail \
+		'Self-update requires curl or wget to download release information'
+	printf 'Finding latest version...\n'
+	markshupDownloadReleaseCsv "$_mssum_major" "$_mssum_csvPath" \
+		|| markshupFail \
+		"Could not download release information for $_mssum_major.x"
+	if _mssum_release=$( markshupReadRelease "$_mssum_major" \
+		"$_mssum_csvPath" )
+	then
+		_mssum_status=0
+	else
+		_mssum_status=$?
+	fi
+	if [ "$_mssum_status" -eq 2 ]
+	then
+		markshupFail \
+			'No supported extractor is available for the update archive'
+	fi
+	[ "$_mssum_status" -eq 0 ] || markshupFail \
+		"Could not parse release information for $_mssum_major.x"
+	IFS="$( printf '\t' )" read -r \
+		_mssum_latest _mssum_format _mssum_url <<EOF
+$_mssum_release
+EOF
+	printf 'Latest version is %s.\n' "$_mssum_latest"
+	if ! markshupVersionIsOlder "$markshupVersion" "$_mssum_latest"
+	then
+		printf 'MarkShup %s is already up to date.\n' "$markshupVersion"
+		return
+	fi
+	printf 'Downloading update...\n'
+	markshupDownload "$_mssum_url" "$_mssum_archivePath" \
+		|| markshupFail 'Could not download the update archive'
+	mkdir -p "$_mssum_extractPath" || markshupFail \
+		'Could not create a directory to decompress the update archive'
+	printf 'Decompressing update...\n'
+	case $_mssum_format in
+		xz)
+			markshupExtractXz "$_mssum_archivePath" \
+				"$_mssum_extractPath" || markshupFail \
+				'Could not decompress the update archive'
+			;;
+		zip)
+			markshupExtractZip "$_mssum_archivePath" \
+				"$_mssum_extractPath" || markshupFail \
+				'Could not decompress the update archive'
+			;;
+	esac
+	[ -f "$_mssum_extractPath/markshup" ] || markshupFail \
+		'Update archive does not contain the expected markshup executable'
+	printf 'Applying update...\n'
+	chmod +x "$_mssum_extractPath/markshup" || markshupFail \
+		'Could not make the updated MarkShup executable runnable'
+	mv "$_mssum_extractPath/markshup" "$MARKSHUP_EXECUTABLE_PATH" \
+		|| markshupFail 'Could not replace the current MarkShup executable'
+	printf 'Updated MarkShup from %s to %s.\n' \
+		"$markshupVersion" "$_mssum_latest"
+}
+
+
+# $1 - Requested major version, or latest.
+markshupSelfUpgrade( )
+{
+	markshupHasDownloader || markshupFail \
+		'Self-upgrade requires curl or wget to download release information'
+	case $1 in
+		latest)
+			printf 'Starting self-upgrade...\n'
+			printf 'Finding latest major version...\n'
+			_mssu_major=${markshupVersion%%.*}
+			_mssu_major=$(( _mssu_major + 1 ))
+			_mssu_foundMajor=
+			while markshupDownloadReleaseCsv "$_mssu_major" \
+				"$_ms_temporaryDirectory/release-$_mssu_major.csv"
+			do
+				_mssu_foundMajor=$_mssu_major
+				_mssu_major=$(( _mssu_major + 1 ))
+			done
+			[ -n "$_mssu_foundMajor" ] || {
+				printf 'MarkShup %s is already on the latest major version.\n' \
+					"$markshupVersion"
+				return
+			}
+			printf 'Latest major version is %s.\n' "$_mssu_foundMajor"
+			markshupSelfUpdateMajor "$_mssu_foundMajor"
+			;;
+		*[!0-9]*|'') markshupFail "Invalid major version: $1" ;;
+		*)
+			printf 'Starting self-upgrade...\n'
+			markshupSelfUpdateMajor "$1"
+			;;
+	esac
+}
+
+# shellcheck shell=sh
+#
+# Copyright 2026 CodingMarkus
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+#
+# cspell:words selfupgrade mafp madp
+
+markshupVersion=1.5.2
+
+
+# This function has no input parameters.
+markshupUsage( )
+{
+	cat <<'EOF'
+
+USAGE
+
+    markshup [[options] ...] <input> <output>
+
+DESCRIPTION
+
+    Convert Markdown files to HTML.
+
+OPTIONS
+
+    --recursive             Convert Markdown files in input subdirectories.
+    --mangle STYLE          Name style: kebab, snake, or keep (default).
+
+    --title TEXT            Prefix every generated document title.
+    --header PATH           HTML file to insert into every document header.
+    --footer PATH           HTML file to insert into every document footer.
+    --meta NAME VALUE       Add a metadata tag. May be repeated.
+    --strip-fragment FRAG   Remove FRAG from HTTP(S) links.
+
+    --css PATH              Link a stylesheet path. May be repeated.
+    --css-ref REF           Stylesheet reference. May be repeated.
+
+    --icon PATH             Link an icon path. May be repeated.
+    --icon-ref REF          Icon reference. May be repeated.
+    --icon-light PATH       Link a light-mode icon path. May be repeated.
+    --icon-light-ref REF    Light-mode icon reference. May be repeated.
+    --icon-dark PATH        Link a dark-mode icon path. May be repeated.
+    --icon-dark-ref REF     Dark-mode icon reference. May be repeated.
+
+    --js PATH               Link a JavaScript path. May be repeated.
+    --js-ref REF            JavaScript reference. May be repeated.
+
+    --js-helper DIR         Write optional JavaScript helpers to DIR.
+    --js-helper-mode MODE   Helper policy: auto, local, or external.
+
+    --templates PATH        Template directory for per-folder document assets.
+
+    --flavor FLAVOR         Markdown flavor: common, common+, extended,
+                            markshup (default).
+
+    --copy-files            Copy referenced local files (default).
+    --no-copy-files         Reference local files without copying them.
+    --detect-img            Detect Smart Image Bundles (default).
+    --no-detect-img         Do not detect Smart Image Bundles.
+    --default-css           Include the built-in stylesheet (default).
+    --no-default-css        Do not include the built-in stylesheet.
+
+    --selfupdate            Update within the current major version.
+    --selfupgrade VERSION   Update to major VERSION, or use "latest".
+
+    --                      Do not interpret following arguments as options.
+    -h, -help, --help       Show this help page.
+    --version               Show the MarkShup version.
+EOF
+}
+
+
+# Remove temporary files created by the command and its release wrapper.
+# shellcheck disable=SC2329 # Invoked indirectly by the EXIT trap.
+markshupCleanup( )
+{
+	rm -rf "$_ms_temporaryDirectory"
+	if [ -n "${markshupReleaseTemporaryDirectory:-}" ]
+	then
+		rm -rf "$markshupReleaseTemporaryDirectory"
+	fi
+}
+
+
+# $1 - Error message.
+markshupFail( )
+{
+	case $1 in
+		*[.!]) _ms_error=$1 ;;
+		*) _ms_error=$1. ;;
+	esac
+	printf 'markshup: %s\n' "$_ms_error" >&2
+	[ "$#" -ge 2 ] && printf '%s\n' "$2" >&2
+	exit 1
+}
+
+
+# $1 - Current tab-separated value list.
+# $2 - Value to append.
+markshupAppendValue( )
+{
+	if [ -n "$1" ]
+	then
+		printf '%s\t%s\n' "$1" "$2"
+	else
+		printf '%s\n' "$2"
+	fi
+}
+
+
+# $1 - Current newline-separated value list.
+# $2 - Value to append.
+markshupAppendLine( )
+{
+	if [ -n "$1" ]
+	then
+		printf '%s\n%s\n' "$1" "$2"
+	else
+		printf '%s\n' "$2"
+	fi
+}
+
+
+# $1 - Metadata value.
+markshupEncodeMeta( )
+{
+	MARKSHUP_META_VALUE=$1 awk '
+		BEGIN {
+			value = ENVIRON["MARKSHUP_META_VALUE"]
+			result = ""
+			for (characterIndex = 1; characterIndex <= length(value); \
+				characterIndex++) {
+				character = substr(value, characterIndex, 1)
+				if (character == "\\") result = result "\\\\"
+				else if (character == "\t") result = result "\\t"
+				else if (character == "\n") result = result "\\n"
+				else if (character == "\r") result = result "\\r"
+				else if (character == "\"") result = result "\\\""
+				else result = result character
+			}
+			print result
+		}
+	'
+}
+
+
+# $1 - Existing file path.
+markshupAbsoluteFilePath( )
+{
+	case $1 in
+		*/*)
+			_mafp_directory=${1%/*}
+			_mafp_name=${1##*/}
+			;;
+		*)
+			_mafp_directory=.
+			_mafp_name=$1
+			;;
+	esac
+	_mafp_directory=$( CDPATH='' cd "$_mafp_directory" 2> /dev/null && pwd ) \
+		|| return 1
+	[ -f "$_mafp_directory/$_mafp_name" ] || return 1
+	printf '%s/%s\n' "$_mafp_directory" "$_mafp_name"
+}
+
+
+# $1 - Existing directory path.
+markshupAbsoluteDirectoryPath( )
+{
+	_madp_directory=$( CDPATH='' cd "$1" 2> /dev/null && pwd ) || return 1
+	[ -d "$_madp_directory" ] || return 1
+	printf '%s\n' "$_madp_directory"
+}
+
+
+# $@ - MarkShup command-line arguments.
+markshupMain( )
+{
+	_ms_hadArguments=$#
+	_ms_inputPath=
+	_ms_outputPath=
+	_ms_stylesheetPaths=
+	_ms_stylesheetRefs=
+	_ms_faviconPaths=
+	_ms_faviconRefs=
+	_ms_faviconLightPaths=
+	_ms_faviconLightRefs=
+	_ms_faviconDarkPaths=
+	_ms_faviconDarkRefs=
+	_ms_javascriptPaths=
+	_ms_javascriptRefs=
+	_ms_jsHelperPath=
+	_ms_jsHelperMode=auto
+	_ms_mermaidEnabled=0
+	_ms_mermaidJavascriptPaths=
+	_ms_mermaidJavascriptRefs=
+	_ms_mermaidJavascriptInlinePath=
+	_ms_metaEntries=
+	_ms_stripFragment=
+	_ms_title=
+	_ms_headerPath=
+	_ms_footerPath=
+	_ms_templatesPath=
+	_ms_mangleStyle=keep
+	_ms_markdownStyle=markshup
+	_ms_defaultCss=1
+	_ms_imgEnabled=1
+	_ms_copyFiles=1
+	_ms_recursive=0
+	_ms_temporaryDirectory=$( mktemp -d "${TMPDIR:-/tmp}/markshup.XXXXXX" ) \
+		|| markshupFail 'Could not create a temporary directory'
+
+	trap markshupCleanup EXIT HUP INT TERM
+
+	while [ "$#" -gt 0 ]
+	do
+		case $1 in
+			--css|--css-ref|--icon|--icon-ref|\
+			--icon-light|--icon-light-ref|\
+			--icon-dark|--icon-dark-ref|--js|--js-ref|--js-helper|\
+			--js-helper-mode|\
+			--strip-fragment|--title|--header|--footer|\
+			--templates|--mangle|--flavor)
+				[ "$#" -ge 2 ] || markshupFail "Missing value for $1"
+				_ms_option=$1
+				_ms_value=$2
+				case $_ms_option in
+					--css)
+						_ms_value=$( markshupAbsoluteFilePath "$_ms_value" ) \
+							|| markshupFail \
+							"Stylesheet file not found: $2"
+						_ms_stylesheetPaths=$( markshupAppendValue \
+							"$_ms_stylesheetPaths" "$_ms_value" )
+						;;
+					--css-ref)
+						_ms_stylesheetRefs=$( markshupAppendValue \
+							"$_ms_stylesheetRefs" "$_ms_value" )
+						;;
+					--icon)
+						_ms_value=$( markshupAbsoluteFilePath "$_ms_value" ) \
+							|| markshupFail "Icon file not found: $2"
+						_ms_faviconPaths=$( markshupAppendValue \
+							"$_ms_faviconPaths" "$_ms_value" )
+						;;
+					--icon-ref)
+						_ms_faviconRefs=$( markshupAppendValue \
+							"$_ms_faviconRefs" "$_ms_value" )
+						;;
+					--icon-light)
+						_ms_value=$( markshupAbsoluteFilePath "$_ms_value" ) \
+							|| markshupFail "Icon file not found: $2"
+						_ms_faviconLightPaths=$( markshupAppendValue \
+							"$_ms_faviconLightPaths" "$_ms_value" )
+						;;
+					--icon-light-ref)
+						_ms_faviconLightRefs=$( markshupAppendValue \
+							"$_ms_faviconLightRefs" "$_ms_value" )
+						;;
+					--icon-dark)
+						_ms_value=$( markshupAbsoluteFilePath "$_ms_value" ) \
+							|| markshupFail "Icon file not found: $2"
+						_ms_faviconDarkPaths=$( markshupAppendValue \
+							"$_ms_faviconDarkPaths" "$_ms_value" )
+						;;
+					--icon-dark-ref)
+						_ms_faviconDarkRefs=$( markshupAppendValue \
+							"$_ms_faviconDarkRefs" "$_ms_value" )
+						;;
+					--js)
+						_ms_value=$( markshupAbsoluteFilePath "$_ms_value" ) \
+							|| markshupFail \
+							"JavaScript file not found: $2"
+						_ms_javascriptPaths=$( markshupAppendValue \
+							"$_ms_javascriptPaths" "$_ms_value" )
+						;;
+					--js-ref)
+						_ms_javascriptRefs=$( markshupAppendValue \
+							"$_ms_javascriptRefs" "$_ms_value" )
+						;;
+					--js-helper)
+						_ms_jsHelperPath=$_ms_value
+						;;
+					--js-helper-mode)
+						case $_ms_value in
+							auto|local|external)
+								_ms_jsHelperMode=$_ms_value
+								;;
+							*)
+								markshupFail \
+									"Unknown JavaScript helper mode: $2"
+								;;
+						esac
+						;;
+					--strip-fragment)
+						case $_ms_value in
+							\#*) _ms_stripFragment=$_ms_value ;;
+							*) _ms_stripFragment=#$_ms_value ;;
+						esac
+						;;
+					--title)
+						_ms_title=$_ms_value
+						;;
+					--header)
+						_ms_value=$( markshupAbsoluteFilePath "$_ms_value" ) \
+							|| markshupFail "Header file not found: $2"
+						_ms_headerPath=$_ms_value
+						;;
+					--footer)
+						_ms_value=$( markshupAbsoluteFilePath "$_ms_value" ) \
+							|| markshupFail "Footer file not found: $2"
+						_ms_footerPath=$_ms_value
+						;;
+					--templates)
+						_ms_templatesPath=$( markshupAbsoluteDirectoryPath \
+							"$_ms_value" ) || markshupFail \
+							"Template directory not found: $2"
+						;;
+					--mangle)
+						case $_ms_value in
+							kebab|snake|keep)
+								_ms_mangleStyle=$_ms_value
+								;;
+							*)
+								markshupFail \
+									"Unknown mangle style: $_ms_value"
+								;;
+						esac
+						;;
+					--flavor)
+						case $_ms_value in
+							markshup|common|common+|extended)
+								_ms_markdownStyle=$_ms_value
+								;;
+							*)
+								markshupFail \
+									"Unknown Markdown flavor: $_ms_value"
+								;;
+						esac
+						;;
+				esac
+				shift 2
+				;;
+			--meta)
+				[ "$#" -ge 3 ] || markshupFail "Missing value for $1"
+				_ms_metaName=$( markshupEncodeMeta "$2" )
+				_ms_metaValue=$( markshupEncodeMeta "$3" )
+				_ms_metaEntries=$( markshupAppendLine \
+					"$_ms_metaEntries" "$_ms_metaName	$_ms_metaValue" )
+				shift 3
+				;;
+			--default-css)
+				_ms_defaultCss=1
+				shift
+				;;
+			--no-default-css)
+				_ms_defaultCss=0
+				shift
+				;;
+			--detect-img)
+				_ms_imgEnabled=1
+				shift
+				;;
+			--no-detect-img|--disable-img)
+				_ms_imgEnabled=0
+				shift
+				;;
+			--copy-files)
+				_ms_copyFiles=1
+				shift
+				;;
+			--no-copy-files)
+				_ms_copyFiles=0
+				shift
+				;;
+			--recursive)
+				_ms_recursive=1
+				shift
+				;;
+			-h|-help|--help)
+				markshupUsage
+				exit 0
+				;;
+			--version)
+				printf 'MarkShup %s\n' "$markshupVersion"
+				exit 0
+				;;
+			--selfupdate)
+				[ "$#" -eq 1 ] || markshupFail "Unexpected argument: $2"
+				[ "$MARKSHUP_SELFUPDATE_AVAILABLE" -eq 1 ] || \
+					markshupFail \
+					'Self-update is only available in deployed MarkShup'
+				printf 'Starting self-update...\n'
+				markshupSelfUpdateMajor "${markshupVersion%%.*}"
+				exit 0
+				;;
+			--selfupgrade)
+				[ "$#" -ge 2 ] || markshupFail "Missing value for $1"
+				[ "$#" -eq 2 ] || markshupFail "Unexpected argument: $3"
+				[ "$MARKSHUP_SELFUPDATE_AVAILABLE" -eq 1 ] || \
+					markshupFail \
+					'Self-update is only available in deployed MarkShup'
+				markshupSelfUpgrade "$2"
+				exit 0
+				;;
+			--)
+				shift
+				break
+				;;
+			-*)
+				markshupFail "Unknown option: $1"
+				;;
+			*)
+				break
+				;;
+		esac
+	done
+
+	if [ "$#" -lt 1 ]
+	then
+		if [ "$_ms_hadArguments" -eq 0 ]
+		then
+			markshupFail 'Missing input path' 'Use --help for details.'
+		fi
+		markshupFail 'Missing input path'
+	fi
+	_ms_inputPath=$1
+	shift
+	[ "$#" -ge 1 ] || markshupFail 'Missing output directory'
+	_ms_outputPath=$1
+	shift
+	[ "$#" -eq 0 ] || markshupFail "Unexpected argument: $1"
+
+	[ -f "$MARKSHUP_RENDERER_PATH" ] \
+		|| markshupFail 'Markdown renderer not found'
+	[ "$_ms_defaultCss" -eq 0 ] || [ -f "$MARKSHUP_DEFAULT_CSS_PATH" ] \
+		|| markshupFail 'Default stylesheet not found'
+	[ -z "$_ms_headerPath" ] || [ -f "$_ms_headerPath" ] \
+		|| markshupFail "Header file not found: $_ms_headerPath"
+	[ -z "$_ms_footerPath" ] || [ -f "$_ms_footerPath" ] \
+		|| markshupFail "Footer file not found: $_ms_footerPath"
+	[ ! -e "$_ms_outputPath" ] || [ -d "$_ms_outputPath" ] \
+		|| markshupFail "Output path is not a directory: $_ms_outputPath"
+
+	_ms_cli_metaEntries=$_ms_metaEntries
+	_ms_cli_stripFragment=$_ms_stripFragment
+	_ms_cli_title=$_ms_title
+	_ms_cli_headerPath=$_ms_headerPath
+	_ms_cli_footerPath=$_ms_footerPath
+	_ms_cli_mangleStyle=$_ms_mangleStyle
+	_ms_cli_markdownStyle=$_ms_markdownStyle
+	_ms_cli_defaultCss=$_ms_defaultCss
+	_ms_cli_imgEnabled=$_ms_imgEnabled
+	_ms_cli_copyFiles=$_ms_copyFiles
+
+	mkdir -p "$_ms_outputPath"
+	_ms_outputDirectory=$( CDPATH='' cd "$_ms_outputPath" && pwd )
+
+	if [ -f "$_ms_inputPath" ]
+	then
+		_ms_inputFile=$( markshupAbsoluteFilePath "$_ms_inputPath" )
+		_ms_inputRoot=${_ms_inputFile%/*}
+		markshupConvert "$_ms_inputFile"
+		return
+	fi
+
+	if [ -d "$_ms_inputPath" ]
+	then
+		_ms_inputRoot=$( CDPATH='' cd "$_ms_inputPath" && pwd )
+		markshupConvertDirectory "$_ms_inputRoot"
+		return
+	fi
+
+	markshupFail "Input path not found: $_ms_inputPath"
+}
+
+markshupMain "$@"
+exit $?

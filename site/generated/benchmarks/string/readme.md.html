@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>String</title>
+<style>
+/*
+ * Copyright 2026 CodingMarkus
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+body {
+	max-width: 61.25em;
+	margin: 0 auto;
+	padding: 2em;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+		Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+	line-height: 1.5;
+	word-wrap: break-word;
+	color: #242424;
+	background-color: #fafafa;
+}
+
+a {
+	color: #0969da;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+p {
+	margin-top: 0;
+	margin-bottom: 1em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+h1 {
+	margin-top: 0.75em;
+	margin-bottom: 0.5em;
+	padding-bottom: 0.3em;
+	font-size: 2em;
+	border-bottom: 0.03em solid #d8dee4;
+}
+
+main > h1:first-child {
+	margin-top: 0;
+}
+
+h2 {
+	margin-top: 1em;
+	margin-bottom: 0.67em;
+	padding-bottom: 0.3em;
+	font-size: 1.5em;
+	border-bottom: 0.04em solid #d8dee4;
+}
+
+h3 {
+	margin-top: 1.2em;
+	margin-bottom: 0.8em;
+	font-size: 1.37em;
+}
+
+h4 {
+	margin-top: 1.5em;
+	margin-bottom: 1em;
+	font-size: 1.25em;
+}
+
+h5 {
+	margin-top: 1.71em;
+	margin-bottom: 1.14em;
+	font-size: 1.14em;
+}
+
+h6 {
+	margin-top: 1.76em;
+	margin-bottom: 1.18em;
+	font-size: 1.04em;
+	font-weight: 700;
+}
+
+hr {
+	height: 0.25em;
+	margin: 1.5em 0;
+	padding: 0;
+	background-color: #d8dee4;
+	border: 0;
+}
+
+ul, ol {
+	margin-top: 0;
+	margin-bottom: 1em;
+	padding-left: 2em;
+}
+
+li + li {
+	margin-top: 0.25em;
+}
+
+li.task-list-item {
+	list-style-type: none;
+}
+
+li.task-list-item input[type="checkbox"] {
+	margin: 0 0.25em 0.25em -1.5em;
+	vertical-align: middle;
+}
+
+li > p {
+	margin-top: 1em;
+}
+
+li > ul, li > ol {
+	margin-top: 0.25em;
+	margin-bottom: 0;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	box-sizing: content-box;
+}
+
+blockquote {
+	margin: 0 0 1em;
+	padding: 0 1em;
+	color: #656d76;
+	border-left: 0.25em solid #d0d7de;
+}
+
+blockquote.admonition {
+	padding: 0.75em 1em;
+	color: #242424;
+}
+
+blockquote.admonition-note {
+	border-left-color: #0969da;
+}
+
+blockquote.admonition-tip {
+	border-left-color: #1a7f37;
+}
+
+blockquote.admonition-important {
+	border-left-color: #8250df;
+}
+
+blockquote.admonition-warning {
+	border-left-color: #bf8700;
+}
+
+blockquote.admonition-caution {
+	border-left-color: #cf222e;
+}
+
+.admonition-title {
+	margin-bottom: 0.5em;
+	font-weight: 600;
+}
+
+blockquote.admonition > :last-child {
+	margin-bottom: 0;
+}
+
+code, pre {
+	font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono",
+		Menlo, monospace;
+}
+
+code {
+	padding: 0.2em 0.4em;
+	margin: 0;
+	font-size: 85%;
+	background-color: #b0b0b033;
+	border-radius: 0.44em;
+}
+
+pre {
+	margin-top: 0;
+	margin-bottom: 1.18em;
+	overflow: auto;
+	padding: 1em;
+	font-size: 85%;
+	line-height: 1.45;
+	word-wrap: normal;
+	background-color: #eeeeee;
+	border: 0.07em solid #aaaaaa;
+	border-radius: 0.44em;
+}
+
+pre code {
+	padding: 0;
+	font-size: 100%;
+	word-break: normal;
+	white-space: pre;
+	background-color: transparent;
+	border: 0;
+}
+
+table {
+	display: block;
+	width: max-content;
+	max-width: 100%;
+	margin-top: 0;
+	margin-bottom: 1em;
+	overflow: auto;
+	border-spacing: 0;
+	border-collapse: collapse;
+}
+
+table th {
+	font-weight: 600;
+}
+
+table th, table td {
+	padding: 0.38em 0.81em;
+	border: 0.0625em solid #d8dee4;
+}
+
+table tr {
+	background-color: #fafafa;
+	border-top: 0.0625em solid #d8dee4;
+}
+
+kbd {
+	display: inline-block;
+	padding: 0.25em 0.42em;
+	font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono",
+		Menlo, monospace;
+	font-size: 0.75em;
+	line-height: 0.83em;
+	color: #242424;
+	vertical-align: middle;
+	background-color: #f6f8fa;
+	border: solid 0.08em #afb8c1;
+	border-bottom-color: #8c959f;
+	border-radius: 0.5em;
+	box-shadow: inset 0 -0.08em 0 #afb8c1;
+}
+
+details {
+	margin-top: 0;
+	margin-bottom: 1em;
+}
+
+summary {
+	cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+	body {
+		color-scheme: dark;
+		color: #d0d0d0;
+		background-color: #121212;
+	}
+
+	a {
+		color: #58a6ff;
+	}
+
+	h1, h2 {
+		border-bottom-color: #484f58;
+	}
+
+	hr {
+		background-color: #484f58;
+	}
+
+	blockquote {
+		color: #8b949e;
+		border-left-color: #30363d;
+	}
+
+	blockquote.admonition {
+		color: #d0d0d0;
+	}
+
+	blockquote.admonition-note {
+		border-left-color: #58a6ff;
+	}
+
+	blockquote.admonition-tip {
+		border-left-color: #3fb950;
+	}
+
+	blockquote.admonition-important {
+		border-left-color: #a371f7;
+	}
+
+	blockquote.admonition-warning {
+		border-left-color: #d29922;
+	}
+
+	blockquote.admonition-caution {
+		border-left-color: #f85149;
+	}
+
+	code {
+		background-color: #8a8a8a40;
+	}
+
+	pre {
+		background-color: #242424;
+		border: 0.07em solid #4a4a4a;
+	}
+
+	table th, table td {
+		border-color: #30363d;
+	}
+
+	table tr {
+		background-color: #121212;
+		border-top-color: #21262d;
+	}
+
+	kbd {
+		color: #d0d0d0;
+		background-color: #161b22;
+		border-color: #6e7681;
+		border-bottom-color: #8b949e;
+		box-shadow: inset 0 -0.08em 0 #6e7681;
+	}
+}
+
+@media (prefers-contrast: more) {
+	body {
+		color-scheme: light;
+		color: #000000;
+		background-color: #ffffff;
+	}
+
+	a {
+		color: #0000ee;
+		text-decoration: underline;
+	}
+
+	h1, h2 {
+		border-bottom-color: #000000;
+	}
+
+	hr {
+		background-color: #000000;
+	}
+
+	pre, table tr, kbd {
+		background-color: #ffffff;
+	}
+
+	blockquote, blockquote.admonition {
+		color: #000000;
+		border-left-color: #000000;
+	}
+
+	blockquote.admonition-note, blockquote.admonition-tip,
+	blockquote.admonition-important, blockquote.admonition-warning,
+	blockquote.admonition-caution {
+		border-left-color: #000000;
+	}
+
+	code {
+		background-color: #ffffff;
+	}
+
+	pre {
+		border: 0.07em solid #000000;
+	}
+
+	table th, table td {
+		border-color: #000000;
+	}
+
+	table tr {
+		border-top-color: #000000;
+	}
+
+	kbd {
+		color: #000000;
+		border-color: #000000;
+		border-bottom-color: #000000;
+		box-shadow: inset 0 -0.08em 0 #000000;
+	}
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+	body {
+		color-scheme: dark;
+		color: #e0e0e0;
+		background-color: #000000;
+	}
+
+	a {
+		color: #e0e0e0;
+	}
+
+	h1, h2 {
+		border-bottom-color: #e0e0e0;
+	}
+
+	hr {
+		background-color: #e0e0e0;
+	}
+
+	pre, table tr, kbd {
+		background-color: #000000;
+	}
+
+	blockquote, blockquote.admonition {
+		color: #e0e0e0;
+		border-left-color: #e0e0e0;
+	}
+
+	blockquote.admonition-note, blockquote.admonition-tip,
+	blockquote.admonition-important, blockquote.admonition-warning,
+	blockquote.admonition-caution {
+		border-left-color: #e0e0e0;
+	}
+
+	code {
+		background-color: #000000;
+	}
+
+	pre {
+		border-color: #e0e0e0;
+	}
+
+	table th, table td {
+		border-color: #e0e0e0;
+	}
+
+	table tr {
+		border-top-color: #e0e0e0;
+	}
+
+	kbd {
+		color: #e0e0e0;
+		border-color: #e0e0e0;
+		border-bottom-color: #e0e0e0;
+		box-shadow: inset 0 -0.08em 0 #e0e0e0;
+	}
+}
+
+@media (max-width: 48rem) {
+	body {
+		padding: 1em;
+	}
+
+	h1 {
+		font-size: 1.75em;
+	}
+
+	h2 {
+		font-size: 1.35em;
+	}
+
+	h3 {
+		font-size: 1.27em;
+	}
+
+	h4 {
+		font-size: 1.19em;
+	}
+
+	h5 {
+		font-size: 1.11em;
+	}
+
+	h6 {
+		font-size: 1.04em;
+	}
+}
+</style>
+<link rel="stylesheet" href="../../../css/footer.css">
+</head>
+<body>
+<header>
+<nav aria-label="Main navigation" style="margin-bottom: 1em;">
+<a href="../../readme.md.html">&larr; Back to overview</a>
+</nav>
+</header>
+<main>
+<h1 id="string">String</h1>
+<h2 id="what-this-benchmark-does">What this benchmark does</h2>
+<p>This benchmark generates a deterministic source text of a bit more than 1 MiB by concatenating pseudo-randomly selected UTF-8 or UTF-16 words from a fixed word list. It then measures how fast each implementation can:</p>
+<ul>
+<li>split the source text into words,</li>
+<li>re-wrap those words into lines below 80 characters, and</li>
+<li>hash the resulting wrapped text to verify the output stays correct.</li>
+</ul>
+<p>The workload is repeated for the configured iteration count. The
+benchmark therefore mainly measures string splitting, concatenation,
+line-wrapping logic, and result verification on a large in-memory text.</p>
+<h2 id="string-specific-variants">String-specific variants</h2>
+<ul>
+<li><strong>C (UTF-16):</strong> Alternative C implementation using fixed-width UTF-16 code units instead of UTF-8 bytes.</li>
+<li><strong>Rust (UTF-16):</strong> Alternative Rust implementation working on UTF-16 code units rather than byte-oriented string handling.</li>
+</ul>
+<h2 id="benchmark-system">Benchmark system</h2>
+<ul>
+<li>Apple M1 Pro (<code>arm64</code>)</li>
+<li>10 CPU cores</li>
+</ul>
+<p>Use <code>../../run -b string</code> to measure this benchmark. It pre-builds compiled
+implementations and measures each benchmark command with <code>/usr/bin/time</code>.</p>
+<h2 id="results">Results</h2>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th align="right">Total (s)</th>
+<th align="right">Benchmark (s)</th>
+<th align="right">Binary (KiB)</th>
+<th align="right">Memory (MiB)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C</td>
+<td align="right">0.330</td>
+<td align="right">0.104</td>
+<td align="right">34</td>
+<td align="right">16.672</td>
+</tr>
+<tr>
+<td>C UTF-16</td>
+<td align="right">0.260</td>
+<td align="right">0.119</td>
+<td align="right">34</td>
+<td align="right">12.907</td>
+</tr>
+<tr>
+<td>Rust</td>
+<td align="right">0.300</td>
+<td align="right">0.152</td>
+<td align="right">459</td>
+<td align="right">12.657</td>
+</tr>
+<tr>
+<td>Rust UTF-16</td>
+<td align="right">0.280</td>
+<td align="right">0.130</td>
+<td align="right">459</td>
+<td align="right">13.063</td>
+</tr>
+<tr>
+<td>Swift</td>
+<td align="right">2.580</td>
+<td align="right">2.433</td>
+<td align="right">60</td>
+<td align="right">44.766</td>
+</tr>
+<tr>
+<td>Objective-C</td>
+<td align="right">2.250</td>
+<td align="right">2.087</td>
+<td align="right">52</td>
+<td align="right">61.875</td>
+</tr>
+<tr>
+<td>Go</td>
+<td align="right">0.310</td>
+<td align="right">0.150</td>
+<td align="right">2486</td>
+<td align="right">14.438</td>
+</tr>
+<tr>
+<td>ScriptC TS</td>
+<td align="right">12.270</td>
+<td align="right">11.958</td>
+<td align="right">391</td>
+<td align="right">49.188</td>
+</tr>
+<tr>
+<td>Bun Compiled JS</td>
+<td align="right">5.370</td>
+<td align="right">4.678</td>
+<td align="right">61960</td>
+<td align="right">175.141</td>
+</tr>
+<tr>
+<td>Java</td>
+<td align="right">0.300</td>
+<td align="right">0.237</td>
+<td align="right">n/a</td>
+<td align="right">412.688</td>
+</tr>
+<tr>
+<td>C#</td>
+<td align="right">0.420</td>
+<td align="right">0.399</td>
+<td align="right">n/a</td>
+<td align="right">50.000</td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td align="right">4.050</td>
+<td align="right">3.951</td>
+<td align="right">n/a</td>
+<td align="right">221.407</td>
+</tr>
+<tr>
+<td>Bun JS</td>
+<td align="right">4.760</td>
+<td align="right">4.660</td>
+<td align="right">n/a</td>
+<td align="right">165.688</td>
+</tr>
+<tr>
+<td>ScriptC Compiled TS</td>
+<td align="right">1.940</td>
+<td align="right">0.300</td>
+<td align="right">n/a</td>
+<td align="right">295.563</td>
+</tr>
+<tr>
+<td>QuickJS</td>
+<td align="right">14.210</td>
+<td align="right">13.859</td>
+<td align="right">n/a</td>
+<td align="right">86.282</td>
+</tr>
+<tr>
+<td>Interpreted Java</td>
+<td align="right">14.280</td>
+<td align="right">14.007</td>
+<td align="right">n/a</td>
+<td align="right">396.454</td>
+</tr>
+<tr>
+<td>Interpreted Node.js</td>
+<td align="right">17.300</td>
+<td align="right">17.037</td>
+<td align="right">n/a</td>
+<td align="right">269.297</td>
+</tr>
+<tr>
+<td>Python</td>
+<td align="right">5.490</td>
+<td align="right">5.327</td>
+<td align="right">n/a</td>
+<td align="right">55.688</td>
+</tr>
+<tr>
+<td>Ruby</td>
+<td align="right">7.220</td>
+<td align="right">7.006</td>
+<td align="right">n/a</td>
+<td align="right">86.625</td>
+</tr>
+<tr>
+<td>PHP</td>
+<td align="right">6.860</td>
+<td align="right">6.680</td>
+<td align="right">n/a</td>
+<td align="right">33.922</td>
+</tr>
+<tr>
+<td>Perl</td>
+<td align="right">21.290</td>
+<td align="right">20.762</td>
+<td align="right">n/a</td>
+<td align="right">41.469</td>
+</tr>
+<tr>
+<td>Lua</td>
+<td align="right">7.090</td>
+<td align="right">6.927</td>
+<td align="right">n/a</td>
+<td align="right">85.782</td>
+</tr>
+</tbody>
+</table>
+<p><picture><source media="(prefers-color-scheme: light)" srcset="../../../../benchmarks/String/assets/results-time.img/light.svg"><source media="(prefers-color-scheme: dark)" srcset="../../../../benchmarks/String/assets/results-time.img/dark.svg"><source srcset="../../../../benchmarks/String/assets/results-time.img/light.svg"><img src="../../../../benchmarks/String/assets/results-time.img/light.svg" alt="Benchmark time"></picture></p>
+<p><picture><source media="(prefers-color-scheme: light)" srcset="../../../../benchmarks/String/assets/results-memory.img/light.svg"><source media="(prefers-color-scheme: dark)" srcset="../../../../benchmarks/String/assets/results-memory.img/dark.svg"><source srcset="../../../../benchmarks/String/assets/results-memory.img/light.svg"><img src="../../../../benchmarks/String/assets/results-memory.img/light.svg" alt="Peak RSS"></picture></p>
+<p><picture><source media="(prefers-color-scheme: light)" srcset="../../../../benchmarks/String/assets/results-binary-size.img/light.svg"><source media="(prefers-color-scheme: dark)" srcset="../../../../benchmarks/String/assets/results-binary-size.img/dark.svg"><source srcset="../../../../benchmarks/String/assets/results-binary-size.img/light.svg"><img src="../../../../benchmarks/String/assets/results-binary-size.img/light.svg" alt="Binary size"></picture></p>
+</main>
+<footer>
+<hr>
+<p>This page was generated automatically from Markdown by <a
+href="https://codingmarkus.codeberg.page/MarkShup">MarkShup</a>.</p>
+<p><a href="https://CodingMarkus.codeberg.page/site/html/imprint.html">
+Legal Notice / Imprint</a></p>
+</footer>
+</body>
+</html>

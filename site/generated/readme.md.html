@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi-lang Benchmarks</title>
+<style>
+/*
+ * Copyright 2026 CodingMarkus
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+body {
+	max-width: 61.25em;
+	margin: 0 auto;
+	padding: 2em;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+		Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+	line-height: 1.5;
+	word-wrap: break-word;
+	color: #242424;
+	background-color: #fafafa;
+}
+
+a {
+	color: #0969da;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+p {
+	margin-top: 0;
+	margin-bottom: 1em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+h1 {
+	margin-top: 0.75em;
+	margin-bottom: 0.5em;
+	padding-bottom: 0.3em;
+	font-size: 2em;
+	border-bottom: 0.03em solid #d8dee4;
+}
+
+main > h1:first-child {
+	margin-top: 0;
+}
+
+h2 {
+	margin-top: 1em;
+	margin-bottom: 0.67em;
+	padding-bottom: 0.3em;
+	font-size: 1.5em;
+	border-bottom: 0.04em solid #d8dee4;
+}
+
+h3 {
+	margin-top: 1.2em;
+	margin-bottom: 0.8em;
+	font-size: 1.37em;
+}
+
+h4 {
+	margin-top: 1.5em;
+	margin-bottom: 1em;
+	font-size: 1.25em;
+}
+
+h5 {
+	margin-top: 1.71em;
+	margin-bottom: 1.14em;
+	font-size: 1.14em;
+}
+
+h6 {
+	margin-top: 1.76em;
+	margin-bottom: 1.18em;
+	font-size: 1.04em;
+	font-weight: 700;
+}
+
+hr {
+	height: 0.25em;
+	margin: 1.5em 0;
+	padding: 0;
+	background-color: #d8dee4;
+	border: 0;
+}
+
+ul, ol {
+	margin-top: 0;
+	margin-bottom: 1em;
+	padding-left: 2em;
+}
+
+li + li {
+	margin-top: 0.25em;
+}
+
+li.task-list-item {
+	list-style-type: none;
+}
+
+li.task-list-item input[type="checkbox"] {
+	margin: 0 0.25em 0.25em -1.5em;
+	vertical-align: middle;
+}
+
+li > p {
+	margin-top: 1em;
+}
+
+li > ul, li > ol {
+	margin-top: 0.25em;
+	margin-bottom: 0;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	box-sizing: content-box;
+}
+
+blockquote {
+	margin: 0 0 1em;
+	padding: 0 1em;
+	color: #656d76;
+	border-left: 0.25em solid #d0d7de;
+}
+
+blockquote.admonition {
+	padding: 0.75em 1em;
+	color: #242424;
+}
+
+blockquote.admonition-note {
+	border-left-color: #0969da;
+}
+
+blockquote.admonition-tip {
+	border-left-color: #1a7f37;
+}
+
+blockquote.admonition-important {
+	border-left-color: #8250df;
+}
+
+blockquote.admonition-warning {
+	border-left-color: #bf8700;
+}
+
+blockquote.admonition-caution {
+	border-left-color: #cf222e;
+}
+
+.admonition-title {
+	margin-bottom: 0.5em;
+	font-weight: 600;
+}
+
+blockquote.admonition > :last-child {
+	margin-bottom: 0;
+}
+
+code, pre {
+	font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono",
+		Menlo, monospace;
+}
+
+code {
+	padding: 0.2em 0.4em;
+	margin: 0;
+	font-size: 85%;
+	background-color: #b0b0b033;
+	border-radius: 0.44em;
+}
+
+pre {
+	margin-top: 0;
+	margin-bottom: 1.18em;
+	overflow: auto;
+	padding: 1em;
+	font-size: 85%;
+	line-height: 1.45;
+	word-wrap: normal;
+	background-color: #eeeeee;
+	border: 0.07em solid #aaaaaa;
+	border-radius: 0.44em;
+}
+
+pre code {
+	padding: 0;
+	font-size: 100%;
+	word-break: normal;
+	white-space: pre;
+	background-color: transparent;
+	border: 0;
+}
+
+table {
+	display: block;
+	width: max-content;
+	max-width: 100%;
+	margin-top: 0;
+	margin-bottom: 1em;
+	overflow: auto;
+	border-spacing: 0;
+	border-collapse: collapse;
+}
+
+table th {
+	font-weight: 600;
+}
+
+table th, table td {
+	padding: 0.38em 0.81em;
+	border: 0.0625em solid #d8dee4;
+}
+
+table tr {
+	background-color: #fafafa;
+	border-top: 0.0625em solid #d8dee4;
+}
+
+kbd {
+	display: inline-block;
+	padding: 0.25em 0.42em;
+	font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono",
+		Menlo, monospace;
+	font-size: 0.75em;
+	line-height: 0.83em;
+	color: #242424;
+	vertical-align: middle;
+	background-color: #f6f8fa;
+	border: solid 0.08em #afb8c1;
+	border-bottom-color: #8c959f;
+	border-radius: 0.5em;
+	box-shadow: inset 0 -0.08em 0 #afb8c1;
+}
+
+details {
+	margin-top: 0;
+	margin-bottom: 1em;
+}
+
+summary {
+	cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+	body {
+		color-scheme: dark;
+		color: #d0d0d0;
+		background-color: #121212;
+	}
+
+	a {
+		color: #58a6ff;
+	}
+
+	h1, h2 {
+		border-bottom-color: #484f58;
+	}
+
+	hr {
+		background-color: #484f58;
+	}
+
+	blockquote {
+		color: #8b949e;
+		border-left-color: #30363d;
+	}
+
+	blockquote.admonition {
+		color: #d0d0d0;
+	}
+
+	blockquote.admonition-note {
+		border-left-color: #58a6ff;
+	}
+
+	blockquote.admonition-tip {
+		border-left-color: #3fb950;
+	}
+
+	blockquote.admonition-important {
+		border-left-color: #a371f7;
+	}
+
+	blockquote.admonition-warning {
+		border-left-color: #d29922;
+	}
+
+	blockquote.admonition-caution {
+		border-left-color: #f85149;
+	}
+
+	code {
+		background-color: #8a8a8a40;
+	}
+
+	pre {
+		background-color: #242424;
+		border: 0.07em solid #4a4a4a;
+	}
+
+	table th, table td {
+		border-color: #30363d;
+	}
+
+	table tr {
+		background-color: #121212;
+		border-top-color: #21262d;
+	}
+
+	kbd {
+		color: #d0d0d0;
+		background-color: #161b22;
+		border-color: #6e7681;
+		border-bottom-color: #8b949e;
+		box-shadow: inset 0 -0.08em 0 #6e7681;
+	}
+}
+
+@media (prefers-contrast: more) {
+	body {
+		color-scheme: light;
+		color: #000000;
+		background-color: #ffffff;
+	}
+
+	a {
+		color: #0000ee;
+		text-decoration: underline;
+	}
+
+	h1, h2 {
+		border-bottom-color: #000000;
+	}
+
+	hr {
+		background-color: #000000;
+	}
+
+	pre, table tr, kbd {
+		background-color: #ffffff;
+	}
+
+	blockquote, blockquote.admonition {
+		color: #000000;
+		border-left-color: #000000;
+	}
+
+	blockquote.admonition-note, blockquote.admonition-tip,
+	blockquote.admonition-important, blockquote.admonition-warning,
+	blockquote.admonition-caution {
+		border-left-color: #000000;
+	}
+
+	code {
+		background-color: #ffffff;
+	}
+
+	pre {
+		border: 0.07em solid #000000;
+	}
+
+	table th, table td {
+		border-color: #000000;
+	}
+
+	table tr {
+		border-top-color: #000000;
+	}
+
+	kbd {
+		color: #000000;
+		border-color: #000000;
+		border-bottom-color: #000000;
+		box-shadow: inset 0 -0.08em 0 #000000;
+	}
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+	body {
+		color-scheme: dark;
+		color: #e0e0e0;
+		background-color: #000000;
+	}
+
+	a {
+		color: #e0e0e0;
+	}
+
+	h1, h2 {
+		border-bottom-color: #e0e0e0;
+	}
+
+	hr {
+		background-color: #e0e0e0;
+	}
+
+	pre, table tr, kbd {
+		background-color: #000000;
+	}
+
+	blockquote, blockquote.admonition {
+		color: #e0e0e0;
+		border-left-color: #e0e0e0;
+	}
+
+	blockquote.admonition-note, blockquote.admonition-tip,
+	blockquote.admonition-important, blockquote.admonition-warning,
+	blockquote.admonition-caution {
+		border-left-color: #e0e0e0;
+	}
+
+	code {
+		background-color: #000000;
+	}
+
+	pre {
+		border-color: #e0e0e0;
+	}
+
+	table th, table td {
+		border-color: #e0e0e0;
+	}
+
+	table tr {
+		border-top-color: #e0e0e0;
+	}
+
+	kbd {
+		color: #e0e0e0;
+		border-color: #e0e0e0;
+		border-bottom-color: #e0e0e0;
+		box-shadow: inset 0 -0.08em 0 #e0e0e0;
+	}
+}
+
+@media (max-width: 48rem) {
+	body {
+		padding: 1em;
+	}
+
+	h1 {
+		font-size: 1.75em;
+	}
+
+	h2 {
+		font-size: 1.35em;
+	}
+
+	h3 {
+		font-size: 1.27em;
+	}
+
+	h4 {
+		font-size: 1.19em;
+	}
+
+	h5 {
+		font-size: 1.11em;
+	}
+
+	h6 {
+		font-size: 1.04em;
+	}
+}
+</style>
+<link rel="stylesheet" href="../css/footer.css">
+</head>
+<body>
+<header>
+</header>
+<main>
+<h1 id="multi-lang-benchmarks">Multi-lang Benchmarks</h1>
+<p>Compare performance of multiple popular languages across different tasks.</p>
+<p>The original and actively developed project is hosted on <a href="https://codeberg.org/CodingMarkus/MultiLang-Benchmarks">Codeberg</a>. <br>
+Additionally this project is also mirrored on <a href="https://github.com/CodingMarkus/MultiLang-Benchmarks">GitHub</a>.</p>
+<h2 id="benchmarks">Benchmarks</h2>
+<ul>
+<li><a href="./benchmarks/string/readme.md.html">String</a></li>
+<li><a href="./benchmarks/fpu/readme.md.html">FPU</a></li>
+<li><a href="./benchmarks/integer/readme.md.html">Integer</a></li>
+</ul>
+<p>Run <code>./run</code> to measure every benchmark in every available language. Use
+<code>-b</code> or <code>--bench</code> to select benchmarks, and <code>-l</code> or <code>--lang</code> to select
+languages. A selected language that a benchmark does not offer is skipped.</p>
+<p>Use <code>./util/update-benchmarks.sh</code> after measuring results to refresh each
+benchmark table and its SVG charts. It only accepts benchmark selection and
+always runs every language available for each selected benchmark.</p>
+<h2 id="tested-languages">Tested Languages</h2>
+<h3 id="compiled-languages">Compiled languages</h3>
+<ul>
+<li><strong>C (<code>c</code>):</strong> C compiled with <code>clang -O3</code>.</li>
+<li><strong>C UTF-16 (<code>c16</code>):</strong> C UTF-16 variant using fixed-width UTF-16 code units.</li>
+<li><strong>Rust (<code>rust</code>):</strong> Rust compiled with <code>rustc -C opt-level=3</code>.</li>
+<li><strong>Rust UTF-16 (<code>rust16</code>):</strong> Rust UTF-16 variant using UTF-16 code units.</li>
+<li><strong>Swift (<code>swift</code>):</strong> Swift compiled with <code>swiftc -O</code>.</li>
+<li><strong>Objective-C (<code>objc</code>):</strong> Objective-C compiled with <code>-Os</code>.</li>
+<li><strong>Go (<code>go</code>):</strong> Go compiled with <code>go build</code>.</li>
+<li><strong>ScriptC TypeScript executable (<code>scriptcc</code>):</strong> TypeScript compiled to a native executable with ScriptC.</li>
+<li><strong>Bun executable (<code>bunc</code>):</strong> JavaScript compiled to a standalone Bun executable.</li>
+</ul>
+<h3 id="vm-languages">VM languages</h3>
+<ul>
+<li><strong>Java (<code>java</code>):</strong> Java running with the normal JVM JIT enabled.</li>
+<li><strong>C# (<code>cs</code>):</strong> C# compiled with <code>mcs</code> and run on Mono with optimizations.</li>
+</ul>
+<h3 id="typescriptjavascript-engines">TypeScript/JavaScript Engines</h3>
+<ul>
+<li><strong>Node.js (<code>node</code>):</strong> Node.js running with the V8 JIT enabled.</li>
+<li><strong>Bun (<code>bun</code>):</strong> JavaScript running on the Bun runtime.</li>
+<li><strong>ScriptC TypeScript (<code>scriptc</code>):</strong> TypeScript run with ScriptC.</li>
+<li><strong>QuickJS (<code>qjs</code>):</strong> QuickJS JavaScript interpreter.</li>
+</ul>
+<h3 id="interpreted-vm-languages">Interpreted VM languages</h3>
+<ul>
+<li><strong>Java interpreted (<code>javai</code>):</strong> Java running with <code>-Xint</code>, disabling the JVM JIT.</li>
+<li><strong>Node.js interpreted (<code>nodei</code>):</strong> Node.js running with <code>--jitless</code>, disabling V8 JIT.</li>
+</ul>
+<h3 id="script-languages">Script languages</h3>
+<ul>
+<li><strong>Python (<code>py</code>):</strong> Python running on CPython, using <code>python</code> or <code>python3</code>.</li>
+<li><strong>Ruby (<code>ruby</code>):</strong> Ruby running on the standard Ruby interpreter.</li>
+<li><strong>PHP (<code>php</code>):</strong> PHP running on the standard PHP CLI interpreter.</li>
+<li><strong>Perl (<code>perl</code>):</strong> Perl running on the standard Perl interpreter.</li>
+<li><strong>Lua (<code>lua</code>):</strong> Lua running on the standard Lua interpreter.</li>
+</ul>
+<p><code>Objective-C</code> and <code>C++</code> are only benchmarked when they can use their standard libraries at a meaningfully higher level than plain C. Both can of course also fall back to the same C implementation style when that is better for performance, so these benchmarks are not mainly about absolute performance. They are included to show how higher-level objects and abstractions can slow things down compared to a C-style baseline or maybe even speed them up due to better optimized implementation.</p>
+<p><code>C UTF-16</code> and <code>Rust UTF-16</code> are only tested for benchmarks that deal with strings that might be Unicode and where this probably has an impact on performance or memory usage.</p>
+<p>TypeScript is only benchmarked because ScriptC can only compile TS; Bun can also compile and directly run TS yet there is no measurable difference to Bun compiling and running the JS implementation (JS is a strict subset of TS).</p>
+<p>Kotlin is not benchmarked separately because the same results as for Java are expected.</p>
+<h2 id="chart-style">Chart Style</h2>
+<p>Benchmark result charts should use one shared visual style across all benchmark folders so regenerated assets stay comparable over time.</p>
+<ul>
+<li>Use horizontal bar charts with a transparent background.</li>
+<li>Generate each chart as a MarkShup image bundle named <code>&lt;name&gt;.img</code> that contains <code>light.svg</code> and <code>dark.svg</code> variants.</li>
+<li>Use dark-mode colors for text, axes, grid lines, and bars in <code>dark.svg</code>.</li>
+<li>Use a chart width of 1280 px.</li>
+<li>Use Arial for labels and axis text, and Arial Bold for titles and value labels.</li>
+<li>Use a 24 px title font size.</li>
+<li>Use a 16 px font size for axis text and numeric value labels.</li>
+<li>Use an 18 px font size for language labels on the y-axis.</li>
+<li>Use a left chart margin of 300 px, a right margin of 40 px, a top plot margin of 60 px, and a bottom margin of 84 px.</li>
+<li>The left chart margin includes the y-axis labels. The plotted bars should start at the right edge of that margin.</li>
+<li>If a y-axis label does not fit into the left chart margin at the default font size, reduce that label's font size until it fits, down to a minimum of 13 px.</li>
+<li>Use a row height of 48 px and a bar height of 26 px.</li>
+<li>Center the title horizontally near the top with the benchmark name followed by the displayed metric and unit.</li>
+<li>Draw a solid left and bottom axis line in a medium gray.</li>
+<li>Draw vertical grid lines in a light gray dashed style.</li>
+<li>Place language labels to the left of the bars and numeric value labels just to the right of the bar ends.</li>
+<li>Format displayed benchmark values with three decimal places.</li>
+<li>Label the x-axis with the displayed metric and unit.</li>
+<li>Keep one bar per benchmarked language in README table order</li>
+</ul>
+</main>
+<footer>
+<hr>
+<p>This page was generated automatically from Markdown by <a
+href="https://codingmarkus.codeberg.page/MarkShup">MarkShup</a>.</p>
+<p><a href="https://CodingMarkus.codeberg.page/site/html/imprint.html">
+Legal Notice / Imprint</a></p>
+</footer>
+</body>
+</html>

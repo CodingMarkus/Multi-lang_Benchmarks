@@ -1,0 +1,37 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1280' height='432' viewBox='0 0 1280 432'>
+<style>text{font-family:Arial,sans-serif;fill:#202124}.grid{stroke:#d8d8d8;stroke-dasharray:4 4}.axis{stroke:#777;stroke-width:1.5}</style>
+<text x='640' y='32' font-family='Arial Bold,Arial,sans-serif' font-size='24' font-weight='bold' text-anchor='middle'>Integer (Binary Size in KiB)</text>
+<line x1='300' y1='60' x2='300' y2='378' class='grid'/>
+<text x='300.0' y='402.0' font-size='16' text-anchor='middle'>0</text>
+<line x1='488' y1='60' x2='488' y2='378' class='grid'/>
+<text x='488.0' y='402.0' font-size='16' text-anchor='middle'>16384</text>
+<line x1='676' y1='60' x2='676' y2='378' class='grid'/>
+<text x='676.0' y='402.0' font-size='16' text-anchor='middle'>32768</text>
+<line x1='864' y1='60' x2='864' y2='378' class='grid'/>
+<text x='864.0' y='402.0' font-size='16' text-anchor='middle'>49152</text>
+<line x1='1052' y1='60' x2='1052' y2='378' class='grid'/>
+<text x='1052.0' y='402.0' font-size='16' text-anchor='middle'>65536</text>
+<line x1='1240' y1='60' x2='1240' y2='378' class='grid'/>
+<text x='1240.0' y='402.0' font-size='16' text-anchor='middle'>81920</text>
+<line x1='300' y1='60' x2='300' y2='378' class='axis'/>
+<line x1='300' y1='378' x2='1240' y2='378' class='axis'/>
+<text x='770.0' y='428.0' font-size='16' text-anchor='middle'>Binary Size in KiB</text>
+<text x='286' y='90.0' font-size='18' text-anchor='end'>C</text>
+<rect x='300' y='71.0' width='0.4' height='26' rx='2' fill='#4c78a8'/>
+<text x='308.4' y='90.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>34</text>
+<text x='286' y='138.0' font-size='18' text-anchor='end'>Rust</text>
+<rect x='300' y='119.0' width='5.3' height='26' rx='2' fill='#4c78a8'/>
+<text x='313.3' y='138.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>460</text>
+<text x='286' y='186.0' font-size='18' text-anchor='end'>Swift</text>
+<rect x='300' y='167.0' width='0.7' height='26' rx='2' fill='#4c78a8'/>
+<text x='308.7' y='186.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>58</text>
+<text x='286' y='234.0' font-size='18' text-anchor='end'>Go</text>
+<rect x='300' y='215.0' width='28.1' height='26' rx='2' fill='#4c78a8'/>
+<text x='336.1' y='234.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>2452</text>
+<text x='286' y='282.0' font-size='18' text-anchor='end'>ScriptC TS</text>
+<rect x='300' y='263.0' width='4.7' height='26' rx='2' fill='#4c78a8'/>
+<text x='312.7' y='282.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>407</text>
+<text x='286' y='330.0' font-size='18' text-anchor='end'>Bun Compiled JS</text>
+<rect x='300' y='311.0' width='711.0' height='26' rx='2' fill='#4c78a8'/>
+<text x='1019.0' y='330.0' font-family='Arial Bold,Arial,sans-serif' font-size='16' font-weight='bold'>61960</text>
+</svg>

@@ -102,12 +102,12 @@ update_benchmark( )
 	' output="$output" "$readme" > "$temporaryDirectory/README.md"
 	mv "$temporaryDirectory/README.md" "$readme"
 	"$projectDirectory/util/generate-benchmark-chart.sh" "$readme" \
-		"$assets/results-time.svg" "$directory (Benchmark Time in Seconds)" \
+		"$assets/results-time.img" "$directory (Benchmark Time in Seconds)" \
 		benchmark
 	"$projectDirectory/util/generate-benchmark-chart.sh" "$readme" \
-		"$assets/results-memory.svg" "$directory (Peak RSS in MiB)" memory
+		"$assets/results-memory.img" "$directory (Peak RSS in MiB)" memory
 	"$projectDirectory/util/generate-benchmark-chart.sh" "$readme" \
-		"$assets/results-binary-size.svg" "$directory (Binary Size in KiB)" \
+		"$assets/results-binary-size.img" "$directory (Binary Size in KiB)" \
 		binary
 	printf 'Updated %s benchmark.\n\n' "$directory"
 }

@@ -77,7 +77,9 @@ Chart Style
 
 Benchmark result charts should use one shared visual style across all benchmark folders so regenerated assets stay comparable over time.
 
-- Use horizontal bar charts on a white background.
+- Use horizontal bar charts with a transparent background.
+- Generate each chart as a MarkShup image bundle named `<name>.img` that contains `light.svg` and `dark.svg` variants.
+- Use dark-mode colors for text, axes, grid lines, and bars in `dark.svg`.
 - Use a chart width of 1280 px.
 - Use Arial for labels and axis text, and Arial Bold for titles and value labels.
 - Use a 24 px title font size.
