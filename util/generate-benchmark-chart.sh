@@ -52,6 +52,9 @@ awk -F'|' -v title="$3" -v metric="$4" '
 		while (step * 5 < maximum) step *= 2
 		axisMaximum = step * 5
 		numberFormat = metric == "binary" ? "%.0f" : "%.3f"
+		axisLabel = title
+		sub(/^[^(]*\(/, "", axisLabel)
+		sub(/\)[[:space:]]*$/, "", axisLabel)
 		print "<svg xmlns=\047http://www.w3.org/2000/svg\047" \
 			" width=\047" width "\047 height=\047" height \
 			"\047 viewBox=\0470 0 " width " " height "\047>"
@@ -79,12 +82,19 @@ awk -F'|' -v title="$3" -v metric="$4" '
 		print "<line x1=\047" left "\047 y1=\047" height - 54 \
 			"\047 x2=\047" width - right "\047 y2=\047" height - 54 \
 			"\047 class=\047axis\047/>"
+		printf "<text x=\047%.1f\047 y=\047%.1f\047 font-size=\04716\047" \
+			" text-anchor=\047middle\047>%s</text>\n", \
+			left + plotWidth / 2, height - 4, xml(axisLabel)
 		for (row = 1; row <= count; row++) {
 			y = top + (row - 1) * rowHeight + 11
 			barWidth = plotWidth * value[row] / axisMaximum
-			printf "<text x=\047%d\047 y=\047%.1f\047 font-size=\04718\047" \
+			labelFontSize = 18
+			while (labelFontSize > 13 && \
+				length(label[row]) * labelFontSize * 0.65 > left - 28) \
+				labelFontSize--
+			printf "<text x=\047%d\047 y=\047%.1f\047 font-size=\047%d\047" \
 				" text-anchor=\047end\047>%s</text>\n", left - 14, y + 19, \
-				xml(label[row])
+				labelFontSize, xml(label[row])
 			printf "<rect x=\047%d\047 y=\047%.1f\047 width=\047%.1f\047" \
 				" height=\047%d\047 rx=\0472\047 fill=\047%s\047/>\n", \
 				left, y, barWidth, barHeight, "#4c78a8"
