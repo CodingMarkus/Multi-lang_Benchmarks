@@ -96,3 +96,9 @@ Benchmark result charts should use one shared visual style across all benchmark 
 - Format displayed benchmark values with three decimal places.
 - Label the x-axis with the displayed metric and unit.
 - Keep one bar per benchmarked language in README table order
+
+
+My other projects
+------------------
+
+See my [other projects](https://CodingMarkus.codeberg.page/).
