@@ -4,8 +4,6 @@
 #
 # SPDX-License-Identifier: Unlicense
 
-# cspell:words CDPATH TMPDIR getline
-
 set -eu
 
 projectDirectory=$(CDPATH='' cd "$(dirname "$0")/.." \

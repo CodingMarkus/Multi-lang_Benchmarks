@@ -4,12 +4,6 @@
 #
 # SPDX-License-Identifier: Unlicense
 
-# cspell:words CDPATH TMPDIR
-# cspell:words objc bunc javai nodei
-# cspell:words rustc swiftc javac quickjs scriptc scriptcc
-# cspell:words Xint fobjc jitless
-# cspell:words darwin linux  kbytes
-
 set -eu
 
 projectDirectory=$(CDPATH='' cd "$(dirname "$0")" && pwd)
