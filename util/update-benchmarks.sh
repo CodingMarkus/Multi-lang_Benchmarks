@@ -59,7 +59,7 @@ update_benchmark( )
 	readme=$projectDirectory/benchmarks/$directory/README.md
 	assets=$projectDirectory/benchmarks/$directory/assets
 
-	printf 'Updating %s benchmark...\n' "$directory"
+	printf '\nUpdating %s benchmark...\n' "$directory"
 	mkfifo "$outputPipe"
 	tee "$output" < "$outputPipe" &
 	teeProcess=$!
@@ -111,7 +111,7 @@ update_benchmark( )
 	"$projectDirectory/util/generate-benchmark-chart.sh" "$readme" \
 		"$assets/results-binary-size.svg" "$directory (Binary Size in KiB)" \
 		binary
-	printf 'Updated %s benchmark.\n' "$directory"
+	printf 'Updated %s benchmark.\n\n' "$directory"
 }
 
 oldIfs=$IFS

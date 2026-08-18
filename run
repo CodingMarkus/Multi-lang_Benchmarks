@@ -5,8 +5,8 @@
 # SPDX-License-Identifier: Unlicense
 
 # cspell:words CDPATH TMPDIR
-# cspell:words objc bunc javai nodei rustc swiftc javac
-# cspell:words quickjs scriptc scriptcts
+# cspell:words objc bunc javai nodei
+# cspell:words rustc swiftc javac quickjs scriptc scriptcc
 # cspell:words Xint fobjc jitless
 # cspell:words darwin linux  kbytes
 
@@ -20,8 +20,11 @@ iterations=
 
 allBenchmarks=string,integer,fpu
 
-allLanguages=c,c16,rust,rust16,swift,objc,go,scriptc,bunc,java,cs,node
-allLanguages=$allLanguages,bun,scriptcts,javai,nodei,qjs,py,ruby,php,perl,lua
+allLanguages=c,c16,rust,rust16,swift,objc,go,scriptcc,bunc
+allLanguages=$allLanguages,java,cs
+allLanguages=$allLanguages,node,bun,scriptc,qjs
+allLanguages=$allLanguages,javai,nodei
+allLanguages=$allLanguages,py,ruby,php,perl,lua
 
 usage( )
 {
@@ -56,28 +59,32 @@ Available benchmarks (default iterations):
 
 Available languages:
 
-    c         C compiled with clang -O3.
-    c16       C UTF-16 variant using fixed-width UTF-16 code units.
-    rust      Rust compiled with rustc -C opt-level=3.
-    rust16    Rust UTF-16 variant using UTF-16 code units.
-    swift     Swift compiled with swiftc -O.
-    objc      Objective-C compiled with Foundation support.
-    go        Go compiled with go build.
-    java      Java running with the normal JVM JIT enabled.
-    cs        C# compiled with mcs and run on Mono with optimizations.
-    node      Node.js running with the V8 JIT enabled.
-    bun       JS running on the Bun runtime.
-    bunc      JS compiled to a standalone Bun executable.
-    javai     Java running with -Xint, disabling the JVM JIT.
-    nodei     Node.js running with --jitless, disabling V8 JIT.
-    qjs       QuickJS JavaScript interpreter.
-    scriptc   TypeScript compiled to a native executable with ScriptC.
-    scriptcts TypeScript run with ScriptC.
-    py        Python running on CPython, using python or python3.
-    ruby      Ruby running on the standard Ruby interpreter.
-    php       PHP running on the standard PHP CLI interpreter.
-    perl      Perl running on the standard Perl interpreter.
-    lua       Lua running on the standard Lua interpreter.
+    c            C compiled with clang -O3.
+    c16          C UTF-16 variant using fixed-width UTF-16 code units.
+    rust         Rust compiled with rustc -C opt-level=3.
+    rust16       Rust UTF-16 variant using UTF-16 code units.
+    swift        Swift compiled with swiftc -O.
+    objc         Objective-C compiled with -Os.
+    go           Go compiled with go build.
+	scriptcc     TypeScript compiled to a native executable with ScriptC.
+	bunc         JS compiled to a standalone Bun executable.
+
+    java         Java running with the normal JVM JIT enabled.
+    cs           C# compiled with mcs and run on Mono with optimizations.
+
+	node         Node.js running with the V8 JIT enabled.
+    bun          JS running on the Bun runtime.
+	scriptc      TypeScript run with ScriptC.
+	qjs          QuickJS JavaScript interpreter.
+
+	javai        Java running with -Xint, disabling the JVM JIT.
+    nodei        Node.js running with --jitless, disabling V8 JIT.
+
+    py           Python running on CPython, using python or python3.
+    ruby         Ruby running on the standard Ruby interpreter.
+    php          PHP running on the standard PHP CLI interpreter.
+    perl         Perl running on the standard Perl interpreter.
+    lua          Lua running on the standard Lua interpreter.
 EOF
 }
 
@@ -93,18 +100,17 @@ die( )
 contains( )
 {
 	case ",$1," in
-	*",$2,"*) return 0 ;;
+		*",$2,"*) return 0 ;;
 	esac
 	return 1
 }
 
 
 validate_list( )
-{
+(
 	list=$1
 	known=$2
 	kind=$3
-	oldIfs=$IFS
 	IFS=,
 	for item in $list
 	do
@@ -113,51 +119,55 @@ validate_list( )
 			die "Unknown $kind: $item"
 		fi
 	done
-	IFS=$oldIfs
-}
+)
+
 
 while [ "$#" -gt 0 ]
 do
 	case "$1" in
-	-h | -help | --help)
-		usage
-		exit 0
+		-h | -help | --help)
+			usage
+			exit 0
 		;;
-	-b | -bench | --bench)
-		if [ "$#" -lt 2 ] \
-			|| [ -z "$2" ]
-		then
-			die 'Missing benchmark list.'
-		fi
-		selectedBenchmarks=$2
-		shift 2
+
+		-b | -bench | --bench)
+			if [ "$#" -lt 2 ] \
+				|| [ -z "$2" ]
+			then
+				die 'Missing benchmark list.'
+			fi
+			selectedBenchmarks=$2
+			shift 2
 		;;
-	-l | -lang | --lang)
-		if [ "$#" -lt 2 ] \
-			|| [ -z "$2" ]
-		then
-			die 'Missing language list.'
-		fi
-		selectedLanguages=$2
-		shift 2
+
+		-l | -lang | --lang)
+			if [ "$#" -lt 2 ] \
+				|| [ -z "$2" ]
+			then
+				die 'Missing language list.'
+			fi
+			selectedLanguages=$2
+			shift 2
 		;;
-	-it | -iterations | --iterations)
-		if [ "$#" -lt 2 ]
-		then
-			die 'Missing iteration count.'
-		fi
-		iterations=$2
-		shift 2
+
+		-it | -iterations | --iterations)
+			if [ "$#" -lt 2 ]
+			then
+				die 'Missing iteration count.'
+			fi
+			iterations=$2
+			shift 2
 		;;
-	*)
-		if [ -n "$iterations" ] \
-			|| [ "${1#*[!0-9]}" != "$1" ] \
-			|| [ "$1" = 0 ]
-		then
-			die 'Iterations must be a positive integer.'
-		fi
-		iterations=$1
-		shift
+
+		*)
+			if [ -n "$iterations" ] \
+				|| [ "${1#*[!0-9]}" != "$1" ] \
+				|| [ "$1" = 0 ]
+			then
+				die 'Iterations must be a positive integer.'
+			fi
+			iterations=$1
+			shift
 		;;
 	esac
 done
@@ -546,7 +556,7 @@ runCompiledScriptCBench( )
 }
 
 
-runScriptCTypeScriptBench( )
+runScriptCBench( )
 {
 	label=$1
 	source=$2
@@ -580,7 +590,7 @@ want_language( )
 
 
 run_benchmark( )
-{
+(
 	benchmark=$1
 	directory=$2
 	base=$3
@@ -594,92 +604,93 @@ run_benchmark( )
 	printf '%s%s\n' \
 		'--------------------+-----------+---------------' \
 		'+--------------+-------------'
-	oldIfs=$IFS
+
 	IFS=,
 	for language in $available
 	do
-		if ! want_language "$language"
-		then
-			continue
-		fi
+		want_language "$language" || continue
+
 		case "$language" in
-		c) source=$directory/$base.c ;;
-		c16) source=$directory/$base-utf16.c ;;
-		rust) source=$directory/$base.rs ;;
-		rust16) source=$directory/$base-utf16.rs ;;
-		swift) source=$directory/$base.swift ;;
-		objc) source=$directory/$base.m ;;
-		go) source=$directory/$base.go ;;
-		java | javai) source=$directory/$base.java ;;
-		cs) source=$directory/$base.cs ;;
-		node | bun | bunc | nodei) source=$directory/$base.node.js ;;
-		qjs) source=$directory/$base.quickjs.js ;;
-		scriptc | scriptcts) source=$directory/$base.ts ;;
-		py) source=$directory/$base.py ;;
-		ruby) source=$directory/$base.rb ;;
-		php) source=$directory/$base.php ;;
-		perl) source=$directory/$base.pl ;;
-		lua) source=$directory/$base.lua ;;
+			c) source=$directory/$base.c ;;
+			c16) source=$directory/$base-utf16.c ;;
+			rust) source=$directory/$base.rs ;;
+			rust16) source=$directory/$base-utf16.rs ;;
+			swift) source=$directory/$base.swift ;;
+			objc) source=$directory/$base.m ;;
+			go) source=$directory/$base.go ;;
+
+			java | javai) source=$directory/$base.java ;;
+			cs) source=$directory/$base.cs ;;
+
+			node | bun | bunc | nodei) source=$directory/$base.node.js ;;
+			qjs) source=$directory/$base.quickjs.js ;;
+			scriptc | scriptcc) source=$directory/$base.ts ;;
+
+			py) source=$directory/$base.py ;;
+			ruby) source=$directory/$base.rb ;;
+			php) source=$directory/$base.php ;;
+			perl) source=$directory/$base.pl ;;
+			lua) source=$directory/$base.lua ;;
 		esac
-		if [ ! -f "$source" ]
-		then
-			continue
-		fi
+
+		[ -f "$source" ] || continue
+
 		case "$language" in
-		c) runCBench C "$source" ;;
-		c16) runCBench 'C UTF-16' "$source" ;;
-		rust) runRustBench Rust "$source" ;;
-		rust16) runRustBench 'Rust UTF-16' "$source" ;;
-		swift) runSwiftBench Swift "$source" ;;
-		objc) runObjectiveCBench Objective-C "$source" ;;
-		go) runGoBench Go "$source" ;;
-		java) runJavaBench Java "$source" ;;
-		cs) runCSharpBench 'C#' "$source" ;;
-		node) runNodeBench 'Node.js' "$source" ;;
-		bun) runBunBench 'Bun JS' "$source" ;;
-		bunc) runCompiledBunBench 'Bun Compiled JS' \
-			"$source" ;;
-		javai) runJavaBench 'Interpreted Java' "$source" \
-			-Xint ;;
-		nodei) runNodeBench 'Interpreted Node.js' \
-			"$source" --jitless ;;
-		qjs) runQuickJSBench QuickJS "$source" ;;
-		scriptc) runCompiledScriptCBench 'ScriptC Compiled TS' "$source" ;;
-		scriptcts) runScriptCTypeScriptBench 'ScriptC TS' "$source" ;;
-		py)
-			if command -v python >/dev/null 2>&1
-			then
-				runScriptBench Python python "$source"
-			else
-				runScriptBench Python python3 "$source"
-			fi
+			c) runCBench C "$source" ;;
+			c16) runCBench 'C UTF-16' "$source" ;;
+			rust) runRustBench Rust "$source" ;;
+			rust16) runRustBench 'Rust UTF-16' "$source" ;;
+			swift) runSwiftBench Swift "$source" ;;
+			objc) runObjectiveCBench Objective-C "$source" ;;
+			go) runGoBench Go "$source" ;;
+			scriptcc) runCompiledScriptCBench 'ScriptC TS' "$source" ;;
+
+			java) runJavaBench Java "$source" ;;
+			cs) runCSharpBench 'C#' "$source" ;;
+
+			node) runNodeBench 'Node.js' "$source" ;;
+			bun) runBunBench 'Bun JS' "$source" ;;
+			bunc) runCompiledBunBench 'Bun Compiled JS' "$source" ;;
+			scriptc) runScriptCBench 'ScriptC Compiled TS' "$source" ;;
+			qjs) runQuickJSBench QuickJS "$source" ;;
+
+			javai) runJavaBench 'Interpreted Java' "$source" -Xint ;;
+			nodei) runNodeBench 'Interpreted Node.js' "$source" --jitless ;;
+
+			py)
+				if command -v python >/dev/null 2>&1
+				then
+					runScriptBench Python python "$source"
+				else
+					runScriptBench Python python3 "$source"
+				fi
 			;;
-		ruby) runScriptBench Ruby ruby "$source" ;;
-		php) runScriptBench PHP php "$source" ;;
-		perl) runScriptBench Perl perl "$source" ;;
-		lua) runScriptBench Lua lua "$source" ;;
+			ruby) runScriptBench Ruby ruby "$source" ;;
+			php) runScriptBench PHP php "$source" ;;
+			perl) runScriptBench Perl perl "$source" ;;
+			lua) runScriptBench Lua lua "$source" ;;
 		esac
 	done
-	IFS=$oldIfs
-}
+)
 
-oldIfs=$IFS
-IFS=,
-for benchmark in $selectedBenchmarks
-do
-	case "$benchmark" in
-	string)
-		run_benchmark String "$projectDirectory/benchmarks/String" string \
-			"$allLanguages" 40
-		;;
-	integer)
-		run_benchmark Integer "$projectDirectory/benchmarks/Integer" integer \
-			"$allLanguages" 3
-		;;
-	fpu)
-		run_benchmark FPU "$projectDirectory/benchmarks/FPU" fpu \
-			"$allLanguages" 20
-		;;
-	esac
-done
-IFS=$oldIfs
+
+( # Restores IFS if required
+	IFS=,
+	for benchmark in $selectedBenchmarks
+	do
+		case "$benchmark" in
+			string)
+				run_benchmark String "$projectDirectory/benchmarks/String" \
+					string "$allLanguages" 40
+				;;
+			integer)
+				run_benchmark Integer "$projectDirectory/benchmarks/Integer" \
+					integer "$allLanguages" 3
+				;;
+			fpu)
+				run_benchmark FPU "$projectDirectory/benchmarks/FPU" \
+					fpu "$allLanguages" 20
+				;;
+		esac
+	done
+)

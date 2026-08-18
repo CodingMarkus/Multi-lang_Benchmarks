@@ -25,25 +25,25 @@ implementations and measures each benchmark command with `/usr/bin/time`.
 
 | Language | Total (s) | Benchmark (s) | Binary (KiB) | Memory (MiB) |
 | --- | ---: | ---: | ---: | ---: |
-| C | 0.410 | 0.185 | 33 | 1.172 |
-| Rust | 0.310 | 0.172 | 461 | 1.235 |
-| Swift | 0.350 | 0.205 | 57 | 2.485 |
-| Go | 0.420 | 0.266 | 2452 | 3.782 |
-| ScriptC Compiled TS | 0.370 | 0.228 | 390 | 1.219 |
-| Bun Compiled JS | 0.820 | 0.229 | 61960 | 36.750 |
-| Java | 0.320 | 0.271 | n/a | 61.579 |
-| C# | 0.520 | 0.506 | n/a | 17.204 |
-| Node.js | 0.290 | 0.262 | n/a | 52.610 |
-| Bun JS | 0.230 | 0.220 | n/a | 40.063 |
-| ScriptC TS | 1.420 | 0.011 | n/a | 347.094 |
-| Interpreted Java | 2.510 | 2.464 | n/a | 40.375 |
-| Interpreted Node.js | 2.860 | 2.828 | n/a | 46.750 |
-| QuickJS | 3.960 | 3.956 | n/a | 2.219 |
-| Python | 8.170 | 8.140 | n/a | 8.516 |
-| Ruby | 5.700 | 5.640 | n/a | 24.500 |
-| PHP | 2.500 | 2.491 | n/a | 8.282 |
-| Perl | 9.060 | 9.049 | n/a | 4.063 |
-| Lua | 1.800 | 1.796 | n/a | 1.500 |
+| C | 0.410 | 0.184 | 33 | 1.110 |
+| Rust | 0.310 | 0.167 | 461 | 1.235 |
+| Swift | 0.340 | 0.203 | 57 | 2.516 |
+| Go | 0.430 | 0.269 | 2452 | 3.672 |
+| ScriptC TS | 0.370 | 0.227 | 390 | 1.188 |
+| Bun Compiled JS | 0.840 | 0.239 | 61960 | 36.750 |
+| Java | 0.320 | 0.272 | n/a | 61.985 |
+| C# | 0.520 | 0.508 | n/a | 17.235 |
+| Node.js | 0.290 | 0.262 | n/a | 52.188 |
+| Bun JS | 0.230 | 0.220 | n/a | 39.266 |
+| ScriptC Compiled TS | 1.420 | 0.011 | n/a | 295.391 |
+| QuickJS | 4.020 | 4.018 | n/a | 2.250 |
+| Interpreted Java | 2.510 | 2.467 | n/a | 40.344 |
+| Interpreted Node.js | 2.870 | 2.837 | n/a | 46.750 |
+| Python | 8.130 | 8.102 | n/a | 8.344 |
+| Ruby | 5.690 | 5.640 | n/a | 24.172 |
+| PHP | 2.500 | 2.496 | n/a | 8.438 |
+| Perl | 9.040 | 9.033 | n/a | 4.235 |
+| Lua | 1.810 | 1.807 | n/a | 1.500 |
 
 ![Benchmark time](assets/results-time.svg)
 
